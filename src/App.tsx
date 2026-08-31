@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { Navigate, Route, Routes } from 'react-router'
@@ -86,6 +87,13 @@ function App() {
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   )
+=======
+import DashboardPage from "./pages/dashboard/DashboardPage";
+
+function App() {
+  // Acceso directo temporal al dashboard mientras se implementa el login.
+  return <DashboardPage />;
+>>>>>>> 9200f9aaa36e727c45d4fea581893a5e3a5b789c
 }
 
 export default App
