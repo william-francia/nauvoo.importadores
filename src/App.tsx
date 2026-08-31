@@ -1,12 +1,11 @@
-<<<<<<< HEAD
 import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { Navigate, Route, Routes } from 'react-router'
 import './App.css'
+import { supabase, supabaseConfigError } from './lib/supabase'
 import { LoginPage } from './pages/auth/LoginPage'
 import { RegisterPage } from './pages/auth/RegisterPage'
-import { DashboardPage } from './pages/dashboard/DashboardPage'
-import { supabase, supabaseConfigError } from './lib/supabase'
+import DashboardPage from './pages/dashboard/DashboardPage'
 
 function App() {
   const [session, setSession] = useState<Session | null>(null)
@@ -62,7 +61,7 @@ function App() {
     return (
       <main className="shell">
         <section className="panel panel--narrow">
-          <span className="eyebrow">Nuvoo Importadores</span>
+          <span className="eyebrow">Nauvoo Importadores</span>
           <h1>Verificando sesion...</h1>
         </section>
       </main>
@@ -72,10 +71,8 @@ function App() {
   if (session) {
     return (
       <Routes>
-        <Route
-          path="*"
-          element={<DashboardPage email={session.user.email ?? 'usuario@empresa.com'} />}
-        />
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     )
   }
@@ -87,13 +84,6 @@ function App() {
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   )
-=======
-import DashboardPage from "./pages/dashboard/DashboardPage";
-
-function App() {
-  // Acceso directo temporal al dashboard mientras se implementa el login.
-  return <DashboardPage />;
->>>>>>> 9200f9aaa36e727c45d4fea581893a5e3a5b789c
 }
 
 export default App
