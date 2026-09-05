@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./DashboardPage.css";
+import ClientesPage from "../clientes/ClientesPage";
 
 type MenuItem = "dashboard" | "ventas" | "productos" | "clientes";
 
@@ -146,13 +147,8 @@ export default function DashboardPage() {
             />
           )}
 
-          {activeItem === "clientes" && (
-            <PlaceholderPage
-              title="Clientes"
-              description="Desde aquí administraremos los clientes registrados."
-              icon={<UsersIcon />}
-            />
-          )}
+          {activeItem === "clientes" && <ClientesPage />}
+
         </main>
       </div>
     </div>
