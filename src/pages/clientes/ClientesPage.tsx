@@ -145,6 +145,16 @@ export default function ClientesPage() {
       selectedClients.includes(client.id),
     );
 
+  const selectedClientRecords = clients.filter((client) =>
+    selectedClients.includes(client.id),
+  );
+  const allSelectedEnabled =
+    selectedClientRecords.length > 0 &&
+    selectedClientRecords.every((client) => client.status === "habilitado");
+  const allSelectedRestricted =
+    selectedClientRecords.length > 0 &&
+    selectedClientRecords.every((client) => client.status === "restringido");
+
   /* =========================================================
      CREAR CLIENTE
   ========================================================= */
@@ -355,25 +365,25 @@ export default function ClientesPage() {
               Eliminar
             </button>
 
-            <button
-              className="clients-action-button clients-action-restrict"
-              disabled={selectedClients.length === 0}
-              onClick={restrictSelectedClients}
-            >
-              <LockIcon />
+            {allSelectedEnabled || (!allSelectedEnabled && !allSelectedRestricted && selectedClientRecords.length > 0) ? (
+              <button
+                className="clients-action-button clients-action-restrict"
+                onClick={restrictSelectedClients}
+              >
+                <LockIcon />
+                Restringir compras
+              </button>
+            ) : null}
 
-              Restringir compras
-            </button>
-
-            <button
-              className="clients-action-button clients-action-enable"
-              disabled={selectedClients.length === 0}
-              onClick={enableSelectedClients}
-            >
-              <UnlockIcon />
-
-              Habilitar
-            </button>
+            {allSelectedRestricted || (!allSelectedEnabled && !allSelectedRestricted && selectedClientRecords.length > 0) ? (
+              <button
+                className="clients-action-button clients-action-enable"
+                onClick={enableSelectedClients}
+              >
+                <UnlockIcon />
+                Habilitar
+              </button>
+            ) : null}
 
             {selectedClients.length > 0 && (
               <span className="clients-selected-count">
