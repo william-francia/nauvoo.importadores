@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./DashboardPage.css";
 import ClientesPage from "../clientes/ClientesPage";
+import { supabase } from "../../lib/supabase";
 
 type MenuItem = "dashboard" | "ventas" | "productos" | "clientes";
 
@@ -81,6 +82,16 @@ export default function DashboardPage() {
 
         {sidebarOpen && (
           <div className="sidebar-footer">
+            <button
+              className="logout-button"
+              type="button"
+              onClick={() => void supabase.auth.signOut()}
+              title="Cerrar sesión"
+            >
+              <LogoutIcon />
+              <span>Cerrar sesión</span>
+            </button>
+
             <span className="status-dot"></span>
             Sistema conectado
           </div>
@@ -477,6 +488,21 @@ function ArrowIcon() {
     <svg viewBox="0 0 24 24">
       <path
         d="m9 18 6-6-6-6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function LogoutIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        d="M10 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h5M14 8l4 4-4 4M9 12h9"
         fill="none"
         stroke="currentColor"
         strokeWidth="1.8"

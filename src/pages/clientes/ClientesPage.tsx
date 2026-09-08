@@ -6,6 +6,14 @@ import {
 } from "react";
 
 import "./ClientesPage.css";
+import {
+  obtenerClientes,
+  crearCliente as crearClienteDb,
+  editarCliente as editarClienteDb,
+  restringirClientes,
+  habilitarClientes,
+  eliminarClientes,
+} from "../../services/clientes.service";
 
 type ClientStatus = "habilitado" | "restringido";
 
@@ -41,8 +49,6 @@ interface ClientForm {
   email: string;
   phone: string;
 }
-
-const STORAGE_KEY = "ferreteria-francia-clientes";
 
 const EMPTY_FORM: ClientForm = {
   documentType: "CI",
@@ -87,31 +93,15 @@ export default function ClientesPage() {
    */
 
   useEffect(() => {
-    try {
-      const savedClients = localStorage.getItem(STORAGE_KEY);
-
-      if (!savedClients) return;
-
-      const parsedClients = JSON.parse(savedClients) as Client[];
-
-      if (Array.isArray(parsedClients)) {
-        setClients(parsedClients);
-      }
-    } catch (error) {
-      console.error("No se pudieron cargar los clientes:", error);
-    }
+    obtenerClientes()
+      .then((rows) => setClients(rows.map((row) => ({
+        id: row.id, code: row.codigo_cliente ?? "", documentType: row.tipo_documento as DocumentType,
+        businessName: row.nombre_razon_social, documentNumber: row.numero_documento ?? "",
+        complement: row.complemento ?? "", email: row.correo ?? "", phone: row.telefono ?? "",
+        status: row.activo ? "habilitado" : "restringido", createdAt: row.created_at, updatedAt: row.updated_at,
+      }))))
+      .catch((error) => console.error("No se pudieron cargar los clientes:", error));
   }, []);
-
-  /*
-   * Persistencia temporal.
-   */
-
-  useEffect(() => {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(clients),
-    );
-  }, [clients]);
 
   /* =========================================================
      FILTROS
@@ -164,34 +154,12 @@ export default function ClientesPage() {
     setFormOpen(true);
   }
 
-  function createClient(form: ClientForm) {
-    const now = new Date().toISOString();
-
-    const newClient: Client = {
-      id: crypto.randomUUID(),
-
-      code: generateClientCode(clients),
-
-      documentType: form.documentType,
-      businessName: form.businessName.trim(),
-      documentNumber: form.documentNumber.trim(),
-      complement: form.complement.trim(),
-
-      email: form.email.trim(),
-      phone: form.phone.trim(),
-
-      status: "habilitado",
-
-      createdAt: now,
-      updatedAt: now,
-    };
-
-    setClients((previous) => [
-      newClient,
-      ...previous,
-    ]);
-
-    setFormOpen(false);
+  async function createClient(form: ClientForm) {
+    try {
+      const row = await crearClienteDb({ tipo_documento: form.documentType, razon_social: form.businessName, numero_documento: form.documentNumber, complemento: form.complement, correo: form.email, telefono: form.phone });
+      setClients((previous) => [{ id: row.id, code: row.codigo_cliente ?? "", documentType: row.tipo_documento as DocumentType, businessName: row.nombre_razon_social, documentNumber: row.numero_documento ?? "", complement: row.complemento ?? "", email: row.correo ?? "", phone: row.telefono ?? "", status: row.activo ? "habilitado" : "restringido", createdAt: row.created_at, updatedAt: row.updated_at }, ...previous]);
+      setFormOpen(false);
+    } catch (error) { console.error(error); }
   }
 
   /* =========================================================
@@ -203,30 +171,11 @@ export default function ClientesPage() {
     setFormOpen(true);
   }
 
-  function updateClient(form: ClientForm) {
+  async function updateClient(form: ClientForm) {
     if (!editingClient) return;
-
-    setClients((previous) =>
-      previous.map((client) => {
-        if (client.id !== editingClient.id) {
-          return client;
-        }
-
-        return {
-          ...client,
-
-          documentType: form.documentType,
-          businessName: form.businessName.trim(),
-          documentNumber: form.documentNumber.trim(),
-          complement: form.complement.trim(),
-
-          email: form.email.trim(),
-          phone: form.phone.trim(),
-
-          updatedAt: new Date().toISOString(),
-        };
-      }),
-    );
+    try { const row = await editarClienteDb(editingClient.id, { tipo_documento: form.documentType, razon_social: form.businessName, numero_documento: form.documentNumber, complemento: form.complement, correo: form.email, telefono: form.phone });
+      setClients((previous) => previous.map((client) => client.id === row.id ? { ...client, code: row.codigo_cliente ?? client.code, documentType: row.tipo_documento as DocumentType, businessName: row.nombre_razon_social, documentNumber: row.numero_documento ?? "", complement: row.complemento ?? "", email: row.correo ?? "", phone: row.telefono ?? "", updatedAt: row.updated_at } : client));
+    } catch (error) { console.error(error); return; }
 
     setEditingClient(null);
     setFormOpen(false);
@@ -286,9 +235,10 @@ export default function ClientesPage() {
      RESTRINGIR / HABILITAR
   ========================================================= */
 
-  function restrictSelectedClients() {
+  async function restrictSelectedClients() {
     if (selectedClients.length === 0) return;
 
+    await restringirClientes(selectedClients);
     setClients((previous) =>
       previous.map((client) => {
         if (!selectedClients.includes(client.id)) {
@@ -306,9 +256,10 @@ export default function ClientesPage() {
     setSelectedClients([]);
   }
 
-  function enableSelectedClients() {
+  async function enableSelectedClients() {
     if (selectedClients.length === 0) return;
 
+    await habilitarClientes(selectedClients);
     setClients((previous) =>
       previous.map((client) => {
         if (!selectedClients.includes(client.id)) {
@@ -336,7 +287,8 @@ export default function ClientesPage() {
     setDeleteOpen(true);
   }
 
-  function deleteSelectedClients() {
+  async function deleteSelectedClients() {
+    await eliminarClientes(selectedClients);
     setClients((previous) =>
       previous.filter(
         (client) =>
@@ -1309,29 +1261,6 @@ function ClientStatusBadge({
 /* =========================================================
    HELPERS
 ========================================================= */
-
-function generateClientCode(
-  clients: Client[],
-) {
-  let highestNumber = 0;
-
-  clients.forEach((client) => {
-    const numericPart = Number(
-      client.code.replace(/\D/g, ""),
-    );
-
-    if (
-      Number.isFinite(numericPart) &&
-      numericPart > highestNumber
-    ) {
-      highestNumber = numericPart;
-    }
-  });
-
-  return `CLI-${String(
-    highestNumber + 1,
-  ).padStart(6, "0")}`;
-}
 
 function getDocumentLabel(
   type: DocumentType,

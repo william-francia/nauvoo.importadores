@@ -11,17 +11,17 @@ export type TipoDocumento =
 
 export interface Cliente {
   id: string
-  codigo: string
+  codigo_cliente: string | null
 
   tipo_documento: TipoDocumento
-  razon_social: string
-  numero_documento: string
+  nombre_razon_social: string
+  numero_documento: string | null
   complemento: string | null
 
-  correo: string
+  correo: string | null
   telefono: string | null
 
-  estado: ClienteEstado
+  activo: boolean
 
   created_at: string
   updated_at: string
