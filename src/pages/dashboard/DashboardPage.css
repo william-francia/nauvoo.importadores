@@ -69,6 +69,8 @@ button {
 }
 
 .brand-icon {
+    position: relative;
+    overflow: visible;
     min-width: 39px;
     width: 39px;
     height: 39px;
@@ -78,7 +80,26 @@ button {
     display: grid;
     place-items: center;
     font-weight: 900;
-    font-size: 20px;
+    font-size: 23px;
+    font-style: italic;
+    letter-spacing: -2px;
+    box-shadow: 0 5px 15px rgba(203, 212, 194, 0.18);
+}
+
+.brand-icon::after,
+.topbar-logo::after {
+    content: "";
+    position: absolute;
+    width: 4px;
+    height: 25px;
+    top: 7px;
+    left: 50%;
+    border-radius: 999px;
+    background: linear-gradient(180deg, transparent, #ffffff, transparent);
+    transform: translateX(-50%) rotate(35deg) scaleY(0);
+    opacity: 0;
+    animation: logo-glint 4.8s ease-in-out infinite;
+    pointer-events: none;
 }
 
 .brand-text {
@@ -89,15 +110,45 @@ button {
 }
 
 .brand-text strong {
-    font-size: 15px;
+    font-size: 0;
     letter-spacing: 0.8px;
 }
+
+.brand-text strong::after { content: "V"; font-size: 21px; font-style: italic; }
 
 .brand-text span {
     margin-top: 3px;
     font-size: 11px;
     color: var(--secondary-color);
-    letter-spacing: 2.3px;
+    font-size: 0;
+    letter-spacing: 1.5px;
+}
+
+.brand-text span::after { content: "IMPORTADORES"; font-size: 11px; }
+
+.brand-business { position: relative; padding-left: 34px; }
+.business-info { position: relative; padding-left: 34px; }
+.business-info strong { font-size: 0; }
+.business-info strong::before { content: "V"; font-size: 30px; font-style: italic; font-weight: 950; }
+.business-info strong::after {
+    content: ""; position: absolute; width: 4px; height: 25px; top: 7px; left: 16px;
+    border-radius: 999px; background: linear-gradient(180deg, transparent, #383938, transparent);
+    transform: rotate(35deg) scaleY(0); opacity: 0; animation: logo-glint 4.8s ease-in-out infinite;
+}
+.topbar-logo {
+    position: absolute; left: 0; top: 50%; transform: translateY(-50%) skew(-8deg);
+    color: var(--primary-color); font-size: 0; font-style: italic; font-weight: 950;
+}
+.topbar-logo::before { content: "V"; font-size: 30px; }
+
+@keyframes logo-glint {
+    0%, 72%, 100% { opacity: 0; transform: translateX(-50%) rotate(35deg) scaleY(0); }
+    78% { opacity: 0.95; transform: translateX(-50%) rotate(35deg) scaleY(1); }
+    86% { opacity: 0; transform: translateX(25%) rotate(35deg) scaleY(0.35); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .brand-icon::after, .topbar-logo::after { animation: none; }
 }
 
 .sidebar-nav {

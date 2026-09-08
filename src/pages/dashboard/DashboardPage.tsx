@@ -16,7 +16,7 @@ export default function DashboardPage() {
       ========================== */}
       <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
         <div className="sidebar-header">
-          <div className="brand-icon">F</div>
+          <div className="brand-icon" aria-label="Logo V"><span>V</span></div>
 
           {sidebarOpen && (
             <div className="brand-text">
