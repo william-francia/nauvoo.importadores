@@ -1,14 +1,13 @@
-| schema_sql                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| -- =====================================================
--- ESQUEMA INICIAL SUPABASE
--- Generado: 2026-09-08
--- Schema: public
--- =====================================================
+-- =============================================================
+-- FERRETERÍA FRANCIA
+-- MIGRACIÓN INICIAL
+-- Snapshot de public
+-- 2026-09-08
+-- =============================================================
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.almacenes
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE TABLE public.almacenes (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     codigo text NOT NULL,
@@ -20,9 +19,9 @@ CREATE TABLE public.almacenes (
     updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.clientes
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE TABLE public.clientes (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     codigo_cliente text,
@@ -38,9 +37,9 @@ CREATE TABLE public.clientes (
     updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.detalle_ventas
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE TABLE public.detalle_ventas (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     venta_id uuid NOT NULL,
@@ -57,9 +56,9 @@ CREATE TABLE public.detalle_ventas (
     updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.facturas_siat
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE TABLE public.facturas_siat (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     venta_id uuid NOT NULL,
@@ -87,9 +86,9 @@ CREATE TABLE public.facturas_siat (
     updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.historial_ventas
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE TABLE public.historial_ventas (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     venta_id uuid NOT NULL,
@@ -115,9 +114,9 @@ CREATE TABLE public.historial_ventas (
     updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.movimientos_inventario
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE TABLE public.movimientos_inventario (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     producto_id uuid NOT NULL,
@@ -134,9 +133,9 @@ CREATE TABLE public.movimientos_inventario (
     fecha timestamp with time zone DEFAULT now() NOT NULL
 );
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.productos
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE TABLE public.productos (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     codigo_interno text NOT NULL,
@@ -158,9 +157,9 @@ CREATE TABLE public.productos (
     updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.stock_por_almacen
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE TABLE public.stock_por_almacen (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     producto_id uuid NOT NULL,
@@ -171,9 +170,9 @@ CREATE TABLE public.stock_por_almacen (
     updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.usuarios
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE TABLE public.usuarios (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     auth_user_id uuid,
@@ -190,9 +189,9 @@ CREATE TABLE public.usuarios (
     updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.ventas
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE TABLE public.ventas (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     codigo_venta text NOT NULL,
@@ -216,344 +215,398 @@ CREATE TABLE public.ventas (
     updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.almacenes.almacenes_codigo_key
--- -------------------------------------------------
-ALTER TABLE public.almacenes ADD CONSTRAINT almacenes_codigo_key UNIQUE (codigo);
+-- ---------------------------------------------------------
+ALTER TABLE public.almacenes
+ADD CONSTRAINT almacenes_codigo_key UNIQUE (codigo);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.almacenes.almacenes_pkey
--- -------------------------------------------------
-ALTER TABLE public.almacenes ADD CONSTRAINT almacenes_pkey PRIMARY KEY (id);
+-- ---------------------------------------------------------
+ALTER TABLE public.almacenes
+ADD CONSTRAINT almacenes_pkey PRIMARY KEY (id);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.clientes.clientes_codigo_cliente_key
--- -------------------------------------------------
-ALTER TABLE public.clientes ADD CONSTRAINT clientes_codigo_cliente_key UNIQUE (codigo_cliente);
+-- ---------------------------------------------------------
+ALTER TABLE public.clientes
+ADD CONSTRAINT clientes_codigo_cliente_key UNIQUE (codigo_cliente);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.clientes.clientes_pkey
--- -------------------------------------------------
-ALTER TABLE public.clientes ADD CONSTRAINT clientes_pkey PRIMARY KEY (id);
+-- ---------------------------------------------------------
+ALTER TABLE public.clientes
+ADD CONSTRAINT clientes_pkey PRIMARY KEY (id);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.detalle_ventas.detalle_almacen_fk
--- -------------------------------------------------
-ALTER TABLE public.detalle_ventas ADD CONSTRAINT detalle_almacen_fk FOREIGN KEY (almacen_id) REFERENCES almacenes(id) ON DELETE RESTRICT;
+-- ---------------------------------------------------------
+ALTER TABLE public.detalle_ventas
+ADD CONSTRAINT detalle_almacen_fk FOREIGN KEY (almacen_id) REFERENCES almacenes(id) ON DELETE RESTRICT;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.detalle_ventas.detalle_cantidad_valida
--- -------------------------------------------------
-ALTER TABLE public.detalle_ventas ADD CONSTRAINT detalle_cantidad_valida CHECK ((cantidad > (0)::numeric));
+-- ---------------------------------------------------------
+ALTER TABLE public.detalle_ventas
+ADD CONSTRAINT detalle_cantidad_valida CHECK ((cantidad > (0)::numeric));
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.detalle_ventas.detalle_descuento_valido
--- -------------------------------------------------
-ALTER TABLE public.detalle_ventas ADD CONSTRAINT detalle_descuento_valido CHECK (((descuento >= (0)::numeric) AND (descuento <= (cantidad * precio_unitario))));
+-- ---------------------------------------------------------
+ALTER TABLE public.detalle_ventas
+ADD CONSTRAINT detalle_descuento_valido CHECK (((descuento >= (0)::numeric) AND (descuento <= (cantidad * precio_unitario))));
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.detalle_ventas.detalle_precio_valido
--- -------------------------------------------------
-ALTER TABLE public.detalle_ventas ADD CONSTRAINT detalle_precio_valido CHECK ((precio_unitario >= (0)::numeric));
+-- ---------------------------------------------------------
+ALTER TABLE public.detalle_ventas
+ADD CONSTRAINT detalle_precio_valido CHECK ((precio_unitario >= (0)::numeric));
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.detalle_ventas.detalle_producto_fk
--- -------------------------------------------------
-ALTER TABLE public.detalle_ventas ADD CONSTRAINT detalle_producto_fk FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE RESTRICT;
+-- ---------------------------------------------------------
+ALTER TABLE public.detalle_ventas
+ADD CONSTRAINT detalle_producto_fk FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE RESTRICT;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.detalle_ventas.detalle_tipo_precio_valido
--- -------------------------------------------------
-ALTER TABLE public.detalle_ventas ADD CONSTRAINT detalle_tipo_precio_valido CHECK ((tipo_precio = ANY (ARRAY['pieza'::text, '12'::text, '100'::text, '1000'::text, 'manual'::text])));
+-- ---------------------------------------------------------
+ALTER TABLE public.detalle_ventas
+ADD CONSTRAINT detalle_tipo_precio_valido CHECK ((tipo_precio = ANY (ARRAY['pieza'::text, '12'::text, '100'::text, '1000'::text, 'manual'::text])));
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.detalle_ventas.detalle_venta_fk
--- -------------------------------------------------
-ALTER TABLE public.detalle_ventas ADD CONSTRAINT detalle_venta_fk FOREIGN KEY (venta_id) REFERENCES ventas(id) ON DELETE CASCADE;
+-- ---------------------------------------------------------
+ALTER TABLE public.detalle_ventas
+ADD CONSTRAINT detalle_venta_fk FOREIGN KEY (venta_id) REFERENCES ventas(id) ON DELETE CASCADE;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.detalle_ventas.detalle_ventas_pkey
--- -------------------------------------------------
-ALTER TABLE public.detalle_ventas ADD CONSTRAINT detalle_ventas_pkey PRIMARY KEY (id);
+-- ---------------------------------------------------------
+ALTER TABLE public.detalle_ventas
+ADD CONSTRAINT detalle_ventas_pkey PRIMARY KEY (id);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.facturas_siat.factura_estado_valido
--- -------------------------------------------------
-ALTER TABLE public.facturas_siat ADD CONSTRAINT factura_estado_valido CHECK ((estado_interno = ANY (ARRAY['pendiente'::text, 'enviada'::text, 'valida'::text, 'observada'::text, 'rechazada'::text, 'anulada'::text])));
+-- ---------------------------------------------------------
+ALTER TABLE public.facturas_siat
+ADD CONSTRAINT factura_estado_valido CHECK ((estado_interno = ANY (ARRAY['pendiente'::text, 'enviada'::text, 'valida'::text, 'observada'::text, 'rechazada'::text, 'anulada'::text])));
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.facturas_siat.factura_numero_valido
--- -------------------------------------------------
-ALTER TABLE public.facturas_siat ADD CONSTRAINT factura_numero_valido CHECK ((numero_factura > 0));
+-- ---------------------------------------------------------
+ALTER TABLE public.facturas_siat
+ADD CONSTRAINT factura_numero_valido CHECK ((numero_factura > 0));
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.facturas_siat.factura_sucursal_numero_unico
--- -------------------------------------------------
-ALTER TABLE public.facturas_siat ADD CONSTRAINT factura_sucursal_numero_unico UNIQUE (codigo_sucursal, codigo_punto_venta, numero_factura);
+-- ---------------------------------------------------------
+ALTER TABLE public.facturas_siat
+ADD CONSTRAINT factura_sucursal_numero_unico UNIQUE (codigo_sucursal, codigo_punto_venta, numero_factura);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.facturas_siat.factura_venta_fk
--- -------------------------------------------------
-ALTER TABLE public.facturas_siat ADD CONSTRAINT factura_venta_fk FOREIGN KEY (venta_id) REFERENCES ventas(id) ON DELETE RESTRICT;
+-- ---------------------------------------------------------
+ALTER TABLE public.facturas_siat
+ADD CONSTRAINT factura_venta_fk FOREIGN KEY (venta_id) REFERENCES ventas(id) ON DELETE RESTRICT;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.facturas_siat.facturas_siat_cuf_key
--- -------------------------------------------------
-ALTER TABLE public.facturas_siat ADD CONSTRAINT facturas_siat_cuf_key UNIQUE (cuf);
+-- ---------------------------------------------------------
+ALTER TABLE public.facturas_siat
+ADD CONSTRAINT facturas_siat_cuf_key UNIQUE (cuf);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.facturas_siat.facturas_siat_pkey
--- -------------------------------------------------
-ALTER TABLE public.facturas_siat ADD CONSTRAINT facturas_siat_pkey PRIMARY KEY (id);
+-- ---------------------------------------------------------
+ALTER TABLE public.facturas_siat
+ADD CONSTRAINT facturas_siat_pkey PRIMARY KEY (id);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.facturas_siat.facturas_siat_venta_id_key
--- -------------------------------------------------
-ALTER TABLE public.facturas_siat ADD CONSTRAINT facturas_siat_venta_id_key UNIQUE (venta_id);
+-- ---------------------------------------------------------
+ALTER TABLE public.facturas_siat
+ADD CONSTRAINT facturas_siat_venta_id_key UNIQUE (venta_id);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.historial_ventas.historial_almacen_fk
--- -------------------------------------------------
-ALTER TABLE public.historial_ventas ADD CONSTRAINT historial_almacen_fk FOREIGN KEY (almacen_id) REFERENCES almacenes(id) ON DELETE SET NULL;
+-- ---------------------------------------------------------
+ALTER TABLE public.historial_ventas
+ADD CONSTRAINT historial_almacen_fk FOREIGN KEY (almacen_id) REFERENCES almacenes(id) ON DELETE SET NULL;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.historial_ventas.historial_cliente_fk
--- -------------------------------------------------
-ALTER TABLE public.historial_ventas ADD CONSTRAINT historial_cliente_fk FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE SET NULL;
+-- ---------------------------------------------------------
+ALTER TABLE public.historial_ventas
+ADD CONSTRAINT historial_cliente_fk FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE SET NULL;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.historial_ventas.historial_usuario_anulacion_fk
--- -------------------------------------------------
-ALTER TABLE public.historial_ventas ADD CONSTRAINT historial_usuario_anulacion_fk FOREIGN KEY (usuario_anulacion_id) REFERENCES usuarios(id) ON DELETE SET NULL;
+-- ---------------------------------------------------------
+ALTER TABLE public.historial_ventas
+ADD CONSTRAINT historial_usuario_anulacion_fk FOREIGN KEY (usuario_anulacion_id) REFERENCES usuarios(id) ON DELETE SET NULL;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.historial_ventas.historial_usuario_fk
--- -------------------------------------------------
-ALTER TABLE public.historial_ventas ADD CONSTRAINT historial_usuario_fk FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL;
+-- ---------------------------------------------------------
+ALTER TABLE public.historial_ventas
+ADD CONSTRAINT historial_usuario_fk FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.historial_ventas.historial_venta_fk
--- -------------------------------------------------
-ALTER TABLE public.historial_ventas ADD CONSTRAINT historial_venta_fk FOREIGN KEY (venta_id) REFERENCES ventas(id) ON DELETE RESTRICT;
+-- ---------------------------------------------------------
+ALTER TABLE public.historial_ventas
+ADD CONSTRAINT historial_venta_fk FOREIGN KEY (venta_id) REFERENCES ventas(id) ON DELETE RESTRICT;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.historial_ventas.historial_ventas_pkey
--- -------------------------------------------------
-ALTER TABLE public.historial_ventas ADD CONSTRAINT historial_ventas_pkey PRIMARY KEY (id);
+-- ---------------------------------------------------------
+ALTER TABLE public.historial_ventas
+ADD CONSTRAINT historial_ventas_pkey PRIMARY KEY (id);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.historial_ventas.historial_ventas_venta_id_key
--- -------------------------------------------------
-ALTER TABLE public.historial_ventas ADD CONSTRAINT historial_ventas_venta_id_key UNIQUE (venta_id);
+-- ---------------------------------------------------------
+ALTER TABLE public.historial_ventas
+ADD CONSTRAINT historial_ventas_venta_id_key UNIQUE (venta_id);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.movimientos_inventario.movimiento_almacen_fk
--- -------------------------------------------------
-ALTER TABLE public.movimientos_inventario ADD CONSTRAINT movimiento_almacen_fk FOREIGN KEY (almacen_id) REFERENCES almacenes(id) ON DELETE RESTRICT;
+-- ---------------------------------------------------------
+ALTER TABLE public.movimientos_inventario
+ADD CONSTRAINT movimiento_almacen_fk FOREIGN KEY (almacen_id) REFERENCES almacenes(id) ON DELETE RESTRICT;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.movimientos_inventario.movimiento_cantidad_valida
--- -------------------------------------------------
-ALTER TABLE public.movimientos_inventario ADD CONSTRAINT movimiento_cantidad_valida CHECK ((cantidad > (0)::numeric));
+-- ---------------------------------------------------------
+ALTER TABLE public.movimientos_inventario
+ADD CONSTRAINT movimiento_cantidad_valida CHECK ((cantidad > (0)::numeric));
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.movimientos_inventario.movimiento_detalle_fk
--- -------------------------------------------------
-ALTER TABLE public.movimientos_inventario ADD CONSTRAINT movimiento_detalle_fk FOREIGN KEY (detalle_venta_id) REFERENCES detalle_ventas(id) ON DELETE SET NULL;
+-- ---------------------------------------------------------
+ALTER TABLE public.movimientos_inventario
+ADD CONSTRAINT movimiento_detalle_fk FOREIGN KEY (detalle_venta_id) REFERENCES detalle_ventas(id) ON DELETE SET NULL;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.movimientos_inventario.movimiento_producto_fk
--- -------------------------------------------------
-ALTER TABLE public.movimientos_inventario ADD CONSTRAINT movimiento_producto_fk FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE RESTRICT;
+-- ---------------------------------------------------------
+ALTER TABLE public.movimientos_inventario
+ADD CONSTRAINT movimiento_producto_fk FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE RESTRICT;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.movimientos_inventario.movimiento_tipo_valido
--- -------------------------------------------------
-ALTER TABLE public.movimientos_inventario ADD CONSTRAINT movimiento_tipo_valido CHECK ((tipo_movimiento = ANY (ARRAY['entrada'::text, 'salida'::text, 'ajuste'::text, 'devolucion_compra'::text, 'devolucion_venta'::text])));
+-- ---------------------------------------------------------
+ALTER TABLE public.movimientos_inventario
+ADD CONSTRAINT movimiento_tipo_valido CHECK ((tipo_movimiento = ANY (ARRAY['entrada'::text, 'salida'::text, 'ajuste'::text, 'devolucion_compra'::text, 'devolucion_venta'::text])));
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.movimientos_inventario.movimiento_usuario_fk
--- -------------------------------------------------
-ALTER TABLE public.movimientos_inventario ADD CONSTRAINT movimiento_usuario_fk FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL;
+-- ---------------------------------------------------------
+ALTER TABLE public.movimientos_inventario
+ADD CONSTRAINT movimiento_usuario_fk FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.movimientos_inventario.movimiento_venta_fk
--- -------------------------------------------------
-ALTER TABLE public.movimientos_inventario ADD CONSTRAINT movimiento_venta_fk FOREIGN KEY (venta_id) REFERENCES ventas(id) ON DELETE SET NULL;
+-- ---------------------------------------------------------
+ALTER TABLE public.movimientos_inventario
+ADD CONSTRAINT movimiento_venta_fk FOREIGN KEY (venta_id) REFERENCES ventas(id) ON DELETE SET NULL;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.movimientos_inventario.movimientos_inventario_pkey
--- -------------------------------------------------
-ALTER TABLE public.movimientos_inventario ADD CONSTRAINT movimientos_inventario_pkey PRIMARY KEY (id);
+-- ---------------------------------------------------------
+ALTER TABLE public.movimientos_inventario
+ADD CONSTRAINT movimientos_inventario_pkey PRIMARY KEY (id);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.productos.productos_codigo_interno_key
--- -------------------------------------------------
-ALTER TABLE public.productos ADD CONSTRAINT productos_codigo_interno_key UNIQUE (codigo_interno);
+-- ---------------------------------------------------------
+ALTER TABLE public.productos
+ADD CONSTRAINT productos_codigo_interno_key UNIQUE (codigo_interno);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.productos.productos_pkey
--- -------------------------------------------------
-ALTER TABLE public.productos ADD CONSTRAINT productos_pkey PRIMARY KEY (id);
+-- ---------------------------------------------------------
+ALTER TABLE public.productos
+ADD CONSTRAINT productos_pkey PRIMARY KEY (id);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.productos.productos_precios_positivos
--- -------------------------------------------------
-ALTER TABLE public.productos ADD CONSTRAINT productos_precios_positivos CHECK (((precio_produccion >= (0)::numeric) AND (precio_1000 >= (0)::numeric) AND (precio_100 >= (0)::numeric) AND (precio_12 >= (0)::numeric) AND (precio_pieza >= (0)::numeric)));
+-- ---------------------------------------------------------
+ALTER TABLE public.productos
+ADD CONSTRAINT productos_precios_positivos CHECK (((precio_produccion >= (0)::numeric) AND (precio_1000 >= (0)::numeric) AND (precio_100 >= (0)::numeric) AND (precio_12 >= (0)::numeric) AND (precio_pieza >= (0)::numeric)));
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.stock_por_almacen.stock_almacen_fk
--- -------------------------------------------------
-ALTER TABLE public.stock_por_almacen ADD CONSTRAINT stock_almacen_fk FOREIGN KEY (almacen_id) REFERENCES almacenes(id) ON DELETE RESTRICT;
+-- ---------------------------------------------------------
+ALTER TABLE public.stock_por_almacen
+ADD CONSTRAINT stock_almacen_fk FOREIGN KEY (almacen_id) REFERENCES almacenes(id) ON DELETE RESTRICT;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.stock_por_almacen.stock_no_negativo
--- -------------------------------------------------
-ALTER TABLE public.stock_por_almacen ADD CONSTRAINT stock_no_negativo CHECK (((cantidad_disponible >= (0)::numeric) AND (cantidad_reservada >= (0)::numeric)));
+-- ---------------------------------------------------------
+ALTER TABLE public.stock_por_almacen
+ADD CONSTRAINT stock_no_negativo CHECK (((cantidad_disponible >= (0)::numeric) AND (cantidad_reservada >= (0)::numeric)));
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.stock_por_almacen.stock_por_almacen_pkey
--- -------------------------------------------------
-ALTER TABLE public.stock_por_almacen ADD CONSTRAINT stock_por_almacen_pkey PRIMARY KEY (id);
+-- ---------------------------------------------------------
+ALTER TABLE public.stock_por_almacen
+ADD CONSTRAINT stock_por_almacen_pkey PRIMARY KEY (id);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.stock_por_almacen.stock_producto_almacen_unico
--- -------------------------------------------------
-ALTER TABLE public.stock_por_almacen ADD CONSTRAINT stock_producto_almacen_unico UNIQUE (producto_id, almacen_id);
+-- ---------------------------------------------------------
+ALTER TABLE public.stock_por_almacen
+ADD CONSTRAINT stock_producto_almacen_unico UNIQUE (producto_id, almacen_id);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.stock_por_almacen.stock_producto_fk
--- -------------------------------------------------
-ALTER TABLE public.stock_por_almacen ADD CONSTRAINT stock_producto_fk FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE RESTRICT;
+-- ---------------------------------------------------------
+ALTER TABLE public.stock_por_almacen
+ADD CONSTRAINT stock_producto_fk FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE RESTRICT;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.usuarios.usuarios_auth_fk
--- -------------------------------------------------
-ALTER TABLE public.usuarios ADD CONSTRAINT usuarios_auth_fk FOREIGN KEY (auth_user_id) REFERENCES auth.users(id) ON DELETE SET NULL;
+-- ---------------------------------------------------------
+ALTER TABLE public.usuarios
+ADD CONSTRAINT usuarios_auth_fk FOREIGN KEY (auth_user_id) REFERENCES auth.users(id) ON DELETE SET NULL;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.usuarios.usuarios_auth_user_id_key
--- -------------------------------------------------
-ALTER TABLE public.usuarios ADD CONSTRAINT usuarios_auth_user_id_key UNIQUE (auth_user_id);
+-- ---------------------------------------------------------
+ALTER TABLE public.usuarios
+ADD CONSTRAINT usuarios_auth_user_id_key UNIQUE (auth_user_id);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.usuarios.usuarios_pkey
--- -------------------------------------------------
-ALTER TABLE public.usuarios ADD CONSTRAINT usuarios_pkey PRIMARY KEY (id);
+-- ---------------------------------------------------------
+ALTER TABLE public.usuarios
+ADD CONSTRAINT usuarios_pkey PRIMARY KEY (id);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.usuarios.usuarios_rol_valido
--- -------------------------------------------------
-ALTER TABLE public.usuarios ADD CONSTRAINT usuarios_rol_valido CHECK ((rol = ANY (ARRAY['administrador'::text, 'vendedor'::text, 'almacen'::text, 'caja'::text])));
+-- ---------------------------------------------------------
+ALTER TABLE public.usuarios
+ADD CONSTRAINT usuarios_rol_valido CHECK ((rol = ANY (ARRAY['administrador'::text, 'vendedor'::text, 'almacen'::text, 'caja'::text])));
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.ventas.ventas_almacen_fk
--- -------------------------------------------------
-ALTER TABLE public.ventas ADD CONSTRAINT ventas_almacen_fk FOREIGN KEY (almacen_local_id) REFERENCES almacenes(id) ON DELETE SET NULL;
+-- ---------------------------------------------------------
+ALTER TABLE public.ventas
+ADD CONSTRAINT ventas_almacen_fk FOREIGN KEY (almacen_local_id) REFERENCES almacenes(id) ON DELETE SET NULL;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.ventas.ventas_cliente_fk
--- -------------------------------------------------
-ALTER TABLE public.ventas ADD CONSTRAINT ventas_cliente_fk FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE SET NULL;
+-- ---------------------------------------------------------
+ALTER TABLE public.ventas
+ADD CONSTRAINT ventas_cliente_fk FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE SET NULL;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.ventas.ventas_codigo_venta_key
--- -------------------------------------------------
-ALTER TABLE public.ventas ADD CONSTRAINT ventas_codigo_venta_key UNIQUE (codigo_venta);
+-- ---------------------------------------------------------
+ALTER TABLE public.ventas
+ADD CONSTRAINT ventas_codigo_venta_key UNIQUE (codigo_venta);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.ventas.ventas_estado_valido
--- -------------------------------------------------
-ALTER TABLE public.ventas ADD CONSTRAINT ventas_estado_valido CHECK ((estado = ANY (ARRAY['pendiente'::text, 'confirmada'::text, 'facturada'::text, 'anulada'::text])));
+-- ---------------------------------------------------------
+ALTER TABLE public.ventas
+ADD CONSTRAINT ventas_estado_valido CHECK ((estado = ANY (ARRAY['pendiente'::text, 'confirmada'::text, 'facturada'::text, 'anulada'::text])));
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.ventas.ventas_montos_validos
--- -------------------------------------------------
-ALTER TABLE public.ventas ADD CONSTRAINT ventas_montos_validos CHECK (((subtotal >= (0)::numeric) AND (descuento_items >= (0)::numeric) AND (descuento_venta >= (0)::numeric) AND ((descuento_items + descuento_venta) <= subtotal)));
+-- ---------------------------------------------------------
+ALTER TABLE public.ventas
+ADD CONSTRAINT ventas_montos_validos CHECK (((subtotal >= (0)::numeric) AND (descuento_items >= (0)::numeric) AND (descuento_venta >= (0)::numeric) AND ((descuento_items + descuento_venta) <= subtotal)));
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.ventas.ventas_pkey
--- -------------------------------------------------
-ALTER TABLE public.ventas ADD CONSTRAINT ventas_pkey PRIMARY KEY (id);
+-- ---------------------------------------------------------
+ALTER TABLE public.ventas
+ADD CONSTRAINT ventas_pkey PRIMARY KEY (id);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.ventas.ventas_usuario_anulacion_fk
--- -------------------------------------------------
-ALTER TABLE public.ventas ADD CONSTRAINT ventas_usuario_anulacion_fk FOREIGN KEY (usuario_anulacion_id) REFERENCES usuarios(id) ON DELETE SET NULL;
+-- ---------------------------------------------------------
+ALTER TABLE public.ventas
+ADD CONSTRAINT ventas_usuario_anulacion_fk FOREIGN KEY (usuario_anulacion_id) REFERENCES usuarios(id) ON DELETE SET NULL;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.ventas.ventas_usuario_fk
--- -------------------------------------------------
-ALTER TABLE public.ventas ADD CONSTRAINT ventas_usuario_fk FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE RESTRICT;
+-- ---------------------------------------------------------
+ALTER TABLE public.ventas
+ADD CONSTRAINT ventas_usuario_fk FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE RESTRICT;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.idx_detalle_producto
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE INDEX idx_detalle_producto ON public.detalle_ventas USING btree (producto_id);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.idx_detalle_venta
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE INDEX idx_detalle_venta ON public.detalle_ventas USING btree (venta_id);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.idx_factura_cuf
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE INDEX idx_factura_cuf ON public.facturas_siat USING btree (cuf);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.idx_historial_cliente
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE INDEX idx_historial_cliente ON public.historial_ventas USING btree (cliente_id);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.idx_historial_fecha
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE INDEX idx_historial_fecha ON public.historial_ventas USING btree (fecha_venta);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.idx_movimientos_fecha
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE INDEX idx_movimientos_fecha ON public.movimientos_inventario USING btree (fecha);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.idx_movimientos_producto
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE INDEX idx_movimientos_producto ON public.movimientos_inventario USING btree (producto_id);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.idx_stock_almacen
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE INDEX idx_stock_almacen ON public.stock_por_almacen USING btree (almacen_id);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.idx_stock_producto
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE INDEX idx_stock_producto ON public.stock_por_almacen USING btree (producto_id);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.idx_usuario_documento_unico
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE UNIQUE INDEX idx_usuario_documento_unico ON public.usuarios USING btree (tipo_documento, numero_documento, COALESCE(complemento, ''::text));
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.idx_ventas_cliente
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE INDEX idx_ventas_cliente ON public.ventas USING btree (cliente_id);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.idx_ventas_fecha
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE INDEX idx_ventas_fecha ON public.ventas USING btree (fecha_venta);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.idx_ventas_usuario
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE INDEX idx_ventas_usuario ON public.ventas USING btree (usuario_id);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.fn_actualizar_historial_venta.17788
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.fn_actualizar_historial_venta()
  RETURNS trigger
  LANGUAGE plpgsql
@@ -746,9 +799,9 @@ END;
 $function$
 ;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.fn_actualizar_updated_at.17771
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.fn_actualizar_updated_at()
  RETURNS trigger
  LANGUAGE plpgsql
@@ -760,9 +813,9 @@ END;
 $function$
 ;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.fn_aplicar_inventario_venta.17785
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.fn_aplicar_inventario_venta()
  RETURNS trigger
  LANGUAGE plpgsql
@@ -1041,9 +1094,9 @@ END;
 $function$
 ;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.fn_recalcular_venta.17781
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.fn_recalcular_venta()
  RETURNS trigger
  LANGUAGE plpgsql
@@ -1099,9 +1152,9 @@ END;
 $function$
 ;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.fn_validar_detalle_venta.17783
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.fn_validar_detalle_venta()
  RETURNS trigger
  LANGUAGE plpgsql
@@ -1145,9 +1198,9 @@ END;
 $function$
 ;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.rls_auto_enable.17486
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.rls_auto_enable()
  RETURNS event_trigger
  LANGUAGE plpgsql
@@ -1179,124 +1232,124 @@ END;
 $function$
 ;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.almacenes.trg_almacenes_updated_at
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE TRIGGER trg_almacenes_updated_at BEFORE UPDATE ON public.almacenes FOR EACH ROW EXECUTE FUNCTION fn_actualizar_updated_at();
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.clientes.trg_clientes_updated_at
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE TRIGGER trg_clientes_updated_at BEFORE UPDATE ON public.clientes FOR EACH ROW EXECUTE FUNCTION fn_actualizar_updated_at();
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.detalle_ventas.trg_detalle_updated_at
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE TRIGGER trg_detalle_updated_at BEFORE UPDATE ON public.detalle_ventas FOR EACH ROW EXECUTE FUNCTION fn_actualizar_updated_at();
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.detalle_ventas.trg_recalcular_venta
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE TRIGGER trg_recalcular_venta AFTER INSERT OR DELETE OR UPDATE ON public.detalle_ventas FOR EACH ROW EXECUTE FUNCTION fn_recalcular_venta();
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.detalle_ventas.trg_validar_detalle_venta
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE TRIGGER trg_validar_detalle_venta BEFORE INSERT OR DELETE OR UPDATE ON public.detalle_ventas FOR EACH ROW EXECUTE FUNCTION fn_validar_detalle_venta();
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.facturas_siat.trg_facturas_updated_at
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE TRIGGER trg_facturas_updated_at BEFORE UPDATE ON public.facturas_siat FOR EACH ROW EXECUTE FUNCTION fn_actualizar_updated_at();
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.historial_ventas.trg_historial_updated_at
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE TRIGGER trg_historial_updated_at BEFORE UPDATE ON public.historial_ventas FOR EACH ROW EXECUTE FUNCTION fn_actualizar_updated_at();
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.productos.trg_productos_updated_at
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE TRIGGER trg_productos_updated_at BEFORE UPDATE ON public.productos FOR EACH ROW EXECUTE FUNCTION fn_actualizar_updated_at();
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.stock_por_almacen.trg_stock_updated_at
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE TRIGGER trg_stock_updated_at BEFORE UPDATE ON public.stock_por_almacen FOR EACH ROW EXECUTE FUNCTION fn_actualizar_updated_at();
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.usuarios.trg_usuarios_updated_at
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE TRIGGER trg_usuarios_updated_at BEFORE UPDATE ON public.usuarios FOR EACH ROW EXECUTE FUNCTION fn_actualizar_updated_at();
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.ventas.trg_actualizar_historial
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE TRIGGER trg_actualizar_historial AFTER INSERT OR UPDATE ON public.ventas FOR EACH ROW EXECUTE FUNCTION fn_actualizar_historial_venta();
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.ventas.trg_aplicar_inventario_venta
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE TRIGGER trg_aplicar_inventario_venta BEFORE UPDATE OF estado ON public.ventas FOR EACH ROW EXECUTE FUNCTION fn_aplicar_inventario_venta();
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.ventas.trg_ventas_updated_at
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE TRIGGER trg_ventas_updated_at BEFORE UPDATE ON public.ventas FOR EACH ROW EXECUTE FUNCTION fn_actualizar_updated_at();
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.almacenes
--- -------------------------------------------------
+-- ---------------------------------------------------------
 ALTER TABLE public.almacenes ENABLE ROW LEVEL SECURITY;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.clientes
--- -------------------------------------------------
+-- ---------------------------------------------------------
 ALTER TABLE public.clientes ENABLE ROW LEVEL SECURITY;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.detalle_ventas
--- -------------------------------------------------
+-- ---------------------------------------------------------
 ALTER TABLE public.detalle_ventas ENABLE ROW LEVEL SECURITY;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.facturas_siat
--- -------------------------------------------------
+-- ---------------------------------------------------------
 ALTER TABLE public.facturas_siat ENABLE ROW LEVEL SECURITY;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.historial_ventas
--- -------------------------------------------------
+-- ---------------------------------------------------------
 ALTER TABLE public.historial_ventas ENABLE ROW LEVEL SECURITY;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.movimientos_inventario
--- -------------------------------------------------
+-- ---------------------------------------------------------
 ALTER TABLE public.movimientos_inventario ENABLE ROW LEVEL SECURITY;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.productos
--- -------------------------------------------------
+-- ---------------------------------------------------------
 ALTER TABLE public.productos ENABLE ROW LEVEL SECURITY;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.stock_por_almacen
--- -------------------------------------------------
+-- ---------------------------------------------------------
 ALTER TABLE public.stock_por_almacen ENABLE ROW LEVEL SECURITY;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.usuarios
--- -------------------------------------------------
+-- ---------------------------------------------------------
 ALTER TABLE public.usuarios ENABLE ROW LEVEL SECURITY;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.ventas
--- -------------------------------------------------
+-- ---------------------------------------------------------
 ALTER TABLE public.ventas ENABLE ROW LEVEL SECURITY;
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.almacenes.acceso_total_autenticados
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE POLICY acceso_total_autenticados
 ON public.almacenes
 AS PERMISSIVE
@@ -1305,9 +1358,9 @@ TO authenticated
 USING (true)
 WITH CHECK (true);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.clientes.acceso_total_autenticados
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE POLICY acceso_total_autenticados
 ON public.clientes
 AS PERMISSIVE
@@ -1316,9 +1369,9 @@ TO authenticated
 USING (true)
 WITH CHECK (true);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.detalle_ventas.acceso_total_autenticados
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE POLICY acceso_total_autenticados
 ON public.detalle_ventas
 AS PERMISSIVE
@@ -1327,9 +1380,9 @@ TO authenticated
 USING (true)
 WITH CHECK (true);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.facturas_siat.acceso_total_autenticados
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE POLICY acceso_total_autenticados
 ON public.facturas_siat
 AS PERMISSIVE
@@ -1338,9 +1391,9 @@ TO authenticated
 USING (true)
 WITH CHECK (true);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.historial_ventas.acceso_total_autenticados
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE POLICY acceso_total_autenticados
 ON public.historial_ventas
 AS PERMISSIVE
@@ -1349,9 +1402,9 @@ TO authenticated
 USING (true)
 WITH CHECK (true);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.movimientos_inventario.acceso_total_autenticados
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE POLICY acceso_total_autenticados
 ON public.movimientos_inventario
 AS PERMISSIVE
@@ -1360,9 +1413,9 @@ TO authenticated
 USING (true)
 WITH CHECK (true);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.productos.acceso_total_autenticados
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE POLICY acceso_total_autenticados
 ON public.productos
 AS PERMISSIVE
@@ -1371,9 +1424,9 @@ TO authenticated
 USING (true)
 WITH CHECK (true);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.stock_por_almacen.acceso_total_autenticados
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE POLICY acceso_total_autenticados
 ON public.stock_por_almacen
 AS PERMISSIVE
@@ -1382,9 +1435,9 @@ TO authenticated
 USING (true)
 WITH CHECK (true);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.usuarios.acceso_total_autenticados
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE POLICY acceso_total_autenticados
 ON public.usuarios
 AS PERMISSIVE
@@ -1393,14 +1446,13 @@ TO authenticated
 USING (true)
 WITH CHECK (true);
 
--- -------------------------------------------------
+-- ---------------------------------------------------------
 -- public.ventas.acceso_total_autenticados
--- -------------------------------------------------
+-- ---------------------------------------------------------
 CREATE POLICY acceso_total_autenticados
 ON public.ventas
 AS PERMISSIVE
 FOR ALL
 TO authenticated
 USING (true)
-WITH CHECK (true); |
-
+WITH CHECK (true);

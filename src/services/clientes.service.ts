@@ -73,7 +73,7 @@ export async function crearCliente(
   const payload = {
     tipo_documento: input.tipo_documento,
 
-    razon_social: input.razon_social.trim(),
+    nombre_razon_social: input.razon_social.trim(),
 
     numero_documento:
       input.numero_documento.trim(),
@@ -86,7 +86,7 @@ export async function crearCliente(
     telefono:
       input.telefono?.trim() || null,
 
-    estado: "habilitado",
+    activo: true,
   };
 
   const { data, error } = await supabase
@@ -131,7 +131,7 @@ export async function editarCliente(
   const payload = {
     tipo_documento: input.tipo_documento,
 
-    razon_social: input.razon_social.trim(),
+    nombre_razon_social: input.razon_social.trim(),
 
     numero_documento:
       input.numero_documento.trim(),
@@ -182,7 +182,7 @@ export async function restringirCliente(
   const { data, error } = await supabase
     .from(CLIENTES_TABLE)
     .update({
-      estado: "restringido",
+      activo: false,
     })
     .eq("id", clienteId)
     .select()
@@ -212,7 +212,7 @@ export async function habilitarCliente(
   const { data, error } = await supabase
     .from(CLIENTES_TABLE)
     .update({
-      estado: "habilitado",
+      activo: true,
     })
     .eq("id", clienteId)
     .select()
@@ -244,7 +244,7 @@ export async function restringirClientes(
   const { error } = await supabase
     .from(CLIENTES_TABLE)
     .update({
-      estado: "restringido",
+      activo: false,
     })
     .in("id", clienteIds);
 
@@ -272,7 +272,7 @@ export async function habilitarClientes(
   const { error } = await supabase
     .from(CLIENTES_TABLE)
     .update({
-      estado: "habilitado",
+      activo: true,
     })
     .in("id", clienteIds);
 
