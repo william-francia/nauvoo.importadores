@@ -1,12 +1,19 @@
 import { useState } from "react";
+import { useLocation, useNavigate } from "react-router";
 import "./DashboardPage.css";
 import ClientesPage from "../clientes/ClientesPage";
+import NuevaVentaPage from "../../features/ventas/NuevaVentaPage";
+import GestionVentasPage from "../../features/ventas/GestionVentasPage";
 
 type MenuItem = "dashboard" | "ventas" | "productos" | "clientes";
 
 export default function DashboardPage() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const ventasActiva = location.pathname.startsWith("/ventas/");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeItem, setActiveItem] = useState<MenuItem>("dashboard");
+  const [ventasOpen, setVentasOpen] = useState(ventasActiva);
 
   return (
     <div className="dashboard">
@@ -30,7 +37,10 @@ export default function DashboardPage() {
             className={`nav-item ${
               activeItem === "dashboard" ? "active" : ""
             }`}
-            onClick={() => setActiveItem("dashboard")}
+            onClick={() => {
+              setActiveItem("dashboard");
+              navigate("/dashboard");
+            }}
           >
             <span className="nav-icon">
               <HomeIcon />
@@ -42,21 +52,54 @@ export default function DashboardPage() {
           {sidebarOpen && <p className="nav-section">TRANSACCIONES</p>}
 
           <button
-            className={`nav-item ${activeItem === "ventas" ? "active" : ""}`}
-            onClick={() => setActiveItem("ventas")}
+            className={`nav-item ${ventasActiva ? "active" : ""}`}
+            onClick={() => {
+              if (!sidebarOpen) {
+                setSidebarOpen(true);
+                setVentasOpen(true);
+                return;
+              }
+              setVentasOpen((actual) => !actual);
+            }}
           >
             <span className="nav-icon">
               <CartIcon />
             </span>
 
             {sidebarOpen && <span>Ventas</span>}
+
+            {sidebarOpen && (
+              <span className={`nav-chevron ${ventasOpen ? "open" : ""}`}>
+                ›
+              </span>
+            )}
           </button>
+
+          {sidebarOpen && ventasOpen && (
+            <div className="nav-submenu">
+              <button
+                className={`nav-subitem ${location.pathname === "/ventas/nueva" ? "active" : ""}`}
+                onClick={() => navigate("/ventas/nueva")}
+              >
+                Registrar venta
+              </button>
+              <button
+                className={`nav-subitem ${location.pathname === "/ventas/gestion" ? "active" : ""}`}
+                onClick={() => navigate("/ventas/gestion")}
+              >
+                Gestión de ventas
+              </button>
+            </div>
+          )}
 
           <button
             className={`nav-item ${
               activeItem === "productos" ? "active" : ""
             }`}
-            onClick={() => setActiveItem("productos")}
+            onClick={() => {
+              setActiveItem("productos");
+              navigate("/dashboard");
+            }}
           >
             <span className="nav-icon">
               <BoxIcon />
@@ -69,7 +112,10 @@ export default function DashboardPage() {
             className={`nav-item ${
               activeItem === "clientes" ? "active" : ""
             }`}
-            onClick={() => setActiveItem("clientes")}
+            onClick={() => {
+              setActiveItem("clientes");
+              navigate("/dashboard");
+            }}
           >
             <span className="nav-icon">
               <UsersIcon />
@@ -129,7 +175,11 @@ export default function DashboardPage() {
             MAIN
         ========================== */}
         <main className="main-content">
-          {activeItem === "dashboard" && <DashboardHome />}
+          {location.pathname === "/ventas/nueva" && <NuevaVentaPage />}
+
+          {location.pathname === "/ventas/gestion" && <GestionVentasPage />}
+
+          {!ventasActiva && activeItem === "dashboard" && <DashboardHome />}
 
           {activeItem === "ventas" && (
             <PlaceholderPage
@@ -139,7 +189,7 @@ export default function DashboardPage() {
             />
           )}
 
-          {activeItem === "productos" && (
+          {!ventasActiva && activeItem === "productos" && (
             <PlaceholderPage
               title="Productos"
               description="Desde aquí administraremos el inventario y los productos."
@@ -147,7 +197,7 @@ export default function DashboardPage() {
             />
           )}
 
-          {activeItem === "clientes" && <ClientesPage />}
+          {!ventasActiva && activeItem === "clientes" && <ClientesPage />}
 
         </main>
       </div>
