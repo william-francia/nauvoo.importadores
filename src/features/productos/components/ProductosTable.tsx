@@ -253,14 +253,10 @@ export default function ProductosTable({
                     }
                   >
                     <td>
-                      <div className="productos-row-actions">
-                        <button type="button" onClick={() => onPreview(producto)}>
-                          Ver
-                        </button>
-                        <button type="button" onClick={() => onEdit(producto)}>
-                          Editar
-                        </button>
-                      </div>
+                      <ProductoRowActions
+                        onPreview={() => onPreview(producto)}
+                        onEdit={() => onEdit(producto)}
+                      />
                     </td>
 
                     <td>
@@ -353,3 +349,4 @@ export default function ProductosTable({
     </div>
   );
 }
+import ProductoRowActions from "./ProductoRowActions";

@@ -4,6 +4,9 @@ import "./DashboardPage.css";
 import ClientesPage from "../clientes/ClientesPage";
 import NuevaVentaPage from "../../features/ventas/NuevaVentaPage";
 import GestionVentasPage from "../../features/ventas/GestionVentasPage";
+import GestionProductosPage from "../productos/GestionProductosPage";
+import ProductoFormPage from "../productos/ProductoFormPage";
+import InventarioProductosPage from "../productos/InventarioProductosPage";
 import { supabase } from "../../lib/supabase";
 
 type MenuItem = "dashboard" | "ventas" | "productos" | "clientes";
@@ -12,9 +15,11 @@ export default function DashboardPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const ventasActiva = location.pathname.startsWith("/ventas/");
+  const productosActiva = location.pathname.startsWith("/productos/");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeItem, setActiveItem] = useState<MenuItem>("dashboard");
   const [ventasOpen, setVentasOpen] = useState(ventasActiva);
+  const [productosOpen, setProductosOpen] = useState(productosActiva);
 
   return (
     <div className="dashboard">
@@ -94,12 +99,14 @@ export default function DashboardPage() {
           )}
 
           <button
-            className={`nav-item ${
-              activeItem === "productos" ? "active" : ""
-            }`}
+            className={`nav-item ${productosActiva ? "active" : ""}`}
             onClick={() => {
-              setActiveItem("productos");
-              navigate("/dashboard");
+              if (!sidebarOpen) {
+                setSidebarOpen(true);
+                setProductosOpen(true);
+                return;
+              }
+              setProductosOpen((actual) => !actual);
             }}
           >
             <span className="nav-icon">
@@ -107,7 +114,30 @@ export default function DashboardPage() {
             </span>
 
             {sidebarOpen && <span>Productos</span>}
+
+            {sidebarOpen && (
+              <span className={`nav-chevron ${productosOpen ? "open" : ""}`}>
+                ›
+              </span>
+            )}
           </button>
+
+          {sidebarOpen && productosOpen && (
+            <div className="nav-submenu">
+              <button
+                className={`nav-subitem ${productosActiva && location.pathname !== "/productos/inventario" ? "active" : ""}`}
+                onClick={() => navigate("/productos/gestion")}
+              >
+                Gestión de productos
+              </button>
+              <button
+                className={`nav-subitem ${location.pathname === "/productos/inventario" ? "active" : ""}`}
+                onClick={() => navigate("/productos/inventario")}
+              >
+                Inventario de productos
+              </button>
+            </div>
+          )}
 
           <button
             className={`nav-item ${
@@ -190,7 +220,13 @@ export default function DashboardPage() {
 
           {location.pathname === "/ventas/gestion" && <GestionVentasPage />}
 
-          {!ventasActiva && activeItem === "dashboard" && <DashboardHome />}
+          {location.pathname === "/productos/gestion" && <GestionProductosPage />}
+
+          {(location.pathname === "/productos/nuevo" || location.pathname.endsWith("/editar")) && <ProductoFormPage />}
+
+          {location.pathname === "/productos/inventario" && <InventarioProductosPage />}
+
+          {!ventasActiva && !productosActiva && activeItem === "dashboard" && <DashboardHome />}
 
           {activeItem === "ventas" && (
             <PlaceholderPage
@@ -208,7 +244,7 @@ export default function DashboardPage() {
             />
           )}
 
-          {!ventasActiva && activeItem === "clientes" && <ClientesPage />}
+          {!ventasActiva && !productosActiva && activeItem === "clientes" && <ClientesPage />}
 
         </main>
       </div>

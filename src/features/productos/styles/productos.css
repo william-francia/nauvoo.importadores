@@ -24,6 +24,11 @@
     color: var(--prod-text);
 }
 
+.main-content > .productos-page {
+    padding: 0;
+    background: transparent;
+}
+
 .productos-page *,
 .productos-page *::before,
 .productos-page *::after {
@@ -268,7 +273,7 @@
 .productos-table {
     width: 100%;
 
-    min-width: 1160px;
+    min-width: 970px;
 
     border-collapse: collapse;
 
@@ -278,7 +283,7 @@
 .productos-table th {
     height: 38px;
 
-    padding: 7px;
+    padding: 6px 5px;
 
     border-right: 1px solid var(--prod-border);
 
@@ -296,7 +301,7 @@
 .productos-table td {
     height: 43px;
 
-    padding: 7px;
+    padding: 6px 5px;
 
     border-right: 1px solid #edf0f2;
 
@@ -314,21 +319,21 @@
 }
 
 .productos-col-actions {
-    width: 95px;
+    width: 62px;
 }
 
 .productos-col-check {
-    width: 40px;
+    width: 34px;
 
     text-align: center !important;
 }
 
 .productos-col-producto {
-    min-width: 310px;
+    min-width: 255px;
 }
 
 .productos-local-column {
-    min-width: 105px;
+    min-width: 74px;
 
     text-align: center !important;
 }

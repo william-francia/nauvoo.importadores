@@ -6,9 +6,6 @@ import { supabase, supabaseConfigError } from './lib/supabase'
 import { LoginPage } from './pages/auth/LoginPage'
 import { RegisterPage } from './pages/auth/RegisterPage'
 import DashboardPage from './pages/dashboard/DashboardPage'
-import GestionProductosPage from './pages/productos/GestionProductosPage'
-import ProductoFormPage from './pages/productos/ProductoFormPage'
-import InventarioProductosPage from './pages/productos/InventarioProductosPage'
 
 function App() {
   const [session, setSession] = useState<Session | null>(null)
@@ -78,10 +75,10 @@ function App() {
         <Route path="/ventas/nueva" element={<DashboardPage />} />
         <Route path="/ventas/gestion" element={<DashboardPage />} />
         <Route path="/ventas" element={<Navigate to="/ventas/nueva" replace />} />
-        <Route path="/productos/gestion" element={<GestionProductosPage />} />
-        <Route path="/productos/nuevo" element={<ProductoFormPage />} />
-        <Route path="/productos/:productoId/editar" element={<ProductoFormPage />} />
-        <Route path="/productos/inventario" element={<InventarioProductosPage />} />
+        <Route path="/productos/gestion" element={<DashboardPage />} />
+        <Route path="/productos/nuevo" element={<DashboardPage />} />
+        <Route path="/productos/:productoId/editar" element={<DashboardPage />} />
+        <Route path="/productos/inventario" element={<DashboardPage />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     )
