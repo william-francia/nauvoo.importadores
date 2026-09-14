@@ -14,8 +14,9 @@ type MenuItem = "dashboard" | "ventas" | "productos" | "clientes";
 export default function DashboardPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const ventasActiva = location.pathname.startsWith("/ventas/");
-  const productosActiva = location.pathname.startsWith("/productos/");
+  const rutaActual = location.pathname.replace(/\/+$/, "") || "/";
+  const ventasActiva = rutaActual.startsWith("/ventas/");
+  const productosActiva = rutaActual.startsWith("/productos/");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeItem, setActiveItem] = useState<MenuItem>("dashboard");
   const [ventasOpen, setVentasOpen] = useState(ventasActiva);
@@ -125,13 +126,13 @@ export default function DashboardPage() {
           {sidebarOpen && productosOpen && (
             <div className="nav-submenu">
               <button
-                className={`nav-subitem ${productosActiva && location.pathname !== "/productos/inventario" ? "active" : ""}`}
+                className={`nav-subitem ${productosActiva && rutaActual !== "/productos/inventario" ? "active" : ""}`}
                 onClick={() => navigate("/productos/gestion")}
               >
                 Gestión de productos
               </button>
               <button
-                className={`nav-subitem ${location.pathname === "/productos/inventario" ? "active" : ""}`}
+                className={`nav-subitem ${rutaActual === "/productos/inventario" ? "active" : ""}`}
                 onClick={() => navigate("/productos/inventario")}
               >
                 Inventario de productos
@@ -216,19 +217,19 @@ export default function DashboardPage() {
             MAIN
         ========================== */}
         <main className="main-content">
-          {location.pathname === "/ventas/nueva" && <NuevaVentaPage />}
+          {rutaActual === "/ventas/nueva" && <NuevaVentaPage />}
 
-          {location.pathname === "/ventas/gestion" && <GestionVentasPage />}
+          {rutaActual === "/ventas/gestion" && <GestionVentasPage />}
 
-          {location.pathname === "/productos/gestion" && <GestionProductosPage />}
+          {rutaActual === "/productos/gestion" && <GestionProductosPage />}
 
-          {(location.pathname === "/productos/nuevo" || location.pathname.endsWith("/editar")) && <ProductoFormPage />}
+          {(rutaActual === "/productos/nuevo" || rutaActual.endsWith("/editar")) && <ProductoFormPage />}
 
-          {location.pathname === "/productos/inventario" && <InventarioProductosPage />}
+          {rutaActual === "/productos/inventario" && <InventarioProductosPage />}
 
           {!ventasActiva && !productosActiva && activeItem === "dashboard" && <DashboardHome />}
 
-          {activeItem === "ventas" && (
+          {!ventasActiva && !productosActiva && activeItem === "ventas" && (
             <PlaceholderPage
               title="Ventas"
               description="Desde aquí administraremos las ventas y facturación."
@@ -236,7 +237,7 @@ export default function DashboardPage() {
             />
           )}
 
-          {!ventasActiva && activeItem === "productos" && (
+          {!ventasActiva && !productosActiva && activeItem === "productos" && (
             <PlaceholderPage
               title="Productos"
               description="Desde aquí administraremos el inventario y los productos."
