@@ -1,0 +1,1476 @@
+/* ==========================================================
+   VARIABLES
+========================================================== */
+
+.nueva-venta-page {
+    --venta-primary: #075fa8;
+    --venta-primary-dark: #064c85;
+    --venta-primary-soft: #eef7ff;
+
+    --venta-border: #dce2e8;
+    --venta-border-strong: #c9d1d9;
+
+    --venta-text: #172033;
+    --venta-muted: #768195;
+
+    --venta-bg: #f6f8fa;
+    --venta-panel: #ffffff;
+
+    --venta-danger: #dc3545;
+    --venta-success: #218838;
+
+    min-height: 100%;
+    padding: 20px;
+
+    background: var(--venta-bg);
+
+    color: var(--venta-text);
+
+    box-sizing: border-box;
+}
+
+.nueva-venta-page *,
+.nueva-venta-page *::before,
+.nueva-venta-page *::after {
+    box-sizing: border-box;
+}
+
+.nueva-venta-page button,
+.nueva-venta-page input,
+.nueva-venta-page select,
+.nueva-venta-page textarea {
+    font: inherit;
+}
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.venta-page-header {
+    margin-bottom: 18px;
+}
+
+.venta-page-header h1 {
+    margin: 5px 0 3px;
+
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.venta-page-header p {
+    margin: 0;
+
+    font-size: 13px;
+
+    color: var(--venta-muted);
+}
+
+.venta-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    color: var(--venta-muted);
+
+    font-size: 12px;
+}
+
+/* ==========================================================
+   LAYOUT
+========================================================== */
+
+.venta-layout {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr) 365px;
+
+    gap: 14px;
+
+    align-items: start;
+}
+
+.venta-main,
+.venta-sidebar {
+    display: flex;
+    flex-direction: column;
+
+    gap: 14px;
+
+    min-width: 0;
+}
+
+/* ==========================================================
+   PANEL
+========================================================== */
+
+.venta-panel {
+    position: relative;
+
+    padding: 14px;
+
+    border: 1px solid var(--venta-border);
+
+    border-radius: 7px;
+
+    background:
+        var(--venta-panel);
+}
+
+.venta-section-title {
+    display: flex;
+    align-items: center;
+
+    margin-bottom: 12px;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.venta-section-title::before,
+.venta-section-title::after {
+    content: "";
+
+    flex: 1;
+
+    height: 1px;
+
+    background:
+        var(--venta-border);
+}
+
+.venta-section-title span {
+    padding: 0 10px;
+}
+
+/* ==========================================================
+   INPUTS
+========================================================== */
+
+.venta-field {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+
+    margin-bottom: 12px;
+}
+
+.venta-field:last-child {
+    margin-bottom: 0;
+}
+
+.venta-field label {
+    color: var(--venta-muted);
+
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.venta-field input,
+.venta-field select,
+.venta-field textarea {
+    width: 100%;
+
+    height: 38px;
+
+    padding: 0 11px;
+
+    border: 1px solid var(--venta-border-strong);
+
+    border-radius: 5px;
+
+    outline: none;
+
+    background: #fff;
+
+    color: var(--venta-text);
+
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.venta-field textarea {
+    min-height: 90px;
+
+    padding-top: 10px;
+
+    resize: vertical;
+}
+
+.venta-field input:focus,
+.venta-field select:focus,
+.venta-field textarea:focus {
+    border-color:
+        var(--venta-primary);
+
+    box-shadow:
+        0 0 0 3px rgba(7, 95, 168, 0.08);
+}
+
+.venta-field input:disabled,
+.venta-field select:disabled {
+    cursor: not-allowed;
+
+    background: #f5f6f7;
+
+    color: #9ba4af;
+}
+
+.venta-grid-2 {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 12px;
+}
+
+/* ==========================================================
+   COLLAPSIBLE
+========================================================== */
+
+.venta-collapse-header {
+    display: flex;
+
+    width: 100%;
+
+    align-items: center;
+    justify-content:
+        space-between;
+
+    border: 0;
+
+    background: transparent;
+
+    color: var(--venta-primary);
+
+    cursor: pointer;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.venta-collapse-header>span:first-child {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.venta-observacion {
+    width: 100%;
+
+    min-height: 75px;
+
+    margin-top: 12px;
+
+    padding: 10px;
+
+    border: 1px solid var(--venta-border);
+
+    border-radius: 5px;
+
+    outline: none;
+
+    resize: vertical;
+}
+
+.venta-none {
+    margin-top: 8px;
+
+    color: #9ba5b1;
+
+    font-size: 12px;
+}
+
+/* ==========================================================
+   CLIENTE
+========================================================== */
+
+.cliente-selector {
+    position: relative;
+}
+
+.cliente-search-row {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr) 43px;
+
+    gap: 8px;
+}
+
+.cliente-search {
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    height: 39px;
+
+    border: 1px solid var(--venta-border-strong);
+
+    border-radius: 5px;
+
+    background: white;
+}
+
+.cliente-search:focus-within {
+    border-color:
+        var(--venta-primary);
+
+    box-shadow:
+        0 0 0 3px rgba(7, 95, 168, 0.07);
+}
+
+.cliente-search__icon {
+    padding-left: 10px;
+
+    color: var(--venta-primary);
+
+    font-size: 18px;
+}
+
+.cliente-search input {
+    min-width: 0;
+
+    flex: 1;
+
+    height: 100%;
+
+    border: 0;
+
+    padding: 0 10px;
+
+    outline: none;
+}
+
+.cliente-search>button {
+    width: 35px;
+    height: 100%;
+
+    border: 0;
+
+    background: transparent;
+
+    color: var(--venta-muted);
+
+    cursor: pointer;
+
+    font-size: 19px;
+}
+
+.cliente-add-button {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 2px;
+
+    border: 1px solid var(--venta-primary);
+
+    border-radius: 5px;
+
+    background:
+        var(--venta-primary-soft);
+
+    color: var(--venta-primary);
+
+    cursor: pointer;
+
+    font-size: 13px;
+}
+
+.cliente-add-button:hover {
+    background:
+        var(--venta-primary);
+
+    color: white;
+}
+
+.cliente-seleccionado {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    margin-top: 10px;
+
+    padding: 9px;
+
+    border: 1px solid #cfe5d4;
+
+    border-radius: 5px;
+
+    background: #f5fcf7;
+}
+
+.cliente-seleccionado__avatar {
+    display: grid;
+
+    width: 34px;
+    height: 34px;
+
+    place-items: center;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background:
+        var(--venta-primary);
+
+    color: white;
+
+    font-weight: 700;
+}
+
+.cliente-seleccionado>div:last-child {
+    display: flex;
+
+    min-width: 0;
+
+    flex-direction: column;
+}
+
+.cliente-seleccionado strong {
+    overflow: hidden;
+
+    font-size: 12px;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+.cliente-seleccionado span {
+    margin-top: 2px;
+
+    color: var(--venta-muted);
+
+    font-size: 11px;
+}
+
+/* ==========================================================
+   DROPDOWNS
+========================================================== */
+
+.venta-dropdown,
+.producto-resultados {
+    position: absolute;
+
+    z-index: 40;
+
+    top: calc(100% + 5px);
+    right: 0;
+    left: 0;
+
+    overflow-y: auto;
+
+    max-height: 320px;
+
+    border: 1px solid var(--venta-border);
+
+    border-radius: 6px;
+
+    background: #fff;
+
+    box-shadow:
+        0 12px 35px rgba(22, 34, 52, 0.14);
+}
+
+.venta-dropdown__message {
+    padding: 15px;
+
+    color: var(--venta-muted);
+
+    font-size: 12px;
+
+    text-align: center;
+}
+
+.cliente-result {
+    display: flex;
+
+    width: 100%;
+
+    flex-direction: column;
+
+    gap: 3px;
+
+    padding: 10px 12px;
+
+    border: 0;
+    border-bottom:
+        1px solid #edf0f2;
+
+    background: white;
+
+    cursor: pointer;
+
+    text-align: left;
+}
+
+.cliente-result:hover {
+    background:
+        var(--venta-primary-soft);
+}
+
+.cliente-result strong {
+    font-size: 12px;
+}
+
+.cliente-result span {
+    color: var(--venta-muted);
+
+    font-size: 11px;
+}
+
+/* ==========================================================
+   PRODUCT SEARCH
+========================================================== */
+
+.producto-selector {
+    position: relative;
+
+    margin-bottom: 14px;
+}
+
+.producto-selector__label {
+    margin-bottom: 7px;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.producto-search {
+    display: flex;
+
+    min-height: 40px;
+
+    align-items: center;
+
+    border: 1px solid var(--venta-border-strong);
+
+    border-radius: 5px;
+
+    background: white;
+}
+
+.producto-search:focus-within {
+    border-color:
+        var(--venta-primary);
+
+    box-shadow:
+        0 0 0 3px rgba(7, 95, 168, 0.07);
+}
+
+.producto-search>span {
+    padding-left: 11px;
+
+    color:
+        var(--venta-primary);
+
+    font-size: 18px;
+}
+
+.producto-search input {
+    min-width: 0;
+
+    flex: 1;
+
+    height: 38px;
+
+    border: 0;
+
+    padding: 0 10px;
+
+    outline: none;
+}
+
+.producto-search__explorar {
+    height: 38px;
+
+    padding: 0 14px;
+
+    border: 0;
+    border-left: 1px solid var(--venta-border);
+
+    background: white;
+
+    color: var(--venta-primary);
+
+    cursor: pointer;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.producto-search__hint {
+    display: block;
+
+    margin-top: 5px;
+    margin-left: 10px;
+
+    color: #9aa5b1;
+
+    font-size: 10px;
+}
+
+.producto-resultados {
+    top: 68px;
+}
+
+.producto-resultado {
+    display: grid;
+
+    width: 100%;
+
+    grid-template-columns:
+        minmax(0, 1fr) auto;
+
+    gap: 7px 15px;
+
+    padding: 11px 12px;
+
+    border: 0;
+    border-bottom:
+        1px solid #edf0f2;
+
+    background: white;
+
+    cursor: pointer;
+
+    text-align: left;
+}
+
+.producto-resultado:hover {
+    background:
+        var(--venta-primary-soft);
+}
+
+.producto-resultado:disabled {
+    cursor: not-allowed;
+
+    opacity: 0.55;
+}
+
+.producto-resultado__principal {
+    display: flex;
+
+    min-width: 0;
+
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+.producto-resultado__principal strong {
+    font-size: 12px;
+}
+
+.producto-resultado__principal span {
+    overflow: hidden;
+
+    color: var(--venta-muted);
+
+    font-size: 11px;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+.producto-resultado__stock {
+    display: flex;
+
+    align-items: flex-end;
+
+    flex-direction: column;
+
+    gap: 2px;
+
+    white-space: nowrap;
+}
+
+.producto-resultado__stock strong {
+    color:
+        var(--venta-primary);
+
+    font-size: 12px;
+}
+
+.producto-resultado__stock span {
+    color:
+        var(--venta-muted);
+
+    font-size: 10px;
+}
+
+.producto-resultado__tiendas {
+    display: flex;
+
+    grid-column: 1 / -1;
+
+    flex-wrap: wrap;
+
+    gap: 5px;
+}
+
+.producto-resultado__tiendas span {
+    padding: 3px 6px;
+
+    border-radius: 20px;
+
+    background: #edf5ee;
+
+    color: #35723b;
+
+    font-size: 9px;
+}
+
+/* ==========================================================
+   TABLE
+========================================================== */
+
+.venta-table-container {
+    overflow-x: auto;
+
+    margin: 0 -2px;
+}
+
+.venta-table-wrapper {
+    min-width: 850px;
+}
+
+.venta-table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    font-size: 11px;
+}
+
+.venta-table th {
+    padding: 9px 8px;
+
+    border-right: 1px solid rgba(255, 255, 255, 0.22);
+
+    background:
+        var(--venta-primary);
+
+    color: white;
+
+    text-align: left;
+
+    white-space: nowrap;
+}
+
+.venta-table th:first-child {
+    border-radius:
+        5px 0 0 0;
+}
+
+.venta-table th:last-child {
+    border-radius:
+        0 5px 0 0;
+}
+
+.venta-table td {
+    padding: 8px;
+
+    border-bottom: 1px solid var(--venta-border);
+
+    vertical-align: middle;
+}
+
+.venta-product-cell {
+    display: flex;
+
+    min-width: 245px;
+
+    flex-direction: column;
+
+    gap: 2px;
+}
+
+.venta-product-cell strong {
+    color: #17243b;
+
+    font-size: 11px;
+}
+
+.venta-product-cell span {
+    color: var(--venta-muted);
+
+    font-size: 9px;
+}
+
+.venta-product-cell small {
+    margin-top: 3px;
+
+    color: var(--venta-muted);
+
+    font-size: 9px;
+}
+
+.cantidad-control {
+    display: grid;
+
+    width: 112px;
+
+    grid-template-columns:
+        31px 1fr 31px;
+
+    overflow: hidden;
+
+    border: 1px solid var(--venta-border-strong);
+
+    border-radius: 4px;
+}
+
+.cantidad-control button {
+    border: 0;
+
+    background: #f3f5f6;
+
+    cursor: pointer;
+
+    font-size: 15px;
+}
+
+.cantidad-control input {
+    width: 100%;
+
+    border: 0;
+
+    outline: none;
+
+    text-align: center;
+}
+
+.stock-info {
+    display: block;
+
+    margin-top: 3px;
+
+    color: var(--venta-muted);
+
+    font-size: 8px;
+}
+
+.venta-table-select {
+    width: 140px;
+
+    height: 34px;
+
+    border: 1px solid var(--venta-border-strong);
+
+    border-radius: 4px;
+
+    background: white;
+
+    font-size: 10px;
+}
+
+.money-input {
+    display: flex;
+
+    width: 105px;
+
+    align-items: center;
+
+    overflow: hidden;
+
+    border: 1px solid var(--venta-border-strong);
+
+    border-radius: 4px;
+}
+
+.money-input input {
+    min-width: 0;
+
+    width: 65px;
+
+    height: 32px;
+
+    border: 0;
+
+    padding: 0 6px;
+
+    outline: none;
+
+    text-align: right;
+}
+
+.money-input span {
+    padding-right: 5px;
+
+    color: var(--venta-muted);
+
+    font-size: 8px;
+}
+
+.venta-operaciones {
+    display: flex;
+
+    gap: 4px;
+}
+
+.venta-op-button {
+    display: grid;
+
+    width: 30px;
+    height: 30px;
+
+    place-items: center;
+
+    border: 1px solid var(--venta-border);
+
+    border-radius: 4px;
+
+    background: white;
+
+    color:
+        var(--venta-primary);
+
+    cursor: pointer;
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.venta-op-button:hover {
+    border-color:
+        var(--venta-primary);
+
+    background:
+        var(--venta-primary-soft);
+}
+
+.venta-op-button--danger {
+    color:
+        var(--venta-danger);
+}
+
+.venta-extra-row td {
+    background: #fafbfd;
+}
+
+.venta-extra-producto {
+    padding: 5px;
+}
+
+.venta-extra-producto label {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: var(--venta-muted);
+
+    font-size: 9px;
+    font-weight: 600;
+}
+
+.venta-extra-producto textarea {
+    width: 100%;
+
+    min-height: 60px;
+
+    padding: 8px;
+
+    border: 1px solid var(--venta-border);
+
+    border-radius: 4px;
+
+    outline: none;
+
+    resize: vertical;
+}
+
+/* ==========================================================
+   EMPTY CART
+========================================================== */
+
+.venta-carrito-vacio {
+    display: flex;
+
+    min-height: 210px;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-direction: column;
+
+    gap: 5px;
+
+    color: var(--venta-muted);
+}
+
+.venta-carrito-vacio__icon {
+    margin-bottom: 5px;
+
+    filter: grayscale(1);
+
+    opacity: 0.5;
+
+    font-size: 45px;
+}
+
+.venta-carrito-vacio strong {
+    color: #626e7a;
+
+    font-size: 12px;
+}
+
+.venta-carrito-vacio span {
+    font-size: 10px;
+}
+
+/* ==========================================================
+   TOTALS
+========================================================== */
+
+.venta-totales {
+    display: flex;
+
+    align-items: flex-end;
+
+    flex-direction: column;
+
+    margin-top: 12px;
+
+    border-top: 1px solid var(--venta-border);
+}
+
+.venta-totales>div {
+    display: flex;
+
+    width: min(100%, 400px);
+
+    min-height: 34px;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 5px 5px;
+
+    border-bottom: 1px solid #edf0f2;
+}
+
+.venta-totales span {
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.venta-totales strong {
+    font-size: 11px;
+}
+
+.venta-totales__total {
+    color:
+        var(--venta-primary);
+}
+
+.venta-totales__total strong {
+    font-size: 14px;
+}
+
+.venta-discount-input {
+    display: flex;
+
+    align-items: center;
+
+    overflow: hidden;
+
+    border: 1px solid var(--venta-border);
+
+    border-radius: 4px;
+}
+
+.venta-discount-input input {
+    width: 90px;
+
+    height: 30px;
+
+    border: 0;
+
+    padding: 0 7px;
+
+    outline: none;
+
+    text-align: right;
+}
+
+.venta-discount-input span {
+    padding-right: 6px;
+
+    color: var(--venta-muted);
+
+    font-size: 8px;
+}
+
+/* ==========================================================
+   PAYMENT
+========================================================== */
+
+.venta-payment__title {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    margin-bottom: 15px;
+
+    color: var(--venta-primary);
+
+    font-size: 11px;
+}
+
+.venta-payment__title strong {
+    font-size: 12px;
+}
+
+.venta-saldo {
+    display: flex;
+
+    height: 38px;
+
+    align-items: center;
+
+    padding: 0 10px;
+
+    border: 1px solid var(--venta-border-strong);
+
+    border-radius: 5px;
+
+    background: #f9fbfc;
+
+    color: var(--venta-success);
+
+    font-weight: 700;
+}
+
+.venta-saldo--negative {
+    color:
+        var(--venta-danger);
+}
+
+.venta-pay-button {
+    display: flex;
+
+    width: 100%;
+    height: 42px;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    margin-top: 4px;
+
+    border: 0;
+
+    border-radius: 5px;
+
+    background:
+        var(--venta-primary);
+
+    color: white;
+
+    cursor: pointer;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    transition:
+        transform 0.15s ease,
+        background 0.15s ease;
+}
+
+.venta-pay-button:hover:not(:disabled) {
+    background:
+        var(--venta-primary-dark);
+
+    transform:
+        translateY(-1px);
+}
+
+.venta-pay-button:disabled {
+    cursor: not-allowed;
+
+    opacity: 0.48;
+}
+
+.venta-check {
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 8px;
+
+    margin-top: 3px;
+
+    cursor: pointer;
+
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.venta-check input {
+    margin-top: 2px;
+}
+
+/* ==========================================================
+   MODAL
+========================================================== */
+
+.venta-modal-backdrop {
+    position: fixed;
+
+    z-index: 999;
+
+    inset: 0;
+
+    display: grid;
+
+    place-items: center;
+
+    padding: 20px;
+
+    background:
+        rgba(12, 21, 34, 0.58);
+
+    backdrop-filter:
+        blur(1px);
+}
+
+.venta-modal {
+    overflow: hidden;
+
+    width: min(100%,
+            570px);
+
+    border-radius: 7px;
+
+    background: white;
+
+    box-shadow:
+        0 25px 80px rgba(0, 0, 0, 0.28);
+}
+
+.venta-modal__header {
+    display: flex;
+
+    align-items: flex-start;
+    justify-content:
+        space-between;
+
+    gap: 20px;
+
+    padding: 19px 20px;
+
+    border-bottom: 1px solid var(--venta-border);
+}
+
+.venta-modal__header h2 {
+    margin: 0;
+
+    font-size: 17px;
+}
+
+.venta-modal__header p {
+    margin: 4px 0 0;
+
+    color: var(--venta-muted);
+
+    font-size: 11px;
+}
+
+.venta-modal__body {
+    padding: 20px;
+}
+
+.venta-modal__footer {
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 8px;
+
+    padding: 12px 20px;
+
+    border-top: 1px solid var(--venta-border);
+
+    background: #fafafa;
+}
+
+.venta-icon-button {
+    display: grid;
+
+    width: 32px;
+    height: 32px;
+
+    place-items: center;
+
+    border: 0;
+
+    border-radius: 5px;
+
+    background: transparent;
+
+    cursor: pointer;
+
+    font-size: 22px;
+}
+
+.venta-icon-button:hover {
+    background: #f1f3f5;
+}
+
+.venta-button {
+    min-height: 36px;
+
+    padding: 0 15px;
+
+    border-radius: 5px;
+
+    cursor: pointer;
+
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.venta-button--ghost {
+    border: 1px solid var(--venta-border);
+
+    background: white;
+
+    color: var(--venta-text);
+}
+
+.venta-button--primary {
+    border: 1px solid var(--venta-primary);
+
+    background:
+        var(--venta-primary);
+
+    color: white;
+}
+
+/* ==========================================================
+   ALERT
+========================================================== */
+
+.venta-alert {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    margin-bottom: 14px;
+
+    padding: 10px 13px;
+
+    border: 1px solid;
+
+    border-radius: 5px;
+
+    font-size: 11px;
+}
+
+.venta-alert button {
+    margin-left: auto;
+
+    border: 0;
+
+    background: transparent;
+
+    cursor: pointer;
+
+    font-size: 18px;
+}
+
+.venta-alert--success {
+    border-color: #bae2c2;
+
+    background: #effaf2;
+
+    color: #256332;
+}
+
+.venta-alert--error {
+    border-color: #f2c5ca;
+
+    background: #fff3f4;
+
+    color: #9d2431;
+}
+
+.venta-error {
+    padding: 9px 10px;
+
+    border-radius: 5px;
+
+    background: #fff1f2;
+
+    color: #a32833;
+
+    font-size: 11px;
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width: 1100px) {
+    .venta-layout {
+        grid-template-columns:
+            1fr;
+    }
+
+    .venta-sidebar {
+        display: grid;
+
+        grid-template-columns:
+            repeat(2,
+                minmax(0, 1fr));
+    }
+
+    .venta-sidebar>.venta-panel:first-child {
+        grid-row: span 2;
+    }
+}
+
+@media (max-width: 720px) {
+    .nueva-venta-page {
+        padding: 12px;
+    }
+
+    .venta-sidebar {
+        display: flex;
+    }
+
+    .venta-grid-2 {
+        grid-template-columns:
+            1fr;
+    }
+
+    .venta-modal-backdrop {
+        padding: 10px;
+    }
+
+    .venta-page-header h1 {
+        font-size: 19px;
+    }
+}

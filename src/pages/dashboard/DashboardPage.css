@@ -340,6 +340,43 @@ button {
     color: var(--primary-color);
 }
 
+.nav-chevron {
+    margin-left: auto;
+    font-size: 21px;
+    line-height: 1;
+    transform: rotate(0deg);
+    transition: transform 0.2s ease;
+}
+
+.nav-chevron.open {
+    transform: rotate(90deg);
+}
+
+.nav-submenu {
+    margin: -1px 0 7px 36px;
+    display: grid;
+    gap: 3px;
+}
+
+.nav-subitem {
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #d8d8d8;
+    cursor: pointer;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 9px 12px;
+    text-align: left;
+}
+
+.nav-subitem:hover,
+.nav-subitem.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--primary1-color);
+}
+
 .nav-icon {
     width: 23px;
     height: 23px;

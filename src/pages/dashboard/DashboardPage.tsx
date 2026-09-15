@@ -1,14 +1,27 @@
 import { useState } from "react";
+import { useLocation, useNavigate } from "react-router";
 import "./DashboardPage.css";
 import ClientesPage from "../clientes/ClientesPage";
+import NuevaVentaPage from "../../features/ventas/NuevaVentaPage";
+import GestionVentasPage from "../../features/ventas/GestionVentasPage";
+import GestionProductosPage from "../productos/GestionProductosPage";
+import ProductoFormPage from "../productos/ProductoFormPage";
+import InventarioProductosPage from "../productos/InventarioProductosPage";
 import { supabase } from "../../lib/supabase";
 import logo from "../../assets/logo sin linea .png";
 
 type MenuItem = "dashboard" | "ventas" | "productos" | "clientes";
 
 export default function DashboardPage() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const rutaActual = location.pathname.replace(/\/+$/, "") || "/";
+  const ventasActiva = rutaActual.startsWith("/ventas/");
+  const productosActiva = rutaActual.startsWith("/productos/");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeItem, setActiveItem] = useState<MenuItem>("dashboard");
+  const [ventasOpen, setVentasOpen] = useState(ventasActiva);
+  const [productosOpen, setProductosOpen] = useState(productosActiva);
 
   return (
     <div className="dashboard">
@@ -37,7 +50,10 @@ export default function DashboardPage() {
             className={`nav-item ${
               activeItem === "dashboard" ? "active" : ""
             }`}
-            onClick={() => setActiveItem("dashboard")}
+            onClick={() => {
+              setActiveItem("dashboard");
+              navigate("/dashboard");
+            }}
           >
             <span className="nav-icon">
               <HomeIcon />
@@ -49,34 +65,95 @@ export default function DashboardPage() {
           {sidebarOpen && <p className="nav-section">TRANSACCIONES</p>}
 
           <button
-            className={`nav-item ${activeItem === "ventas" ? "active" : ""}`}
-            onClick={() => setActiveItem("ventas")}
+            className={`nav-item ${ventasActiva ? "active" : ""}`}
+            onClick={() => {
+              if (!sidebarOpen) {
+                setSidebarOpen(true);
+                setVentasOpen(true);
+                return;
+              }
+              setVentasOpen((actual) => !actual);
+            }}
           >
             <span className="nav-icon">
               <CartIcon />
             </span>
 
             {sidebarOpen && <span>Ventas</span>}
+
+            {sidebarOpen && (
+              <span className={`nav-chevron ${ventasOpen ? "open" : ""}`}>
+                ›
+              </span>
+            )}
           </button>
 
+          {sidebarOpen && ventasOpen && (
+            <div className="nav-submenu">
+              <button
+                className={`nav-subitem ${location.pathname === "/ventas/nueva" ? "active" : ""}`}
+                onClick={() => navigate("/ventas/nueva")}
+              >
+                Registrar venta
+              </button>
+              <button
+                className={`nav-subitem ${location.pathname === "/ventas/gestion" ? "active" : ""}`}
+                onClick={() => navigate("/ventas/gestion")}
+              >
+                Gestión de ventas
+              </button>
+            </div>
+          )}
+
           <button
-            className={`nav-item ${
-              activeItem === "productos" ? "active" : ""
-            }`}
-            onClick={() => setActiveItem("productos")}
+            className={`nav-item ${productosActiva ? "active" : ""}`}
+            onClick={() => {
+              if (!sidebarOpen) {
+                setSidebarOpen(true);
+                setProductosOpen(true);
+                return;
+              }
+              setProductosOpen((actual) => !actual);
+            }}
           >
             <span className="nav-icon">
               <BoxIcon />
             </span>
 
             {sidebarOpen && <span>Productos</span>}
+
+            {sidebarOpen && (
+              <span className={`nav-chevron ${productosOpen ? "open" : ""}`}>
+                ›
+              </span>
+            )}
           </button>
+
+          {sidebarOpen && productosOpen && (
+            <div className="nav-submenu">
+              <button
+                className={`nav-subitem ${productosActiva && rutaActual !== "/productos/inventario" ? "active" : ""}`}
+                onClick={() => navigate("/productos/gestion")}
+              >
+                Gestión de productos
+              </button>
+              <button
+                className={`nav-subitem ${rutaActual === "/productos/inventario" ? "active" : ""}`}
+                onClick={() => navigate("/productos/inventario")}
+              >
+                Inventario de productos
+              </button>
+            </div>
+          )}
 
           <button
             className={`nav-item ${
               activeItem === "clientes" ? "active" : ""
             }`}
-            onClick={() => setActiveItem("clientes")}
+            onClick={() => {
+              setActiveItem("clientes");
+              navigate("/dashboard");
+            }}
           >
             <span className="nav-icon">
               <UsersIcon />
@@ -146,9 +223,19 @@ export default function DashboardPage() {
             MAIN
         ========================== */}
         <main className="main-content">
-          {activeItem === "dashboard" && <DashboardHome />}
+          {rutaActual === "/ventas/nueva" && <NuevaVentaPage />}
 
-          {activeItem === "ventas" && (
+          {rutaActual === "/ventas/gestion" && <GestionVentasPage />}
+
+          {rutaActual === "/productos/gestion" && <GestionProductosPage />}
+
+          {(rutaActual === "/productos/nuevo" || rutaActual.endsWith("/editar")) && <ProductoFormPage />}
+
+          {rutaActual === "/productos/inventario" && <InventarioProductosPage />}
+
+          {!ventasActiva && !productosActiva && activeItem === "dashboard" && <DashboardHome />}
+
+          {!ventasActiva && !productosActiva && activeItem === "ventas" && (
             <PlaceholderPage
               title="Ventas"
               description="Desde aquí administraremos las ventas y facturación."
@@ -156,7 +243,7 @@ export default function DashboardPage() {
             />
           )}
 
-          {activeItem === "productos" && (
+          {!ventasActiva && !productosActiva && activeItem === "productos" && (
             <PlaceholderPage
               title="Productos"
               description="Desde aquí administraremos el inventario y los productos."
@@ -164,7 +251,7 @@ export default function DashboardPage() {
             />
           )}
 
-          {activeItem === "clientes" && <ClientesPage />}
+          {!ventasActiva && !productosActiva && activeItem === "clientes" && <ClientesPage />}
 
         </main>
       </div>
