@@ -151,6 +151,154 @@ button {
     .brand-icon::after, .topbar-logo::after { animation: none; }
 }
 
+/* Logo real con barrido de luz periódico */
+.brand-icon {
+    overflow: hidden;
+    isolation: isolate;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.brand-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    display: block;
+    filter: brightness(1.08) contrast(1.05);
+}
+
+.sidebar.open .brand-icon {
+    width: 168px;
+    min-width: 168px;
+    height: 52px;
+}
+
+.sidebar.open .brand-text { display: none; }
+
+.sidebar-header { justify-content: flex-start; }
+
+.sidebar.closed .brand-icon {
+    width: 39px;
+    min-width: 39px;
+    height: 39px;
+}
+
+.sidebar.closed .brand-icon img {
+    object-position: left center;
+}
+
+.brand-icon::after,
+.business-info::after {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    inset: -35% auto -35% -55%;
+    width: 24%;
+    background: linear-gradient(105deg, transparent 8%, rgba(255,255,255,.18) 28%, rgba(255,255,255,.98) 50%, rgba(255,255,255,.18) 72%, transparent 92%);
+    transform: skewX(-20deg) translateX(0);
+    filter: blur(.3px);
+    mix-blend-mode: screen;
+    opacity: 0;
+    animation: light-sweep 5.2s cubic-bezier(.35,0,.2,1) infinite;
+    pointer-events: none;
+}
+
+.business-info {
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.topbar-logo-image {
+    position: relative;
+    z-index: 1;
+    width: 150px;
+    height: 46px;
+    object-fit: contain;
+    object-position: left center;
+    display: block;
+}
+
+.business-info > strong { display: none; }
+.business-info > span { display: none; }
+
+@keyframes light-sweep {
+    0%, 62% { transform: skewX(-20deg) translateX(0); opacity: 0; }
+    67% { opacity: 1; }
+    78% { opacity: .9; }
+    88%, 100% { transform: skewX(-20deg) translateX(680%); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .brand-icon::after, .business-info::after { animation: none; }
+}
+
+/* Barrido limpio: la luz vive dentro del mismo marco del logo. */
+.brand-icon::after,
+.business-info::after { display: none; }
+
+.logo-frame {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.logo-frame img {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    object-position: center;
+}
+
+.logo-shine {
+    position: absolute;
+    z-index: 2;
+    top: -35%;
+    bottom: -35%;
+    left: -35%;
+    width: 24%;
+    background: linear-gradient(
+        105deg,
+        transparent 0%,
+        rgba(255, 255, 255, .12) 28%,
+        rgba(255, 255, 255, .98) 50%,
+        rgba(255, 255, 255, .12) 72%,
+        transparent 100%
+    );
+    transform: skewX(-20deg) translateX(0);
+    mix-blend-mode: screen;
+    opacity: 0;
+    pointer-events: none;
+    animation: logo-light-sweep 5.4s cubic-bezier(.35, 0, .2, 1) infinite;
+}
+
+.topbar-logo-frame {
+    width: 150px;
+    height: 46px;
+}
+
+.topbar-logo-frame .topbar-logo-image {
+    width: 100%;
+    height: 100%;
+}
+
+@keyframes logo-light-sweep {
+    0%, 64% { transform: skewX(-20deg) translateX(0); opacity: 0; }
+    68% { opacity: 1; }
+    80% { opacity: .9; }
+    90%, 100% { transform: skewX(-20deg) translateX(650%); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .logo-shine { animation: none; }
+}
+
 .sidebar-nav {
     padding: 18px 12px;
     flex: 1;
