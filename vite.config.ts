@@ -8,15 +8,21 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      injectRegister: 'auto',
+      includeAssets: ['nuvoo-icon.svg'],
       manifest: {
         name: 'Nuvoo Importadores',
         short_name: 'Nuvoo',
         lang: 'es',
-        description: 'Panel de gestion para Nuvoo Importadores.',
+        description: 'Sistema de gestión de ventas, productos e inventario para Nuvoo Importadores.',
         theme_color: '#1f6b5d',
         background_color: '#f4efe7',
         display: 'standalone',
-        start_url: '/login',
+        display_override: ['window-controls-overlay', 'standalone'],
+        start_url: '/',
+        scope: '/',
+        orientation: 'any',
+        categories: ['business', 'productivity'],
         icons: [
           {
             src: '/nuvoo-icon.svg',
@@ -25,6 +31,13 @@ export default defineConfig({
             purpose: 'any maskable',
           },
         ],
+      },
+      workbox: {
+        // Mantiene disponible el contenedor de React al abrir enlaces internos
+        // o cuando la conexión es intermitente. Los datos de Supabase se
+        // solicitarán de nuevo cuando haya conexión.
+        navigateFallback: '/index.html',
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff2}'],
       },
     }),
   ],
