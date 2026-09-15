@@ -2,6 +2,7 @@ import { useState } from "react";
 import "./DashboardPage.css";
 import ClientesPage from "../clientes/ClientesPage";
 import { supabase } from "../../lib/supabase";
+import logo from "../../assets/logo sin linea .png";
 
 type MenuItem = "dashboard" | "ventas" | "productos" | "clientes";
 
@@ -16,7 +17,12 @@ export default function DashboardPage() {
       ========================== */}
       <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
         <div className="sidebar-header">
-          <div className="brand-icon" aria-label="Logo V"><span>V</span></div>
+          <div className="brand-icon" aria-label="Logo Nauvoo Importadores">
+            <div className="logo-frame">
+              <img src={logo} alt="Nauvoo Importadores" />
+              <span className="logo-shine" aria-hidden="true" />
+            </div>
+          </div>
 
           {sidebarOpen && (
             <div className="brand-text">
