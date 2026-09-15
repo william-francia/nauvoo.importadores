@@ -7,6 +7,7 @@ import GestionVentasPage from "../../features/ventas/GestionVentasPage";
 import GestionProductosPage from "../productos/GestionProductosPage";
 import ProductoFormPage from "../productos/ProductoFormPage";
 import InventarioProductosPage from "../productos/InventarioProductosPage";
+import ReportesPage from "../productos/ReportesPage";
 import { supabase } from "../../lib/supabase";
 
 type MenuItem = "dashboard" | "ventas" | "productos" | "clientes";
@@ -17,6 +18,10 @@ export default function DashboardPage() {
   const rutaActual = location.pathname.replace(/\/+$/, "") || "/";
   const ventasActiva = rutaActual.startsWith("/ventas/");
   const productosActiva = rutaActual.startsWith("/productos/");
+  const gestionProductosActiva =
+    rutaActual === "/productos/gestion" ||
+    rutaActual === "/productos/nuevo" ||
+    rutaActual.endsWith("/editar");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeItem, setActiveItem] = useState<MenuItem>("dashboard");
   const [ventasOpen, setVentasOpen] = useState(ventasActiva);
@@ -126,7 +131,7 @@ export default function DashboardPage() {
           {sidebarOpen && productosOpen && (
             <div className="nav-submenu">
               <button
-                className={`nav-subitem ${productosActiva && rutaActual !== "/productos/inventario" ? "active" : ""}`}
+                className={`nav-subitem ${gestionProductosActiva ? "active" : ""}`}
                 onClick={() => navigate("/productos/gestion")}
               >
                 Gestión de productos
@@ -136,6 +141,12 @@ export default function DashboardPage() {
                 onClick={() => navigate("/productos/inventario")}
               >
                 Inventario de productos
+              </button>
+              <button
+                className={`nav-subitem ${rutaActual === "/productos/reportes" ? "active" : ""}`}
+                onClick={() => navigate("/productos/reportes")}
+              >
+                Reportes
               </button>
             </div>
           )}
@@ -226,6 +237,8 @@ export default function DashboardPage() {
           {(rutaActual === "/productos/nuevo" || rutaActual.endsWith("/editar")) && <ProductoFormPage />}
 
           {rutaActual === "/productos/inventario" && <InventarioProductosPage />}
+
+          {rutaActual === "/productos/reportes" && <ReportesPage />}
 
           {!ventasActiva && !productosActiva && activeItem === "dashboard" && <DashboardHome />}
 

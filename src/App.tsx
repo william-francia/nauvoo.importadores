@@ -79,6 +79,7 @@ function App() {
         <Route path="/productos/nuevo" element={<DashboardPage />} />
         <Route path="/productos/:productoId/editar" element={<DashboardPage />} />
         <Route path="/productos/inventario" element={<DashboardPage />} />
+        <Route path="/productos/reportes" element={<DashboardPage />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     )
