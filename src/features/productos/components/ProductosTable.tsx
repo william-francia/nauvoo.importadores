@@ -8,6 +8,7 @@ import type {
   GestionProductosFilters,
   Producto,
 } from "../types/productos.types";
+import type { ProductoHomologacion } from "../../facturas/types/siat.types";
 
 import {
   calcularInventarioTotal,
@@ -42,6 +43,8 @@ interface Props {
   onEdit: (
     producto: Producto
   ) => void;
+  homologaciones: Map<string, ProductoHomologacion>;
+  onHomologar: (producto: ProductoHomologacion) => void;
 }
 
 function StockChip({
@@ -78,6 +81,8 @@ export default function ProductosTable({
   onPreview,
 
   onEdit,
+  homologaciones,
+  onHomologar,
 }: Props) {
   const todosSeleccionados =
     productos.length > 0 &&
@@ -106,9 +111,7 @@ export default function ProductosTable({
               />
             </th>
 
-            <th>
-              Act.Eco.
-            </th>
+            <th>Estado SIAT</th>
 
             <th className="productos-col-producto">
               Producto
@@ -143,18 +146,7 @@ export default function ProductosTable({
             <th />
 
             <th>
-              <input
-                value={
-                  filters.actividadEconomica
-                }
-                placeholder="Filtrar..."
-                onChange={(event) =>
-                  onFilterChange(
-                    "actividadEconomica",
-                    event.target.value
-                  )
-                }
-              />
+              <select value={filters.siat} onChange={(event)=>onFilterChange("siat",event.target.value as GestionProductosFilters["siat"])}><option value="TODOS">Todos</option><option value="HOMOLOGADO">Homologado</option><option value="PENDIENTE">Pendiente</option></select>
             </th>
 
             <th>
@@ -226,6 +218,8 @@ export default function ProductosTable({
           ) : (
             productos.map(
               (producto) => {
+                const homologacion = homologaciones.get(producto.id) ?? homologaciones.get(producto.sku.toUpperCase());
+                const estadoSiat = homologacion?.estado === "HOMOLOGADO" ? "Homologado" : homologacion?.estado === "INVALIDO" ? "Inválido" : "Pendiente";
                 const total =
                   calcularInventarioTotal(
                     producto.stockPorLocal
@@ -273,11 +267,7 @@ export default function ProductosTable({
                       />
                     </td>
 
-                    <td>
-                      {
-                        producto.actividadEconomicaCodigo
-                      }
-                    </td>
+                    <td><button type="button" className={`producto-status producto-status--${homologacion?.estado === "HOMOLOGADO" ? "alto" : homologacion?.estado === "INVALIDO" ? "sin_stock" : "bajo"}`} disabled={!homologacion} title={homologacion?"Administrar homologación fiscal":"El producto aún no existe en la fuente real de Supabase"} onClick={()=>homologacion&&onHomologar(homologacion)}>{estadoSiat}</button></td>
 
                     <td>
                       <button

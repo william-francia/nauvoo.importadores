@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import "./DashboardPage.css";
 import ClientesPage from "../clientes/ClientesPage";
@@ -11,6 +11,12 @@ import ReportesPage from "../productos/ReportesPage";
 import { supabase } from "../../lib/supabase";
 import logo from "../../assets/logo sin linea .png";
 
+const FacturasPage = lazy(() => import("../facturas/FacturasPage"));
+const ContingenciasPage = lazy(() => import("../facturas/ContingenciasPage"));
+const RegistrarVentaOfflinePage = lazy(() => import("../facturas/RegistrarVentaOfflinePage"));
+const VentasOfflinePage = lazy(() => import("../facturas/VentasOfflinePage"));
+const EventosPage = lazy(() => import("../facturas/EventosPage"));
+
 type MenuItem = "dashboard" | "ventas" | "productos" | "clientes";
 
 export default function DashboardPage() {
@@ -19,6 +25,8 @@ export default function DashboardPage() {
   const rutaActual = location.pathname.replace(/\/+$/, "") || "/";
   const ventasActiva = rutaActual.startsWith("/ventas/");
   const productosActiva = rutaActual.startsWith("/productos/");
+  const facturasActiva = rutaActual === "/facturas" || rutaActual.startsWith("/facturas/");
+  const offlineActiva = rutaActual.startsWith("/facturas/offline/");
   const gestionProductosActiva =
     rutaActual === "/productos/gestion" ||
     rutaActual === "/productos/nuevo" ||
@@ -27,6 +35,8 @@ export default function DashboardPage() {
   const [activeItem, setActiveItem] = useState<MenuItem>("dashboard");
   const [ventasOpen, setVentasOpen] = useState(ventasActiva);
   const [productosOpen, setProductosOpen] = useState(productosActiva);
+  const [facturasOpen, setFacturasOpen] = useState(facturasActiva);
+  const [offlineOpen, setOfflineOpen] = useState(offlineActiva);
 
   return (
     <div className="dashboard">
@@ -172,6 +182,37 @@ export default function DashboardPage() {
 
             {sidebarOpen && <span>Clientes</span>}
           </button>
+
+          <button
+            className={`nav-item ${facturasActiva ? "active" : ""}`}
+            onClick={() => {
+              if (!sidebarOpen) {
+                setSidebarOpen(true);
+                setFacturasOpen(true);
+                return;
+              }
+              setFacturasOpen((actual) => !actual);
+            }}
+          >
+            <span className="nav-icon"><ReceiptIcon /></span>
+            {sidebarOpen && <span>Facturas</span>}
+            {sidebarOpen && <span className={`nav-chevron ${facturasOpen ? "open" : ""}`}>›</span>}
+          </button>
+
+          {sidebarOpen && facturasOpen && (
+            <div className="nav-submenu">
+              <button className={`nav-subitem ${rutaActual === "/facturas" ? "active" : ""}`} onClick={() => navigate("/facturas")}>Gestión de facturas</button>
+              <button className={`nav-subitem ${rutaActual === "/facturas/contingencias" ? "active" : ""}`} onClick={() => navigate("/facturas/contingencias")}>Contingencias</button>
+              <button className={`nav-subgroup-trigger ${offlineActiva ? "active" : ""}`} onClick={() => setOfflineOpen((actual) => !actual)}>
+                <span>Fuera de línea</span><span className={`nav-chevron ${offlineOpen ? "open" : ""}`}>›</span>
+              </button>
+              {offlineOpen && <div className="nav-submenu nav-submenu--nested">
+                <button className={`nav-subitem ${rutaActual === "/facturas/offline/nueva" ? "active" : ""}`} onClick={() => navigate("/facturas/offline/nueva")}>Registrar venta offline</button>
+                <button className={`nav-subitem ${rutaActual === "/facturas/offline/ventas" ? "active" : ""}`} onClick={() => navigate("/facturas/offline/ventas")}>Gestión de ventas offline</button>
+                <button className={`nav-subitem ${rutaActual === "/facturas/offline/eventos" ? "active" : ""}`} onClick={() => navigate("/facturas/offline/eventos")}>Gestión de eventos</button>
+              </div>}
+            </div>
+          )}
         </nav>
 
         {sidebarOpen && (
@@ -246,9 +287,17 @@ export default function DashboardPage() {
 
           {rutaActual === "/productos/reportes" && <ReportesPage />}
 
-          {!ventasActiva && !productosActiva && activeItem === "dashboard" && <DashboardHome />}
+          {facturasActiva && <Suspense fallback={<div className="siat-state">Cargando módulo fiscal…</div>}>
+            {rutaActual === "/facturas" && <FacturasPage />}
+            {rutaActual === "/facturas/contingencias" && <ContingenciasPage />}
+            {rutaActual === "/facturas/offline/nueva" && <RegistrarVentaOfflinePage />}
+            {rutaActual === "/facturas/offline/ventas" && <VentasOfflinePage />}
+            {rutaActual === "/facturas/offline/eventos" && <EventosPage />}
+          </Suspense>}
 
-          {!ventasActiva && !productosActiva && activeItem === "ventas" && (
+          {!ventasActiva && !productosActiva && !facturasActiva && activeItem === "dashboard" && <DashboardHome />}
+
+          {!ventasActiva && !productosActiva && !facturasActiva && activeItem === "ventas" && (
             <PlaceholderPage
               title="Ventas"
               description="Desde aquí administraremos las ventas y facturación."
@@ -256,7 +305,7 @@ export default function DashboardPage() {
             />
           )}
 
-          {!ventasActiva && !productosActiva && activeItem === "productos" && (
+          {!ventasActiva && !productosActiva && !facturasActiva && activeItem === "productos" && (
             <PlaceholderPage
               title="Productos"
               description="Desde aquí administraremos el inventario y los productos."
@@ -264,7 +313,7 @@ export default function DashboardPage() {
             />
           )}
 
-          {!ventasActiva && !productosActiva && activeItem === "clientes" && <ClientesPage />}
+          {!ventasActiva && !productosActiva && !facturasActiva && activeItem === "clientes" && <ClientesPage />}
 
         </main>
       </div>

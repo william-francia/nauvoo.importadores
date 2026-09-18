@@ -1,7 +1,4 @@
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useState } from "react";
 import type { FormEvent } from "react";
 
 import type {
@@ -27,39 +24,24 @@ function correoValido(
   );
 }
 
-export default function ResendEmailModal({
+export default function ResendEmailModal(props: Props) {
+  if (!props.venta) return null;
+  return <ResendEmailModalContent key={props.venta.id} venta={props.venta} onCerrar={props.onCerrar} onEnviar={props.onEnviar} />;
+}
+
+function ResendEmailModalContent({
   venta,
   onCerrar,
   onEnviar,
-}: Props) {
+}: Omit<Props, "venta"> & { venta: GestionVenta }) {
   const [correo, setCorreo] =
     useState("");
 
   const [correos, setCorreos] =
-    useState<string[]>([]);
+    useState<string[]>(venta.correoCliente ? [venta.correoCliente] : []);
 
   const [error, setError] =
     useState("");
-
-  useEffect(() => {
-    if (!venta) {
-      return;
-    }
-
-    setCorreo("");
-
-    setError("");
-
-    setCorreos(
-      venta.correoCliente
-        ? [venta.correoCliente]
-        : []
-    );
-  }, [venta]);
-
-  if (!venta) {
-    return null;
-  }
 
   const ventaActual = venta;
 

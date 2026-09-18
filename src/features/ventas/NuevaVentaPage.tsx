@@ -90,6 +90,7 @@ export default function NuevaVentaPage() {
   async function handlePagar(data: {
     metodo: MetodoPago;
     montoRecibido: number;
+    tarjetaOfuscada: string | null;
   }) {
     if (venta.lineas.length === 0) {
       return;
@@ -105,6 +106,8 @@ export default function NuevaVentaPage() {
             venta.cliente?.id ?? null,
 
           metodo_pago: data.metodo,
+
+          tarjeta_ofuscada: data.tarjetaOfuscada,
 
           observacion:
             venta.observacion,

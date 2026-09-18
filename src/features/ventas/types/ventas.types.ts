@@ -85,6 +85,8 @@ export interface RegistrarVentaInput {
 
   metodo_pago: MetodoPago;
 
+  tarjeta_ofuscada: string | null;
+
   observacion?: string;
 
   descuento_venta: number;

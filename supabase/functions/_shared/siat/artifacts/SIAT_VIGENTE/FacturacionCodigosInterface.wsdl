@@ -1,0 +1,438 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="https://siat.impuestos.gob.bo/" name="ServicioFacturacionCodigos" targetNamespace="https://siat.impuestos.gob.bo/">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="https://siat.impuestos.gob.bo/" elementFormDefault="unqualified" targetNamespace="https://siat.impuestos.gob.bo/" version="1.0">
+
+  <xs:element name="cufd" type="tns:cufd"/>
+
+  <xs:element name="cufdMasivo" type="tns:cufdMasivo"/>
+
+  <xs:element name="cufdMasivoResponse" type="tns:cufdMasivoResponse"/>
+
+  <xs:element name="cufdResponse" type="tns:cufdResponse"/>
+
+  <xs:element name="cuis" type="tns:cuis"/>
+
+  <xs:element name="cuisMasivo" type="tns:cuisMasivo"/>
+
+  <xs:element name="cuisMasivoResponse" type="tns:cuisMasivoResponse"/>
+
+  <xs:element name="cuisResponse" type="tns:cuisResponse"/>
+
+  <xs:element name="notificaCertificadoRevocado" type="tns:notificaCertificadoRevocado"/>
+
+  <xs:element name="notificaCertificadoRevocadoResponse" type="tns:notificaCertificadoRevocadoResponse"/>
+
+  <xs:element name="verificarComunicacion" type="tns:verificarComunicacion"/>
+
+  <xs:element name="verificarComunicacionResponse" type="tns:verificarComunicacionResponse"/>
+
+  <xs:element name="verificarNit" type="tns:verificarNit"/>
+
+  <xs:element name="verificarNitResponse" type="tns:verificarNitResponse"/>
+
+  <xs:complexType name="verificarComunicacion">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="verificarComunicacionResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="RespuestaComunicacion" type="tns:respuestaComunicacion"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="respuestaComunicacion">
+    <xs:complexContent>
+      <xs:extension base="tns:modelDto">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="mensajesList" nillable="true" type="tns:mensajeServicio"/>
+          <xs:element minOccurs="0" name="transaccion" type="xs:boolean"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType abstract="true" name="modelDto">
+    <xs:complexContent>
+      <xs:extension base="tns:model">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType abstract="true" name="model">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="mensajeServicio">
+    <xs:complexContent>
+      <xs:extension base="tns:modelDto">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="codigo" type="xs:int"/>
+          <xs:element minOccurs="0" name="descripcion" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="verificarNit">
+    <xs:sequence>
+      <xs:element name="SolicitudVerificarNit" type="tns:solicitudVerificarNit"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="solicitudVerificarNit">
+    <xs:sequence>
+      <xs:element name="codigoAmbiente" type="xs:int"/>
+      <xs:element name="codigoModalidad" type="xs:int"/>
+      <xs:element name="codigoSistema" type="xs:string"/>
+      <xs:element name="codigoSucursal" type="xs:int"/>
+      <xs:element name="cuis" type="xs:string"/>
+      <xs:element name="nit" type="xs:long"/>
+      <xs:element name="nitParaVerificacion" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="verificarNitResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="RespuestaVerificarNit" type="tns:respuestaVerificarNit"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="respuestaVerificarNit">
+    <xs:complexContent>
+      <xs:extension base="tns:respuestaConfiguracion">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="respuestaConfiguracion">
+    <xs:complexContent>
+      <xs:extension base="tns:modelDto">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="mensajesList" nillable="true" type="tns:mensajeServicio"/>
+          <xs:element minOccurs="0" name="transaccion" type="xs:boolean"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="cuisMasivo">
+    <xs:sequence>
+      <xs:element name="SolicitudCuisMasivoSistemas" type="tns:solicitudCuisMasivoSistemas"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="solicitudCuisMasivoSistemas">
+    <xs:sequence>
+      <xs:element name="codigoAmbiente" type="xs:int"/>
+      <xs:element name="codigoModalidad" type="xs:int"/>
+      <xs:element name="codigoSistema" type="xs:string"/>
+      <xs:element maxOccurs="unbounded" name="datosSolicitud" type="tns:solicitudListaCuisDto"/>
+      <xs:element name="nit" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="solicitudListaCuisDto">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="codigoPuntoVenta" type="xs:int"/>
+      <xs:element name="codigoSucursal" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="cuisMasivoResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="RespuestaCuisMasivo" type="tns:respuestaCuisMasivo"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="respuestaCuisMasivo">
+    <xs:complexContent>
+      <xs:extension base="tns:modelDto">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="listaRespuestasCuis" nillable="true" type="tns:respuestaListaRegistroCuisSoapDto"/>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="mensajesList" nillable="true" type="tns:mensajeServicio"/>
+          <xs:element minOccurs="0" name="transaccion" type="xs:boolean"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="respuestaListaRegistroCuisSoapDto">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="codigo" type="xs:string"/>
+      <xs:element minOccurs="0" name="codigoPuntoVenta" type="xs:int"/>
+      <xs:element minOccurs="0" name="codigoSucursal" type="xs:int"/>
+      <xs:element minOccurs="0" name="fechaVigencia" type="xs:dateTime"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="mensajeServicioList" nillable="true" type="tns:mensajeServicio"/>
+      <xs:element name="transaccion" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="cufd">
+    <xs:sequence>
+      <xs:element name="SolicitudCufd" type="tns:solicitudCufd"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="solicitudCufd">
+    <xs:sequence>
+      <xs:element name="codigoAmbiente" type="xs:int"/>
+      <xs:element name="codigoModalidad" type="xs:int"/>
+      <xs:element minOccurs="0" name="codigoPuntoVenta" nillable="true" type="xs:int"/>
+      <xs:element name="codigoSistema" type="xs:string"/>
+      <xs:element name="codigoSucursal" type="xs:int"/>
+      <xs:element name="cuis" type="xs:string"/>
+      <xs:element name="nit" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="cufdResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="RespuestaCufd" type="tns:respuestaCufd"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="respuestaCufd">
+    <xs:complexContent>
+      <xs:extension base="tns:modelDto">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="codigo" type="xs:string"/>
+          <xs:element minOccurs="0" name="codigoControl" type="xs:string"/>
+          <xs:element minOccurs="0" name="direccion" type="xs:string"/>
+          <xs:element minOccurs="0" name="fechaVigencia" type="xs:dateTime"/>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="mensajesList" nillable="true" type="tns:mensajeServicio"/>
+          <xs:element minOccurs="0" name="transaccion" type="xs:boolean"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="notificaCertificadoRevocado">
+    <xs:sequence>
+      <xs:element name="SolicitudNotificaRevocado" type="tns:solicitudNotifcaRevocado"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="solicitudNotifcaRevocado">
+    <xs:sequence>
+      <xs:element name="certificado" type="xs:string"/>
+      <xs:element name="codigoAmbiente" type="xs:int"/>
+      <xs:element name="codigoSistema" type="xs:string"/>
+      <xs:element name="codigoSucursal" type="xs:int"/>
+      <xs:element name="cuis" type="xs:string"/>
+      <xs:element minOccurs="0" name="fechaRevocacion" nillable="true" type="xs:dateTime"/>
+      <xs:element name="nit" type="xs:long"/>
+      <xs:element name="razonRevocacion" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="notificaCertificadoRevocadoResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="RespuestaNotificaRevocado" type="tns:respuestaNotificaRevocado"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="respuestaNotificaRevocado">
+    <xs:complexContent>
+      <xs:extension base="tns:respuestaConfiguracion">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="cuis">
+    <xs:sequence>
+      <xs:element name="SolicitudCuis" type="tns:solicitudCuis"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="solicitudCuis">
+    <xs:sequence>
+      <xs:element name="codigoAmbiente" type="xs:int"/>
+      <xs:element name="codigoModalidad" type="xs:int"/>
+      <xs:element minOccurs="0" name="codigoPuntoVenta" nillable="true" type="xs:int"/>
+      <xs:element name="codigoSistema" type="xs:string"/>
+      <xs:element name="codigoSucursal" type="xs:int"/>
+      <xs:element name="nit" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="cuisResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="RespuestaCuis" type="tns:respuestaCuis"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="respuestaCuis">
+    <xs:complexContent>
+      <xs:extension base="tns:modelDto">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="codigo" type="xs:string"/>
+          <xs:element minOccurs="0" name="fechaVigencia" type="xs:dateTime"/>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="mensajesList" nillable="true" type="tns:mensajeServicio"/>
+          <xs:element minOccurs="0" name="transaccion" type="xs:boolean"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="cufdMasivo">
+    <xs:sequence>
+      <xs:element name="SolicitudCufdMasivo" type="tns:solicitudCufdMasivo"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="solicitudCufdMasivo">
+    <xs:sequence>
+      <xs:element name="codigoAmbiente" type="xs:int"/>
+      <xs:element name="codigoModalidad" type="xs:int"/>
+      <xs:element name="codigoSistema" type="xs:string"/>
+      <xs:element maxOccurs="unbounded" name="datosSolicitud" type="tns:solicitudListaCufdDto"/>
+      <xs:element name="nit" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="solicitudListaCufdDto">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="codigoPuntoVenta" type="xs:int"/>
+      <xs:element name="codigoSucursal" type="xs:int"/>
+      <xs:element name="cuis" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="cufdMasivoResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="RespuestaCufdMasivo" type="tns:respuestaCufdMasivo"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="respuestaCufdMasivo">
+    <xs:complexContent>
+      <xs:extension base="tns:modelDto">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="listaRespuestasCufd" nillable="true" type="tns:respuestaListaRegistroCufdSoapDto"/>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="mensajesList" nillable="true" type="tns:mensajeServicio"/>
+          <xs:element minOccurs="0" name="transaccion" type="xs:boolean"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="respuestaListaRegistroCufdSoapDto">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="codigo" type="xs:string"/>
+      <xs:element minOccurs="0" name="codigoControl" type="xs:string"/>
+      <xs:element minOccurs="0" name="codigoPuntoVenta" type="xs:int"/>
+      <xs:element minOccurs="0" name="codigoSucursal" type="xs:int"/>
+      <xs:element minOccurs="0" name="cuis" type="xs:string"/>
+      <xs:element minOccurs="0" name="direccion" type="xs:string"/>
+      <xs:element minOccurs="0" name="fechaVigencia" type="xs:dateTime"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="mensajeServicioList" nillable="true" type="tns:mensajeServicio"/>
+      <xs:element name="transaccion" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="verificarNit">
+    <wsdl:part element="ns1:verificarNit" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="verificarComunicacion">
+    <wsdl:part element="ns1:verificarComunicacion" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="verificarComunicacionResponse">
+    <wsdl:part element="ns1:verificarComunicacionResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="cuisResponse">
+    <wsdl:part element="ns1:cuisResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="cufdMasivoResponse">
+    <wsdl:part element="ns1:cufdMasivoResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="cufdResponse">
+    <wsdl:part element="ns1:cufdResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="cuisMasivo">
+    <wsdl:part element="ns1:cuisMasivo" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="cuisMasivoResponse">
+    <wsdl:part element="ns1:cuisMasivoResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="cufd">
+    <wsdl:part element="ns1:cufd" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="notificaCertificadoRevocadoResponse">
+    <wsdl:part element="ns1:notificaCertificadoRevocadoResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="notificaCertificadoRevocado">
+    <wsdl:part element="ns1:notificaCertificadoRevocado" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="cuis">
+    <wsdl:part element="ns1:cuis" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="verificarNitResponse">
+    <wsdl:part element="ns1:verificarNitResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="cufdMasivo">
+    <wsdl:part element="ns1:cufdMasivo" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="ServicioFacturacionCodigos">
+    <wsdl:operation name="verificarComunicacion">
+      <wsdl:input message="ns1:verificarComunicacion" name="verificarComunicacion">
+    </wsdl:input>
+      <wsdl:output message="ns1:verificarComunicacionResponse" name="verificarComunicacionResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="verificarNit">
+      <wsdl:input message="ns1:verificarNit" name="verificarNit">
+    </wsdl:input>
+      <wsdl:output message="ns1:verificarNitResponse" name="verificarNitResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="cuisMasivo">
+      <wsdl:input message="ns1:cuisMasivo" name="cuisMasivo">
+    </wsdl:input>
+      <wsdl:output message="ns1:cuisMasivoResponse" name="cuisMasivoResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="cufd">
+      <wsdl:input message="ns1:cufd" name="cufd">
+    </wsdl:input>
+      <wsdl:output message="ns1:cufdResponse" name="cufdResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="notificaCertificadoRevocado">
+      <wsdl:input message="ns1:notificaCertificadoRevocado" name="notificaCertificadoRevocado">
+    </wsdl:input>
+      <wsdl:output message="ns1:notificaCertificadoRevocadoResponse" name="notificaCertificadoRevocadoResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="cuis">
+      <wsdl:input message="ns1:cuis" name="cuis">
+    </wsdl:input>
+      <wsdl:output message="ns1:cuisResponse" name="cuisResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="cufdMasivo">
+      <wsdl:input message="ns1:cufdMasivo" name="cufdMasivo">
+    </wsdl:input>
+      <wsdl:output message="ns1:cufdMasivoResponse" name="cufdMasivoResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>

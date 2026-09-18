@@ -67,9 +67,9 @@ export interface ProductoFormValues {
 }
 
 export interface GestionProductosFilters {
-  actividadEconomica: string;
   producto: string;
   inventario: string;
+  siat: "TODOS" | "HOMOLOGADO" | "PENDIENTE";
 }
 
 export interface LocalProducto {

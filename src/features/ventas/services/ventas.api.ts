@@ -108,9 +108,10 @@ export async function buscarProductosVenta(termino: string): Promise<ProductoVen
 }
 
 export async function registrarVenta(venta: RegistrarVentaInput) {
-  const { data, error } = await supabase.rpc("registrar_venta", {
+  const { data, error } = await supabase.rpc("registrar_venta_fiscal", {
     p_cliente_id: venta.cliente_id,
     p_metodo_pago: venta.metodo_pago,
+    p_tarjeta_ofuscada: venta.tarjeta_ofuscada,
     p_observacion: venta.observacion || null,
     p_descuento_venta: venta.descuento_venta,
     p_items: venta.items,

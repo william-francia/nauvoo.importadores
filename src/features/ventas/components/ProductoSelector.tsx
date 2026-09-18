@@ -16,6 +16,7 @@ interface Props {
   onAgregar: (
     producto: ProductoVenta
   ) => void;
+  buscar?: (termino: string) => Promise<ProductoVenta[]>;
 }
 
 function moneda(valor: number) {
@@ -30,6 +31,7 @@ function moneda(valor: number) {
 
 export default function ProductoSelector({
   onAgregar,
+  buscar = buscarProductosVenta,
 }: Props) {
   const [texto, setTexto] =
     useState("");
@@ -86,7 +88,7 @@ export default function ProductoSelector({
           setCargando(true);
 
           const resultado =
-            await buscarProductosVenta(
+            await buscar(
               texto
             );
 
@@ -102,7 +104,7 @@ export default function ProductoSelector({
 
     return () =>
       window.clearTimeout(timer);
-  }, [texto, abierto]);
+  }, [texto, abierto, buscar]);
 
   function agregar(
     producto: ProductoVenta

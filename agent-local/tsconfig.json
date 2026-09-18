@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts", "../supabase/functions/_shared/siat/**/*.ts"],
+  "exclude": ["../supabase/functions/_shared/siat/runtime.ts", "../supabase/functions/_shared/siat/repository.ts", "../supabase/functions/_shared/siat/engine.ts"]
+}

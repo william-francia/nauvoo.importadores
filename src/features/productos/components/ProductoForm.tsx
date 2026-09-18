@@ -4,9 +4,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 
 import {
-  ACTIVIDADES_ECONOMICAS,
   LOCALES,
-  PRODUCTOS_HOMOLOGADOS,
   PROVEEDORES,
   TIPOS_PRODUCTO,
   UNIDADES_MEDIDA,
@@ -80,24 +78,6 @@ export default function ProductoForm({
   ) {
     event.preventDefault();
 
-    if (
-      !form.actividadEconomicaCodigo
-    ) {
-      setError(
-        "Selecciona la actividad económica."
-      );
-
-      return;
-    }
-
-    if (!form.homologadoCodigo) {
-      setError(
-        "Selecciona el producto homologado."
-      );
-
-      return;
-    }
-
     if (!form.nombre.trim()) {
       setError(
         "Ingresa el nombre del producto."
@@ -138,89 +118,8 @@ export default function ProductoForm({
         <div className="producto-form-main">
           <section className="producto-form-section">
             <h2>
-              HOMOLOGACIÓN
+              INFORMACIÓN DEL PRODUCTO
             </h2>
-
-            <label className="producto-field">
-              <span>
-                Actividad Económica *
-              </span>
-
-              <select
-                value={
-                  form.actividadEconomicaCodigo
-                }
-                onChange={(event) =>
-                  setField(
-                    "actividadEconomicaCodigo",
-                    event.target.value
-                  )
-                }
-              >
-                <option value="">
-                  Seleccione...
-                </option>
-
-                {ACTIVIDADES_ECONOMICAS.map(
-                  (item) => (
-                    <option
-                      key={
-                        item.codigo
-                      }
-                      value={
-                        item.codigo
-                      }
-                    >
-                      P -{" "}
-                      {item.codigo} -{" "}
-                      {
-                        item.nombre
-                      }
-                    </option>
-                  )
-                )}
-              </select>
-            </label>
-
-            <label className="producto-field">
-              <span>
-                Producto Homologado *
-              </span>
-
-              <select
-                value={
-                  form.homologadoCodigo
-                }
-                onChange={(event) =>
-                  setField(
-                    "homologadoCodigo",
-                    event.target.value
-                  )
-                }
-              >
-                <option value="">
-                  Seleccione...
-                </option>
-
-                {PRODUCTOS_HOMOLOGADOS.map(
-                  (item) => (
-                    <option
-                      key={
-                        item.codigo
-                      }
-                      value={
-                        item.codigo
-                      }
-                    >
-                      {item.codigo} -{" "}
-                      {
-                        item.nombre
-                      }
-                    </option>
-                  )
-                )}
-              </select>
-            </label>
 
             <label className="producto-field">
               <span>

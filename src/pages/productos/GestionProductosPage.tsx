@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import "../../features/productos/styles/productos.css";
 import ProductosTable from "../../features/productos/components/ProductosTable";
@@ -6,11 +7,19 @@ import ProductoPreviewModal from "../../features/productos/components/ProductoPr
 import { PRODUCTOS_MOCK } from "../../features/productos/data/productos.mock";
 import { useGestionProductos } from "../../features/productos/hooks/useGestionProductos";
 import type { Producto } from "../../features/productos/types/productos.types";
+import ProductoHomologacionModal from "../../features/productos/components/ProductoHomologacionModal";
+import { listarHomologacionesProductos } from "../../features/facturas/services/siat.service";
+import type { ProductoHomologacion } from "../../features/facturas/types/siat.types";
 
 export default function GestionProductosPage() {
   const navigate = useNavigate();
-  const gestion = useGestionProductos(PRODUCTOS_MOCK);
+  const homologacionesQuery = useQuery({queryKey:["siat-productos-homologacion"],queryFn:listarHomologacionesProductos});
+  const homologaciones = new Map<string,ProductoHomologacion>();
+  for(const item of homologacionesQuery.data??[]){homologaciones.set(item.productoId,item);homologaciones.set(item.codigoInterno.toUpperCase(),item)}
+  const homologados = new Set([...homologaciones.entries()].filter(([,value])=>value.estado==="HOMOLOGADO").map(([key])=>key));
+  const gestion = useGestionProductos(PRODUCTOS_MOCK,homologados);
   const [preview, setPreview] = useState<Producto | null>(null);
+  const [homologar,setHomologar]=useState<ProductoHomologacion|null>(null);
 
   return (
     <div className="productos-page">
@@ -33,6 +42,7 @@ export default function GestionProductosPage() {
       </header>
 
       <section className="productos-card">
+        {homologacionesQuery.error && <div className="producto-form-error">{homologacionesQuery.error.message}</div>}
         <div className="productos-toolbar">
           <span>{gestion.productosFiltrados.length} productos</span>
           <button className="productos-btn productos-btn--ghost" type="button" onClick={gestion.limpiarFiltros}>
@@ -52,6 +62,8 @@ export default function GestionProductosPage() {
           onTogglePagina={gestion.togglePagina}
           onPreview={setPreview}
           onEdit={(producto) => navigate(`/productos/${producto.id}/editar`)}
+          homologaciones={homologaciones}
+          onHomologar={setHomologar}
         />
 
         <footer className="productos-pagination">
@@ -67,6 +79,7 @@ export default function GestionProductosPage() {
       </section>
 
       <ProductoPreviewModal producto={preview} onCerrar={() => setPreview(null)} onEditar={(producto) => navigate(`/productos/${producto.id}/editar`)} />
+      <ProductoHomologacionModal producto={homologar} onClose={()=>setHomologar(null)}/>
     </div>
   );
 }

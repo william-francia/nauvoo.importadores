@@ -51,6 +51,27 @@ button {
     height: 100vh;
 }
 
+.sidebar-nav {
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(203, 212, 194, .55) transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar { width: 6px; }
+.sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+.sidebar-nav::-webkit-scrollbar-thumb { background: rgba(203, 212, 194, .45); border-radius: 999px; }
+.sidebar-nav::-webkit-scrollbar-thumb:hover { background: rgba(203, 212, 194, .7); }
+
+.nav-subgroup-trigger {
+    width: 100%; border: 0; background: transparent; color: inherit; display: flex;
+    justify-content: space-between; align-items: center; padding: 10px 18px 10px 42px;
+    font: inherit; font-size: 13px; cursor: pointer; opacity: .92;
+}
+.nav-subgroup-trigger.active { color: var(--secondary-color); font-weight: 700; }
+.nav-submenu--nested { margin-left: 13px; border-left: 1px solid rgba(255,255,255,.14); }
+.nav-submenu--nested .nav-subitem { padding-left: 38px; font-size: 12px; }
+
 .sidebar.open {
     width: var(--sidebar-width);
 }

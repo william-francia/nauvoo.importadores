@@ -16,13 +16,14 @@ import {
 } from "../utils/productos.utils";
 
 const FILTROS_INICIALES: GestionProductosFilters = {
-  actividadEconomica: "",
   producto: "",
   inventario: "",
+  siat: "TODOS",
 };
 
 export function useGestionProductos(
-  initialProducts: Producto[]
+  initialProducts: Producto[],
+  homologados: Set<string> = new Set()
 ) {
   const [productos, setProductos] =
     useState<Producto[]>(
@@ -66,11 +67,6 @@ export function useGestionProductos(
 
   const productosFiltrados =
     useMemo(() => {
-      const actividad =
-        normalizarBusqueda(
-          filters.actividadEconomica
-        );
-
       const producto =
         normalizarBusqueda(
           filters.producto
@@ -83,15 +79,6 @@ export function useGestionProductos(
 
       return productos.filter(
         (item) => {
-          if (
-            actividad &&
-            !normalizarBusqueda(
-              item.actividadEconomicaCodigo
-            ).includes(actividad)
-          ) {
-            return false;
-          }
-
           if (
             producto &&
             !normalizarBusqueda(
@@ -116,12 +103,17 @@ export function useGestionProductos(
             }
           }
 
+          const homologado = homologados.has(item.id) || homologados.has(item.sku.toUpperCase());
+          if (filters.siat === "HOMOLOGADO" && !homologado) return false;
+          if (filters.siat === "PENDIENTE" && homologado) return false;
+
           return true;
         }
       );
     }, [
       productos,
       filters,
+      homologados,
     ]);
 
   const totalPaginas = Math.max(

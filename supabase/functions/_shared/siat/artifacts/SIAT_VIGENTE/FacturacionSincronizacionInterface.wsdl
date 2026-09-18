@@ -1,0 +1,736 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="https://siat.impuestos.gob.bo/" name="ServicioFacturacionSincronizacion" targetNamespace="https://siat.impuestos.gob.bo/">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="https://siat.impuestos.gob.bo/" elementFormDefault="unqualified" targetNamespace="https://siat.impuestos.gob.bo/" version="1.0">
+
+  <xs:element name="sincronizarActividades" type="tns:sincronizarActividades"/>
+
+  <xs:element name="sincronizarActividadesResponse" type="tns:sincronizarActividadesResponse"/>
+
+  <xs:element name="sincronizarFechaHora" type="tns:sincronizarFechaHora"/>
+
+  <xs:element name="sincronizarFechaHoraResponse" type="tns:sincronizarFechaHoraResponse"/>
+
+  <xs:element name="sincronizarListaActividadesDocumentoSector" type="tns:sincronizarListaActividadesDocumentoSector"/>
+
+  <xs:element name="sincronizarListaActividadesDocumentoSectorResponse" type="tns:sincronizarListaActividadesDocumentoSectorResponse"/>
+
+  <xs:element name="sincronizarListaLeyendasFactura" type="tns:sincronizarListaLeyendasFactura"/>
+
+  <xs:element name="sincronizarListaLeyendasFacturaResponse" type="tns:sincronizarListaLeyendasFacturaResponse"/>
+
+  <xs:element name="sincronizarListaMensajesServicios" type="tns:sincronizarListaMensajesServicios"/>
+
+  <xs:element name="sincronizarListaMensajesServiciosResponse" type="tns:sincronizarListaMensajesServiciosResponse"/>
+
+  <xs:element name="sincronizarListaProductosServicios" type="tns:sincronizarListaProductosServicios"/>
+
+  <xs:element name="sincronizarListaProductosServiciosResponse" type="tns:sincronizarListaProductosServiciosResponse"/>
+
+  <xs:element name="sincronizarParametricaEventosSignificativos" type="tns:sincronizarParametricaEventosSignificativos"/>
+
+  <xs:element name="sincronizarParametricaEventosSignificativosResponse" type="tns:sincronizarParametricaEventosSignificativosResponse"/>
+
+  <xs:element name="sincronizarParametricaMotivoAnulacion" type="tns:sincronizarParametricaMotivoAnulacion"/>
+
+  <xs:element name="sincronizarParametricaMotivoAnulacionResponse" type="tns:sincronizarParametricaMotivoAnulacionResponse"/>
+
+  <xs:element name="sincronizarParametricaPaisOrigen" type="tns:sincronizarParametricaPaisOrigen"/>
+
+  <xs:element name="sincronizarParametricaPaisOrigenResponse" type="tns:sincronizarParametricaPaisOrigenResponse"/>
+
+  <xs:element name="sincronizarParametricaTipoDocumentoIdentidad" type="tns:sincronizarParametricaTipoDocumentoIdentidad"/>
+
+  <xs:element name="sincronizarParametricaTipoDocumentoIdentidadResponse" type="tns:sincronizarParametricaTipoDocumentoIdentidadResponse"/>
+
+  <xs:element name="sincronizarParametricaTipoDocumentoSector" type="tns:sincronizarParametricaTipoDocumentoSector"/>
+
+  <xs:element name="sincronizarParametricaTipoDocumentoSectorResponse" type="tns:sincronizarParametricaTipoDocumentoSectorResponse"/>
+
+  <xs:element name="sincronizarParametricaTipoEmision" type="tns:sincronizarParametricaTipoEmision"/>
+
+  <xs:element name="sincronizarParametricaTipoEmisionResponse" type="tns:sincronizarParametricaTipoEmisionResponse"/>
+
+  <xs:element name="sincronizarParametricaTipoHabitacion" type="tns:sincronizarParametricaTipoHabitacion"/>
+
+  <xs:element name="sincronizarParametricaTipoHabitacionResponse" type="tns:sincronizarParametricaTipoHabitacionResponse"/>
+
+  <xs:element name="sincronizarParametricaTipoMetodoPago" type="tns:sincronizarParametricaTipoMetodoPago"/>
+
+  <xs:element name="sincronizarParametricaTipoMetodoPagoResponse" type="tns:sincronizarParametricaTipoMetodoPagoResponse"/>
+
+  <xs:element name="sincronizarParametricaTipoMoneda" type="tns:sincronizarParametricaTipoMoneda"/>
+
+  <xs:element name="sincronizarParametricaTipoMonedaResponse" type="tns:sincronizarParametricaTipoMonedaResponse"/>
+
+  <xs:element name="sincronizarParametricaTipoPuntoVenta" type="tns:sincronizarParametricaTipoPuntoVenta"/>
+
+  <xs:element name="sincronizarParametricaTipoPuntoVentaResponse" type="tns:sincronizarParametricaTipoPuntoVentaResponse"/>
+
+  <xs:element name="sincronizarParametricaTiposFactura" type="tns:sincronizarParametricaTiposFactura"/>
+
+  <xs:element name="sincronizarParametricaTiposFacturaResponse" type="tns:sincronizarParametricaTiposFacturaResponse"/>
+
+  <xs:element name="sincronizarParametricaUnidadMedida" type="tns:sincronizarParametricaUnidadMedida"/>
+
+  <xs:element name="sincronizarParametricaUnidadMedidaResponse" type="tns:sincronizarParametricaUnidadMedidaResponse"/>
+
+  <xs:element name="verificarComunicacion" type="tns:verificarComunicacion"/>
+
+  <xs:element name="verificarComunicacionResponse" type="tns:verificarComunicacionResponse"/>
+
+  <xs:complexType name="sincronizarParametricaMotivoAnulacion">
+    <xs:sequence>
+      <xs:element name="SolicitudSincronizacion" type="tns:solicitudSincronizacion"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="solicitudSincronizacion">
+    <xs:sequence>
+      <xs:element name="codigoAmbiente" type="xs:int"/>
+      <xs:element minOccurs="0" name="codigoPuntoVenta" nillable="true" type="xs:int"/>
+      <xs:element name="codigoSistema" type="xs:string"/>
+      <xs:element name="codigoSucursal" type="xs:int"/>
+      <xs:element name="cuis" type="xs:string"/>
+      <xs:element name="nit" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarParametricaMotivoAnulacionResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="RespuestaListaParametricas" type="tns:respuestaListaParametricas"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="respuestaListaParametricas">
+    <xs:complexContent>
+      <xs:extension base="tns:respuestaConfiguracion">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="listaCodigos" nillable="true" type="tns:parametricasDto"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="respuestaConfiguracion">
+    <xs:complexContent>
+      <xs:extension base="tns:modelDto">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="mensajesList" nillable="true" type="tns:mensajeServicio"/>
+          <xs:element minOccurs="0" name="transaccion" type="xs:boolean"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType abstract="true" name="modelDto">
+    <xs:complexContent>
+      <xs:extension base="tns:model">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType abstract="true" name="model">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="parametricasDto">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="codigoClasificador" type="xs:int"/>
+      <xs:element minOccurs="0" name="descripcion" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="mensajeServicio">
+    <xs:complexContent>
+      <xs:extension base="tns:modelDto">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="codigo" type="xs:int"/>
+          <xs:element minOccurs="0" name="descripcion" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarActividades">
+    <xs:sequence>
+      <xs:element name="SolicitudSincronizacion" type="tns:solicitudSincronizacion"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarActividadesResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="RespuestaListaActividades" type="tns:respuestaListaActividades"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="respuestaListaActividades">
+    <xs:complexContent>
+      <xs:extension base="tns:respuestaConfiguracion">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="listaActividades" nillable="true" type="tns:actividadesDto"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="actividadesDto">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="codigoCaeb" type="xs:string"/>
+      <xs:element minOccurs="0" name="descripcion" type="xs:string"/>
+      <xs:element minOccurs="0" name="tipoActividad" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarFechaHora">
+    <xs:sequence>
+      <xs:element name="SolicitudSincronizacion" type="tns:solicitudSincronizacion"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarFechaHoraResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="RespuestaFechaHora" type="tns:respuestaFechaHora"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="respuestaFechaHora">
+    <xs:complexContent>
+      <xs:extension base="tns:respuestaConfiguracion">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="fechaHora" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarListaLeyendasFactura">
+    <xs:sequence>
+      <xs:element name="SolicitudSincronizacion" type="tns:solicitudSincronizacion"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarListaLeyendasFacturaResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="RespuestaListaParametricasLeyendas" type="tns:respuestaListaParametricasLeyendas"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="respuestaListaParametricasLeyendas">
+    <xs:complexContent>
+      <xs:extension base="tns:respuestaConfiguracion">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="listaLeyendas" nillable="true" type="tns:parametricaLeyendasDto"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="parametricaLeyendasDto">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="codigoActividad" type="xs:string"/>
+      <xs:element minOccurs="0" name="descripcionLeyenda" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarParametricaTipoHabitacion">
+    <xs:sequence>
+      <xs:element name="SolicitudSincronizacion" type="tns:solicitudSincronizacion"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarParametricaTipoHabitacionResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="RespuestaListaParametricas" type="tns:respuestaListaParametricas"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarListaActividadesDocumentoSector">
+    <xs:sequence>
+      <xs:element name="SolicitudSincronizacion" type="tns:solicitudSincronizacion"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarListaActividadesDocumentoSectorResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="RespuestaListaActividadesDocumentoSector" type="tns:respuestaListaActividadesDocumentoSector"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="respuestaListaActividadesDocumentoSector">
+    <xs:complexContent>
+      <xs:extension base="tns:respuestaConfiguracion">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="listaActividadesDocumentoSector" nillable="true" type="tns:actividadesDocumentoSectorDto"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="actividadesDocumentoSectorDto">
+    <xs:complexContent>
+      <xs:extension base="tns:modelDto">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="codigoActividad" type="xs:string"/>
+          <xs:element minOccurs="0" name="codigoDocumentoSector" type="xs:int"/>
+          <xs:element minOccurs="0" name="tipoDocumentoSector" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarParametricaTipoDocumentoIdentidad">
+    <xs:sequence>
+      <xs:element name="SolicitudSincronizacion" type="tns:solicitudSincronizacion"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarParametricaTipoDocumentoIdentidadResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="RespuestaListaParametricas" type="tns:respuestaListaParametricas"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarParametricaUnidadMedida">
+    <xs:sequence>
+      <xs:element name="SolicitudSincronizacion" type="tns:solicitudSincronizacion"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarParametricaUnidadMedidaResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="RespuestaListaParametricas" type="tns:respuestaListaParametricas"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarParametricaTipoDocumentoSector">
+    <xs:sequence>
+      <xs:element name="SolicitudSincronizacion" type="tns:solicitudSincronizacion"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarParametricaTipoDocumentoSectorResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="RespuestaListaParametricas" type="tns:respuestaListaParametricas"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarParametricaTiposFactura">
+    <xs:sequence>
+      <xs:element name="SolicitudSincronizacion" type="tns:solicitudSincronizacion"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarParametricaTiposFacturaResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="RespuestaListaParametricas" type="tns:respuestaListaParametricas"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="verificarComunicacion">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="verificarComunicacionResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:respuestaComunicacion"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="respuestaComunicacion">
+    <xs:complexContent>
+      <xs:extension base="tns:modelDto">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="mensajesList" nillable="true" type="tns:mensajeServicio"/>
+          <xs:element minOccurs="0" name="transaccion" type="xs:boolean"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarListaMensajesServicios">
+    <xs:sequence>
+      <xs:element name="SolicitudSincronizacion" type="tns:solicitudSincronizacion"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarListaMensajesServiciosResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="RespuestaListaParametricas" type="tns:respuestaListaParametricas"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarParametricaTipoMetodoPago">
+    <xs:sequence>
+      <xs:element name="SolicitudSincronizacion" type="tns:solicitudSincronizacion"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarParametricaTipoMetodoPagoResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="RespuestaListaParametricas" type="tns:respuestaListaParametricas"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarParametricaEventosSignificativos">
+    <xs:sequence>
+      <xs:element name="SolicitudSincronizacion" type="tns:solicitudSincronizacion"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarParametricaEventosSignificativosResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="RespuestaListaParametricas" type="tns:respuestaListaParametricas"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarParametricaTipoPuntoVenta">
+    <xs:sequence>
+      <xs:element name="SolicitudSincronizacion" type="tns:solicitudSincronizacion"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarParametricaTipoPuntoVentaResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="RespuestaListaParametricas" type="tns:respuestaListaParametricas"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarListaProductosServicios">
+    <xs:sequence>
+      <xs:element name="SolicitudSincronizacion" type="tns:solicitudSincronizacion"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarListaProductosServiciosResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="RespuestaListaProductos" type="tns:respuestaListaProductos"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="respuestaListaProductos">
+    <xs:complexContent>
+      <xs:extension base="tns:respuestaConfiguracion">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="listaCodigos" nillable="true" type="tns:productosDto"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="productosDto">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="codigoActividad" type="xs:string"/>
+      <xs:element minOccurs="0" name="codigoProducto" type="xs:long"/>
+      <xs:element minOccurs="0" name="descripcionProducto" type="xs:string"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="nandina" nillable="true" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarParametricaTipoEmision">
+    <xs:sequence>
+      <xs:element name="SolicitudSincronizacion" type="tns:solicitudSincronizacion"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarParametricaTipoEmisionResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="RespuestaListaParametricas" type="tns:respuestaListaParametricas"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarParametricaPaisOrigen">
+    <xs:sequence>
+      <xs:element name="SolicitudSincronizacion" type="tns:solicitudSincronizacion"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarParametricaPaisOrigenResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="RespuestaListaParametricas" type="tns:respuestaListaParametricas"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarParametricaTipoMoneda">
+    <xs:sequence>
+      <xs:element name="SolicitudSincronizacion" type="tns:solicitudSincronizacion"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sincronizarParametricaTipoMonedaResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="RespuestaListaParametricas" type="tns:respuestaListaParametricas"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="sincronizarActividadesResponse">
+    <wsdl:part element="ns1:sincronizarActividadesResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarParametricaMotivoAnulacion">
+    <wsdl:part element="ns1:sincronizarParametricaMotivoAnulacion" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarActividades">
+    <wsdl:part element="ns1:sincronizarActividades" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarFechaHora">
+    <wsdl:part element="ns1:sincronizarFechaHora" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarListaLeyendasFactura">
+    <wsdl:part element="ns1:sincronizarListaLeyendasFactura" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarParametricaTipoHabitacion">
+    <wsdl:part element="ns1:sincronizarParametricaTipoHabitacion" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarListaActividadesDocumentoSector">
+    <wsdl:part element="ns1:sincronizarListaActividadesDocumentoSector" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarParametricaPaisOrigenResponse">
+    <wsdl:part element="ns1:sincronizarParametricaPaisOrigenResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarParametricaTipoDocumentoSector">
+    <wsdl:part element="ns1:sincronizarParametricaTipoDocumentoSector" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarParametricaTipoMonedaResponse">
+    <wsdl:part element="ns1:sincronizarParametricaTipoMonedaResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarParametricaTipoMetodoPago">
+    <wsdl:part element="ns1:sincronizarParametricaTipoMetodoPago" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarParametricaTipoHabitacionResponse">
+    <wsdl:part element="ns1:sincronizarParametricaTipoHabitacionResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarParametricaEventosSignificativos">
+    <wsdl:part element="ns1:sincronizarParametricaEventosSignificativos" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarListaProductosServicios">
+    <wsdl:part element="ns1:sincronizarListaProductosServicios" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarParametricaTipoEmision">
+    <wsdl:part element="ns1:sincronizarParametricaTipoEmision" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarListaMensajesServiciosResponse">
+    <wsdl:part element="ns1:sincronizarListaMensajesServiciosResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarParametricaTipoMetodoPagoResponse">
+    <wsdl:part element="ns1:sincronizarParametricaTipoMetodoPagoResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarParametricaTipoMoneda">
+    <wsdl:part element="ns1:sincronizarParametricaTipoMoneda" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarParametricaTipoDocumentoIdentidadResponse">
+    <wsdl:part element="ns1:sincronizarParametricaTipoDocumentoIdentidadResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarParametricaTipoDocumentoIdentidad">
+    <wsdl:part element="ns1:sincronizarParametricaTipoDocumentoIdentidad" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarParametricaUnidadMedida">
+    <wsdl:part element="ns1:sincronizarParametricaUnidadMedida" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarParametricaUnidadMedidaResponse">
+    <wsdl:part element="ns1:sincronizarParametricaUnidadMedidaResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarListaActividadesDocumentoSectorResponse">
+    <wsdl:part element="ns1:sincronizarListaActividadesDocumentoSectorResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarParametricaTipoDocumentoSectorResponse">
+    <wsdl:part element="ns1:sincronizarParametricaTipoDocumentoSectorResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarFechaHoraResponse">
+    <wsdl:part element="ns1:sincronizarFechaHoraResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarParametricaTiposFactura">
+    <wsdl:part element="ns1:sincronizarParametricaTiposFactura" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="verificarComunicacion">
+    <wsdl:part element="ns1:verificarComunicacion" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="verificarComunicacionResponse">
+    <wsdl:part element="ns1:verificarComunicacionResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarParametricaTiposFacturaResponse">
+    <wsdl:part element="ns1:sincronizarParametricaTiposFacturaResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarListaMensajesServicios">
+    <wsdl:part element="ns1:sincronizarListaMensajesServicios" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarParametricaTipoPuntoVentaResponse">
+    <wsdl:part element="ns1:sincronizarParametricaTipoPuntoVentaResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarParametricaTipoPuntoVenta">
+    <wsdl:part element="ns1:sincronizarParametricaTipoPuntoVenta" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarListaProductosServiciosResponse">
+    <wsdl:part element="ns1:sincronizarListaProductosServiciosResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarParametricaPaisOrigen">
+    <wsdl:part element="ns1:sincronizarParametricaPaisOrigen" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarParametricaMotivoAnulacionResponse">
+    <wsdl:part element="ns1:sincronizarParametricaMotivoAnulacionResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarListaLeyendasFacturaResponse">
+    <wsdl:part element="ns1:sincronizarListaLeyendasFacturaResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarParametricaEventosSignificativosResponse">
+    <wsdl:part element="ns1:sincronizarParametricaEventosSignificativosResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sincronizarParametricaTipoEmisionResponse">
+    <wsdl:part element="ns1:sincronizarParametricaTipoEmisionResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="ServicioFacturacionSincronizacion">
+    <wsdl:operation name="sincronizarParametricaMotivoAnulacion">
+      <wsdl:input message="ns1:sincronizarParametricaMotivoAnulacion" name="sincronizarParametricaMotivoAnulacion">
+    </wsdl:input>
+      <wsdl:output message="ns1:sincronizarParametricaMotivoAnulacionResponse" name="sincronizarParametricaMotivoAnulacionResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarActividades">
+      <wsdl:input message="ns1:sincronizarActividades" name="sincronizarActividades">
+    </wsdl:input>
+      <wsdl:output message="ns1:sincronizarActividadesResponse" name="sincronizarActividadesResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarFechaHora">
+      <wsdl:input message="ns1:sincronizarFechaHora" name="sincronizarFechaHora">
+    </wsdl:input>
+      <wsdl:output message="ns1:sincronizarFechaHoraResponse" name="sincronizarFechaHoraResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarListaLeyendasFactura">
+      <wsdl:input message="ns1:sincronizarListaLeyendasFactura" name="sincronizarListaLeyendasFactura">
+    </wsdl:input>
+      <wsdl:output message="ns1:sincronizarListaLeyendasFacturaResponse" name="sincronizarListaLeyendasFacturaResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarParametricaTipoHabitacion">
+      <wsdl:input message="ns1:sincronizarParametricaTipoHabitacion" name="sincronizarParametricaTipoHabitacion">
+    </wsdl:input>
+      <wsdl:output message="ns1:sincronizarParametricaTipoHabitacionResponse" name="sincronizarParametricaTipoHabitacionResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarListaActividadesDocumentoSector">
+      <wsdl:input message="ns1:sincronizarListaActividadesDocumentoSector" name="sincronizarListaActividadesDocumentoSector">
+    </wsdl:input>
+      <wsdl:output message="ns1:sincronizarListaActividadesDocumentoSectorResponse" name="sincronizarListaActividadesDocumentoSectorResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarParametricaTipoDocumentoIdentidad">
+      <wsdl:input message="ns1:sincronizarParametricaTipoDocumentoIdentidad" name="sincronizarParametricaTipoDocumentoIdentidad">
+    </wsdl:input>
+      <wsdl:output message="ns1:sincronizarParametricaTipoDocumentoIdentidadResponse" name="sincronizarParametricaTipoDocumentoIdentidadResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarParametricaUnidadMedida">
+      <wsdl:input message="ns1:sincronizarParametricaUnidadMedida" name="sincronizarParametricaUnidadMedida">
+    </wsdl:input>
+      <wsdl:output message="ns1:sincronizarParametricaUnidadMedidaResponse" name="sincronizarParametricaUnidadMedidaResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarParametricaTipoDocumentoSector">
+      <wsdl:input message="ns1:sincronizarParametricaTipoDocumentoSector" name="sincronizarParametricaTipoDocumentoSector">
+    </wsdl:input>
+      <wsdl:output message="ns1:sincronizarParametricaTipoDocumentoSectorResponse" name="sincronizarParametricaTipoDocumentoSectorResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarParametricaTiposFactura">
+      <wsdl:input message="ns1:sincronizarParametricaTiposFactura" name="sincronizarParametricaTiposFactura">
+    </wsdl:input>
+      <wsdl:output message="ns1:sincronizarParametricaTiposFacturaResponse" name="sincronizarParametricaTiposFacturaResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="verificarComunicacion">
+      <wsdl:input message="ns1:verificarComunicacion" name="verificarComunicacion">
+    </wsdl:input>
+      <wsdl:output message="ns1:verificarComunicacionResponse" name="verificarComunicacionResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarListaMensajesServicios">
+      <wsdl:input message="ns1:sincronizarListaMensajesServicios" name="sincronizarListaMensajesServicios">
+    </wsdl:input>
+      <wsdl:output message="ns1:sincronizarListaMensajesServiciosResponse" name="sincronizarListaMensajesServiciosResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarParametricaTipoMetodoPago">
+      <wsdl:input message="ns1:sincronizarParametricaTipoMetodoPago" name="sincronizarParametricaTipoMetodoPago">
+    </wsdl:input>
+      <wsdl:output message="ns1:sincronizarParametricaTipoMetodoPagoResponse" name="sincronizarParametricaTipoMetodoPagoResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarParametricaEventosSignificativos">
+      <wsdl:input message="ns1:sincronizarParametricaEventosSignificativos" name="sincronizarParametricaEventosSignificativos">
+    </wsdl:input>
+      <wsdl:output message="ns1:sincronizarParametricaEventosSignificativosResponse" name="sincronizarParametricaEventosSignificativosResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarParametricaTipoPuntoVenta">
+      <wsdl:input message="ns1:sincronizarParametricaTipoPuntoVenta" name="sincronizarParametricaTipoPuntoVenta">
+    </wsdl:input>
+      <wsdl:output message="ns1:sincronizarParametricaTipoPuntoVentaResponse" name="sincronizarParametricaTipoPuntoVentaResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarListaProductosServicios">
+      <wsdl:input message="ns1:sincronizarListaProductosServicios" name="sincronizarListaProductosServicios">
+    </wsdl:input>
+      <wsdl:output message="ns1:sincronizarListaProductosServiciosResponse" name="sincronizarListaProductosServiciosResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarParametricaTipoEmision">
+      <wsdl:input message="ns1:sincronizarParametricaTipoEmision" name="sincronizarParametricaTipoEmision">
+    </wsdl:input>
+      <wsdl:output message="ns1:sincronizarParametricaTipoEmisionResponse" name="sincronizarParametricaTipoEmisionResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarParametricaPaisOrigen">
+      <wsdl:input message="ns1:sincronizarParametricaPaisOrigen" name="sincronizarParametricaPaisOrigen">
+    </wsdl:input>
+      <wsdl:output message="ns1:sincronizarParametricaPaisOrigenResponse" name="sincronizarParametricaPaisOrigenResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarParametricaTipoMoneda">
+      <wsdl:input message="ns1:sincronizarParametricaTipoMoneda" name="sincronizarParametricaTipoMoneda">
+    </wsdl:input>
+      <wsdl:output message="ns1:sincronizarParametricaTipoMonedaResponse" name="sincronizarParametricaTipoMonedaResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>

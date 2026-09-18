@@ -1,0 +1,183 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="https://siat.impuestos.gob.bo/FacturacionSincronizacion" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns2="http://schemas.xmlsoap.org/soap/http" xmlns:ns1="https://siat.impuestos.gob.bo/" name="ServicioFacturacionSincronizacion" targetNamespace="https://siat.impuestos.gob.bo/FacturacionSincronizacion">
+  <wsdl:import location="https://pilotosiatservicios.impuestos.gob.bo/v2/FacturacionSincronizacion?wsdl=ServicioFacturacionSincronizacion.wsdl" namespace="https://siat.impuestos.gob.bo/">
+    </wsdl:import>
+  <wsdl:binding name="ServicioFacturacionSincronizacionSoapBinding" type="ns1:ServicioFacturacionSincronizacion">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="sincronizarParametricaMotivoAnulacion">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sincronizarParametricaMotivoAnulacion">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sincronizarParametricaMotivoAnulacionResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarActividades">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sincronizarActividades">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sincronizarActividadesResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarFechaHora">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sincronizarFechaHora">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sincronizarFechaHoraResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarListaLeyendasFactura">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sincronizarListaLeyendasFactura">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sincronizarListaLeyendasFacturaResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarParametricaTipoHabitacion">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sincronizarParametricaTipoHabitacion">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sincronizarParametricaTipoHabitacionResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarListaActividadesDocumentoSector">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sincronizarListaActividadesDocumentoSector">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sincronizarListaActividadesDocumentoSectorResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarParametricaTipoDocumentoIdentidad">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sincronizarParametricaTipoDocumentoIdentidad">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sincronizarParametricaTipoDocumentoIdentidadResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarParametricaUnidadMedida">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sincronizarParametricaUnidadMedida">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sincronizarParametricaUnidadMedidaResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarParametricaTipoDocumentoSector">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sincronizarParametricaTipoDocumentoSector">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sincronizarParametricaTipoDocumentoSectorResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarParametricaTiposFactura">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sincronizarParametricaTiposFactura">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sincronizarParametricaTiposFacturaResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="verificarComunicacion">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="verificarComunicacion">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="verificarComunicacionResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarListaMensajesServicios">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sincronizarListaMensajesServicios">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sincronizarListaMensajesServiciosResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarParametricaTipoMetodoPago">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sincronizarParametricaTipoMetodoPago">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sincronizarParametricaTipoMetodoPagoResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarParametricaEventosSignificativos">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sincronizarParametricaEventosSignificativos">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sincronizarParametricaEventosSignificativosResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarParametricaTipoPuntoVenta">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sincronizarParametricaTipoPuntoVenta">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sincronizarParametricaTipoPuntoVentaResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarListaProductosServicios">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sincronizarListaProductosServicios">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sincronizarListaProductosServiciosResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarParametricaTipoEmision">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sincronizarParametricaTipoEmision">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sincronizarParametricaTipoEmisionResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarParametricaPaisOrigen">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sincronizarParametricaPaisOrigen">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sincronizarParametricaPaisOrigenResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sincronizarParametricaTipoMoneda">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sincronizarParametricaTipoMoneda">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sincronizarParametricaTipoMonedaResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ServicioFacturacionSincronizacion">
+    <wsdl:port binding="tns:ServicioFacturacionSincronizacionSoapBinding" name="ServicioFacturacionSincronizacionPort">
+      <soap:address location="https://pilotosiatservicios.impuestos.gob.bo/v2/FacturacionSincronizacion"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

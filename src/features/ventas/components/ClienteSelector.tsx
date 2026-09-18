@@ -18,12 +18,14 @@ interface Props {
   ) => void;
 
   onNuevoCliente: () => void;
+  buscar?: (termino: string) => Promise<ClienteVenta[]>;
 }
 
 export default function ClienteSelector({
   cliente,
   onSeleccionar,
   onNuevoCliente,
+  buscar = buscarClientes,
 }: Props) {
   const [texto, setTexto] =
     useState("");
@@ -79,7 +81,7 @@ export default function ClienteSelector({
           setCargando(true);
 
           const clientes =
-            await buscarClientes(texto);
+            await buscar(texto);
 
           setResultados(clientes);
         } catch {
@@ -93,7 +95,7 @@ export default function ClienteSelector({
 
     return () =>
       window.clearTimeout(timer);
-  }, [texto, abierto, cliente]);
+  }, [texto, abierto, cliente, buscar]);
 
   function seleccionar(
     item: ClienteVenta

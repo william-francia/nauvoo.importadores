@@ -4,6 +4,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import {
   useNavigate,
@@ -21,6 +22,11 @@ import {
 import type {
   ProductoFormValues,
 } from "../../features/productos/types/productos.types";
+import ProductoHomologacionModal from "../../features/productos/components/ProductoHomologacionModal";
+import { listarHomologacionesProductos } from "../../features/facturas/services/siat.service";
+import type { ProductoHomologacion } from "../../features/facturas/types/siat.types";
+import { EstadoBadge } from "../../features/facturas/components/SiatShared";
+import "../../features/facturas/styles/siat.css";
 
 const INITIAL_VALUES: ProductoFormValues = {
   actividadEconomicaCodigo:
@@ -62,6 +68,8 @@ export default function ProductoFormPage() {
 
   const [guardando, setGuardando] =
     useState(false);
+  const [homologacionAbierta,setHomologacionAbierta]=useState(false);
+  const homologaciones=useQuery({queryKey:["siat-productos-homologacion"],queryFn:listarHomologacionesProductos});
 
   const producto =
     useMemo(
@@ -77,6 +85,7 @@ export default function ProductoFormPage() {
     productoId
       ? "edit"
       : "create";
+  const homologacion:ProductoHomologacion|null=producto ? (homologaciones.data?.find(item=>item.productoId===producto.id||item.codigoInterno.toUpperCase()===producto.sku.toUpperCase())??null) : null;
 
   if (
     mode === "edit" &&
@@ -241,6 +250,8 @@ export default function ProductoFormPage() {
           )
         }
       />
+      <section className="siat-card" style={{marginTop:16}}><div className="siat-card-title"><div><h3>Datos fiscales SIAT</h3><p>La homologación usa únicamente catálogos oficiales sincronizados.</p></div>{homologacion?<EstadoBadge estado={homologacion.estado}/>:<EstadoBadge estado="PENDIENTE"/>}</div>{mode==="create"?<p className="siat-muted">Guarda primero el producto para asociar su homologación fiscal.</p>:homologacion?<button type="button" className="siat-secondary-button" onClick={()=>setHomologacionAbierta(true)}>Administrar homologación</button>:<p className="siat-muted">Este producto de la vista actual aún no coincide con un registro real de Supabase.</p>}</section>
+      {homologacionAbierta&&<ProductoHomologacionModal producto={homologacion} onClose={()=>setHomologacionAbierta(false)}/>}
     </div>
   );
 }

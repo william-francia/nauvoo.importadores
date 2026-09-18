@@ -13,9 +13,12 @@ interface Props {
 
   procesando?: boolean;
 
+  etiquetaBoton?: string;
+
   onPagar: (data: {
     metodo: MetodoPago;
     montoRecibido: number;
+    tarjetaOfuscada: string | null;
   }) => void;
 }
 
@@ -33,6 +36,7 @@ export default function PagoPanel({
   total,
   bloqueado = false,
   procesando = false,
+  etiquetaBoton = "REALIZAR PAGO",
   onPagar,
 }: Props) {
   const [metodo, setMetodo] =
@@ -71,7 +75,8 @@ export default function PagoPanel({
     !bloqueado &&
     !procesando &&
     total > 0 &&
-    montoParaPago >= total;
+    montoParaPago >= total &&
+    (metodo !== "TARJETA" || ultimosDigitos.length === 8);
 
   return (
     <>
@@ -133,23 +138,23 @@ export default function PagoPanel({
 
           <div className="venta-field">
             <label>
-              Número de tarjeta
+              Primeros y últimos 4 dígitos
             </label>
 
             <input
               disabled={
                 metodo !== "TARJETA"
               }
-              maxLength={4}
+              maxLength={8}
               value={ultimosDigitos}
               onChange={(e) =>
                 setUltimosDigitos(
                   e.target.value
                     .replace(/\D/g, "")
-                    .slice(0, 4)
+                    .slice(0, 8)
                 )
               }
-              placeholder="Últimos 4"
+              placeholder="Ej. 47977896"
             />
           </div>
         </div>
@@ -215,6 +220,7 @@ export default function PagoPanel({
             onPagar({
               metodo,
               montoRecibido: montoParaPago,
+              tarjetaOfuscada: metodo === "TARJETA" ? `${ultimosDigitos.slice(0, 4)}00000000${ultimosDigitos.slice(4)}` : null,
             })
           }
         >
@@ -222,7 +228,7 @@ export default function PagoPanel({
 
           {procesando
             ? "PROCESANDO..."
-            : "REALIZAR PAGO"}
+            : etiquetaBoton}
         </button>
       </div>
     </>

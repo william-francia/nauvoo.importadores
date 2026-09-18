@@ -1,0 +1,61 @@
+{
+  "versionNormativa": "SIAT_VIGENTE",
+  "fechaObtencion": "2026-09-17T00:00:00-04:00",
+  "fuente": "Servicio de Impuestos Nacionales (SIN)",
+  "artefactos": [
+    {
+      "nombre": "facturaComputarizadaCompraVenta.xsd",
+      "version": "XSD 23/08/2021",
+      "url": "https://siatinfo.impuestos.gob.bo/images/archivos_tecnicos/archivos_apoyo/CompraVentaXML.zip",
+      "sha256": "344ED2A4BE74C191637B7E918ED3DCE6D85B667CB98DA47A53FA4103683717D9"
+    },
+    {
+      "nombre": "facturaElectronicaCompraVenta.xsd",
+      "version": "XSD 23/08/2021",
+      "url": "https://siatinfo.impuestos.gob.bo/images/archivos_tecnicos/archivos_apoyo/CompraVentaXML.zip",
+      "sha256": "A3BB1D2E35C2D1E8C710AFBE9F1DA242A9F02BDD49F78C3D45DC4DBAFDA339CF"
+    },
+    {
+      "nombre": "SignatureSchema.xsd",
+      "version": "publicado por SIN",
+      "url": "https://siatinfo.impuestos.gob.bo/images/archivos_tecnicos/archivos_apoyo/SignatureSchema.xsd",
+      "sha256": "01D2501D2FBD59DB2783DA454E0582F759ABBB4B04F35DC14F94E690966E47C8"
+    },
+    {
+      "nombre": "FacturacionCodigos.wsdl",
+      "version": "v2 ambiente piloto",
+      "url": "https://pilotosiatservicios.impuestos.gob.bo/v2/FacturacionCodigos?wsdl",
+      "sha256": "F4FB0FBDBBFD04EC16B7F607E72A4E1305C823EFAF0F5B3182A7C50ED225F464"
+    },
+    {
+      "nombre": "FacturacionCodigosInterface.wsdl",
+      "version": "v2 ambiente piloto",
+      "url": "https://pilotosiatservicios.impuestos.gob.bo/v2/FacturacionCodigos?wsdl=ServicioFacturacionCodigos.wsdl",
+      "sha256": "B110E0AD1589A779339EE2F097D3FF7D8846D7F9BCEAB9B19647AF63A862B59F"
+    },
+    {
+      "nombre": "FacturacionSincronizacion.wsdl",
+      "version": "v2 ambiente piloto",
+      "url": "https://pilotosiatservicios.impuestos.gob.bo/v2/FacturacionSincronizacion?wsdl",
+      "sha256": "DA4510A70A159CD621CBAF5D2155EA7E26EC3200CC6115D593AE504545BCB6AC"
+    },
+    {
+      "nombre": "FacturacionSincronizacionInterface.wsdl",
+      "version": "v2 ambiente piloto",
+      "url": "https://pilotosiatservicios.impuestos.gob.bo/v2/FacturacionSincronizacion?wsdl=ServicioFacturacionSincronizacion.wsdl",
+      "sha256": "0A1D542F46D92A3516A77C0679CA2BABB514CD31632F0A9626EE03099C976FEE"
+    },
+    {
+      "nombre": "ServicioFacturacionCompraVenta.wsdl",
+      "version": "v2 ambiente piloto",
+      "url": "https://pilotosiatservicios.impuestos.gob.bo/v2/ServicioFacturacionCompraVenta?wsdl",
+      "sha256": "8FC01968442F8CB012ECFB6053DE91F57EF01261DECC2DFE6863B6A108785B69"
+    },
+    {
+      "nombre": "ServicioFacturacionCompraVentaInterface.wsdl",
+      "version": "v2 ambiente piloto",
+      "url": "https://pilotosiatservicios.impuestos.gob.bo/v2/ServicioFacturacionCompraVenta?wsdl=ServicioFacturacion.wsdl",
+      "sha256": "A51FCCA25E282BD8FE04A6213509AF78103991221EFE5A971014409E62160ECD"
+    }
+  ]
+}

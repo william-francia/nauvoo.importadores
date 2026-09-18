@@ -80,6 +80,12 @@ function App() {
         <Route path="/productos/:productoId/editar" element={<DashboardPage />} />
         <Route path="/productos/inventario" element={<DashboardPage />} />
         <Route path="/productos/reportes" element={<DashboardPage />} />
+        <Route path="/facturas" element={<DashboardPage />} />
+        <Route path="/facturas/contingencias" element={<DashboardPage />} />
+        <Route path="/facturas/offline/nueva" element={<DashboardPage />} />
+        <Route path="/facturas/offline/ventas" element={<DashboardPage />} />
+        <Route path="/facturas/offline/eventos" element={<DashboardPage />} />
+        <Route path="/facturas/offline" element={<Navigate to="/facturas/offline/nueva" replace />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     )
