@@ -10,7 +10,7 @@ interface Props {
   productos: InventarioProducto[];
   filasExpandidas: Set<string>;
   onToggleFila: (productoId: string) => void;
-  onEditarInventario: (producto: InventarioProducto) => void;
+  onEditarInventario?: (producto: InventarioProducto) => void;
 }
 
 function estadoStock(total: number) {
@@ -47,14 +47,14 @@ export default function StockProductosTable({
               <Fragment key={producto.id}>
                 <tr>
                   <td>
-                    <button
+                    {onEditarInventario ? <button
                       type="button"
                       className="inv-edit-button"
                       onClick={() => onEditarInventario(producto)}
                     >
                       <Pencil size={13} aria-hidden="true" />
                       Editar inventario
-                    </button>
+                    </button> : <span>Solo lectura</span>}
                   </td>
                   <td>{producto.codigo}</td>
                   <td><strong>{producto.nombre}</strong></td>
@@ -106,4 +106,3 @@ export default function StockProductosTable({
     </div>
   );
 }
-

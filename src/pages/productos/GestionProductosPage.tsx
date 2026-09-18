@@ -10,10 +10,12 @@ import type { Producto } from "../../features/productos/types/productos.types";
 import ProductoHomologacionModal from "../../features/productos/components/ProductoHomologacionModal";
 import { listarHomologacionesProductos } from "../../features/facturas/services/siat.service";
 import type { ProductoHomologacion } from "../../features/facturas/types/siat.types";
+import { usePermissions } from "../../features/account/hooks/useCurrentAccount";
 
 export default function GestionProductosPage() {
   const navigate = useNavigate();
-  const homologacionesQuery = useQuery({queryKey:["siat-productos-homologacion"],queryFn:listarHomologacionesProductos});
+  const permissions = usePermissions();
+  const homologacionesQuery = useQuery({queryKey:["siat-productos-homologacion"],queryFn:listarHomologacionesProductos,enabled:permissions.can("invoices.read")});
   const homologaciones = new Map<string,ProductoHomologacion>();
   for(const item of homologacionesQuery.data??[]){homologaciones.set(item.productoId,item);homologaciones.set(item.codigoInterno.toUpperCase(),item)}
   const homologados = new Set([...homologaciones.entries()].filter(([,value])=>value.estado==="HOMOLOGADO").map(([key])=>key));
@@ -32,12 +34,12 @@ export default function GestionProductosPage() {
           <p>Consulta, filtra y administra tus productos.</p>
         </div>
         <div className="productos-header-actions">
-          <button className="productos-btn productos-btn--ghost" type="button" onClick={() => navigate("/productos/inventario")}>
+          {permissions.can("inventory.read") && <button className="productos-btn productos-btn--ghost" type="button" onClick={() => navigate("/productos/inventario")}>
             Inventario
-          </button>
-          <button className="productos-btn productos-btn--primary" type="button" onClick={() => navigate("/productos/nuevo")}>
+          </button>}
+          {permissions.can("products.create") && <button className="productos-btn productos-btn--primary" type="button" onClick={() => navigate("/productos/nuevo")}>
             + Nuevo producto
-          </button>
+          </button>}
         </div>
       </header>
 
@@ -48,9 +50,9 @@ export default function GestionProductosPage() {
           <button className="productos-btn productos-btn--ghost" type="button" onClick={gestion.limpiarFiltros}>
             Limpiar filtros
           </button>
-          <button className="productos-btn productos-btn--danger" type="button" onClick={gestion.eliminarSeleccionados} disabled={gestion.seleccionados.size === 0}>
+          {permissions.can("products.delete") && <button className="productos-btn productos-btn--danger" type="button" onClick={gestion.eliminarSeleccionados} disabled={gestion.seleccionados.size === 0}>
             Eliminar seleccionados
-          </button>
+          </button>}
         </div>
 
         <ProductosTable
@@ -64,6 +66,9 @@ export default function GestionProductosPage() {
           onEdit={(producto) => navigate(`/productos/${producto.id}/editar`)}
           homologaciones={homologaciones}
           onHomologar={setHomologar}
+          canEdit={permissions.can("products.update")}
+          canDelete={permissions.can("products.delete")}
+          canManageInvoices={permissions.can("invoices.issue")}
         />
 
         <footer className="productos-pagination">
@@ -78,8 +83,8 @@ export default function GestionProductosPage() {
         </footer>
       </section>
 
-      <ProductoPreviewModal producto={preview} onCerrar={() => setPreview(null)} onEditar={(producto) => navigate(`/productos/${producto.id}/editar`)} />
-      <ProductoHomologacionModal producto={homologar} onClose={()=>setHomologar(null)}/>
+      <ProductoPreviewModal producto={preview} onCerrar={() => setPreview(null)} onEditar={permissions.can("products.update") ? (producto) => navigate(`/productos/${producto.id}/editar`) : undefined} />
+      {permissions.can("invoices.issue") && <ProductoHomologacionModal producto={homologar} onClose={()=>setHomologar(null)}/>}
     </div>
   );
 }

@@ -10,7 +10,12 @@ import InventarioProductosPage from "../productos/InventarioProductosPage";
 import ReportesPage from "../productos/ReportesPage";
 import { supabase } from "../../lib/supabase";
 import logo from "../../assets/logo sin linea .png";
+import { usePermissions } from "../../features/account/hooks/useCurrentAccount";
+import type { AccountSection } from "../../features/account/types/account.types";
 
+const DashboardHome = lazy(() => import("../../features/dashboard/DashboardHome"));
+const UserAccountControl = lazy(() => import("../../features/account/components/UserAccountControl"));
+const AccountModal = lazy(() => import("../../features/account/components/AccountModal"));
 const FacturasPage = lazy(() => import("../facturas/FacturasPage"));
 const ContingenciasPage = lazy(() => import("../facturas/ContingenciasPage"));
 const RegistrarVentaOfflinePage = lazy(() => import("../facturas/RegistrarVentaOfflinePage"));
@@ -37,6 +42,13 @@ export default function DashboardPage() {
   const [productosOpen, setProductosOpen] = useState(productosActiva);
   const [facturasOpen, setFacturasOpen] = useState(facturasActiva);
   const [offlineOpen, setOfflineOpen] = useState(offlineActiva);
+  const [accountSection, setAccountSection] = useState<AccountSection | null>(null);
+  const account = usePermissions();
+  const canUseSales = account.canAny("sales.read", "sales.create");
+  const canUseProducts = account.canAny("products.read", "inventory.read", "history.read");
+  const canUseInvoices = account.can("invoices.read");
+  const requiredPermission = getRequiredPermission(rutaActual, activeItem);
+  const routeAllowed = !requiredPermission || account.can(requiredPermission);
 
   return (
     <div className="dashboard">
@@ -79,6 +91,7 @@ export default function DashboardPage() {
 
           {sidebarOpen && <p className="nav-section">TRANSACCIONES</p>}
 
+          {canUseSales && <>
           <button
             className={`nav-item ${ventasActiva ? "active" : ""}`}
             onClick={() => {
@@ -105,21 +118,27 @@ export default function DashboardPage() {
 
           {sidebarOpen && ventasOpen && (
             <div className="nav-submenu">
+              {account.can("sales.create") && (
               <button
                 className={`nav-subitem ${location.pathname === "/ventas/nueva" ? "active" : ""}`}
                 onClick={() => navigate("/ventas/nueva")}
               >
                 Registrar venta
               </button>
+              )}
+              {account.can("sales.read") && (
               <button
                 className={`nav-subitem ${location.pathname === "/ventas/gestion" ? "active" : ""}`}
                 onClick={() => navigate("/ventas/gestion")}
               >
                 Gestión de ventas
               </button>
+              )}
             </div>
           )}
+          </>}
 
+          {canUseProducts && <>
           <button
             className={`nav-item ${productosActiva ? "active" : ""}`}
             onClick={() => {
@@ -146,27 +165,35 @@ export default function DashboardPage() {
 
           {sidebarOpen && productosOpen && (
             <div className="nav-submenu">
+              {account.can("products.read") && (
               <button
                 className={`nav-subitem ${gestionProductosActiva ? "active" : ""}`}
                 onClick={() => navigate("/productos/gestion")}
               >
                 Gestión de productos
               </button>
+              )}
+              {account.can("inventory.read") && (
               <button
                 className={`nav-subitem ${rutaActual === "/productos/inventario" ? "active" : ""}`}
                 onClick={() => navigate("/productos/inventario")}
               >
                 Inventario de productos
               </button>
+              )}
+              {account.can("history.read") && (
               <button
                 className={`nav-subitem ${rutaActual === "/productos/reportes" ? "active" : ""}`}
                 onClick={() => navigate("/productos/reportes")}
               >
                 Reportes
               </button>
+              )}
             </div>
           )}
+          </>}
 
+          {account.can("clients.read") && (
           <button
             className={`nav-item ${
               activeItem === "clientes" ? "active" : ""
@@ -182,7 +209,9 @@ export default function DashboardPage() {
 
             {sidebarOpen && <span>Clientes</span>}
           </button>
+          )}
 
+          {canUseInvoices && <>
           <button
             className={`nav-item ${facturasActiva ? "active" : ""}`}
             onClick={() => {
@@ -202,6 +231,7 @@ export default function DashboardPage() {
           {sidebarOpen && facturasOpen && (
             <div className="nav-submenu">
               <button className={`nav-subitem ${rutaActual === "/facturas" ? "active" : ""}`} onClick={() => navigate("/facturas")}>Gestión de facturas</button>
+              {account.can("invoices.issue") && <>
               <button className={`nav-subitem ${rutaActual === "/facturas/contingencias" ? "active" : ""}`} onClick={() => navigate("/facturas/contingencias")}>Contingencias</button>
               <button className={`nav-subgroup-trigger ${offlineActiva ? "active" : ""}`} onClick={() => setOfflineOpen((actual) => !actual)}>
                 <span>Fuera de línea</span><span className={`nav-chevron ${offlineOpen ? "open" : ""}`}>›</span>
@@ -211,8 +241,10 @@ export default function DashboardPage() {
                 <button className={`nav-subitem ${rutaActual === "/facturas/offline/ventas" ? "active" : ""}`} onClick={() => navigate("/facturas/offline/ventas")}>Gestión de ventas offline</button>
                 <button className={`nav-subitem ${rutaActual === "/facturas/offline/eventos" ? "active" : ""}`} onClick={() => navigate("/facturas/offline/eventos")}>Gestión de eventos</button>
               </div>}
+              </>}
             </div>
           )}
+          </>}
         </nav>
 
         {sidebarOpen && (
@@ -260,14 +292,15 @@ export default function DashboardPage() {
               <span className="notification-dot"></span>
             </button>
 
-            <div className="user-info">
-              <div className="user-text">
-                <span>Bienvenido</span>
-                <strong>Administrador</strong>
-              </div>
-
-              <div className="user-avatar">A</div>
-            </div>
+            <Suspense fallback={<div className="user-avatar">…</div>}>
+              <UserAccountControl
+                key={location.key}
+                account={account.data}
+                isLoading={account.isLoading}
+                errorMessage={account.error?.message}
+                onOpenSection={setAccountSection}
+              />
+            </Suspense>
           </div>
         </header>
 
@@ -275,19 +308,23 @@ export default function DashboardPage() {
             MAIN
         ========================== */}
         <main className="main-content">
-          {rutaActual === "/ventas/nueva" && <NuevaVentaPage />}
+          {requiredPermission && account.isLoading && <AccountAccessState title="Cargando acceso…" description="Estamos validando los permisos de tu cuenta." />}
+          {requiredPermission && account.isError && <AccountAccessState title="No se pudo validar el acceso" description={account.error.message} />}
+          {requiredPermission && !account.isLoading && !account.isError && !routeAllowed && <AccountAccessState title="Acceso restringido" description="Tu rol no tiene permiso para abrir este módulo o ejecutar esta acción." />}
 
-          {rutaActual === "/ventas/gestion" && <GestionVentasPage />}
+          {routeAllowed && rutaActual === "/ventas/nueva" && <NuevaVentaPage />}
 
-          {rutaActual === "/productos/gestion" && <GestionProductosPage />}
+          {routeAllowed && rutaActual === "/ventas/gestion" && <GestionVentasPage />}
 
-          {(rutaActual === "/productos/nuevo" || rutaActual.endsWith("/editar")) && <ProductoFormPage />}
+          {routeAllowed && rutaActual === "/productos/gestion" && <GestionProductosPage />}
 
-          {rutaActual === "/productos/inventario" && <InventarioProductosPage />}
+          {routeAllowed && (rutaActual === "/productos/nuevo" || rutaActual.endsWith("/editar")) && <ProductoFormPage />}
 
-          {rutaActual === "/productos/reportes" && <ReportesPage />}
+          {routeAllowed && rutaActual === "/productos/inventario" && <InventarioProductosPage />}
 
-          {facturasActiva && <Suspense fallback={<div className="siat-state">Cargando módulo fiscal…</div>}>
+          {routeAllowed && rutaActual === "/productos/reportes" && <ReportesPage />}
+
+          {routeAllowed && facturasActiva && <Suspense fallback={<div className="siat-state">Cargando módulo fiscal…</div>}>
             {rutaActual === "/facturas" && <FacturasPage />}
             {rutaActual === "/facturas/contingencias" && <ContingenciasPage />}
             {rutaActual === "/facturas/offline/nueva" && <RegistrarVentaOfflinePage />}
@@ -295,7 +332,11 @@ export default function DashboardPage() {
             {rutaActual === "/facturas/offline/eventos" && <EventosPage />}
           </Suspense>}
 
-          {!ventasActiva && !productosActiva && !facturasActiva && activeItem === "dashboard" && <DashboardHome />}
+          {!ventasActiva && !productosActiva && !facturasActiva && activeItem === "dashboard" && (
+            <Suspense fallback={<div className="business-dashboard-state">Cargando Dashboard…</div>}>
+              <DashboardHome />
+            </Suspense>
+          )}
 
           {!ventasActiva && !productosActiva && !facturasActiva && activeItem === "ventas" && (
             <PlaceholderPage
@@ -313,170 +354,35 @@ export default function DashboardPage() {
             />
           )}
 
-          {!ventasActiva && !productosActiva && !facturasActiva && activeItem === "clientes" && <ClientesPage />}
+          {routeAllowed && !ventasActiva && !productosActiva && !facturasActiva && activeItem === "clientes" && <ClientesPage />}
 
         </main>
       </div>
+      {accountSection && account.data && (
+        <Suspense fallback={null}>
+          <AccountModal account={account.data} initialSection={accountSection} onClose={() => setAccountSection(null)} />
+        </Suspense>
+      )}
     </div>
   );
 }
 
-/* =========================================================
-   DASHBOARD PRINCIPAL
-========================================================= */
+function getRequiredPermission(path: string, activeItem: MenuItem): string | null {
+  if (path === "/ventas/nueva") return "sales.create";
+  if (path === "/ventas/gestion") return "sales.read";
+  if (path === "/productos/nuevo") return "products.create";
+  if (path.startsWith("/productos/") && path.endsWith("/editar")) return "products.update";
+  if (path === "/productos/gestion") return "products.read";
+  if (path === "/productos/inventario") return "inventory.read";
+  if (path === "/productos/reportes") return "history.read";
+  if (path.startsWith("/facturas/offline/") || path === "/facturas/contingencias") return "invoices.issue";
+  if (path === "/facturas" || path.startsWith("/facturas/")) return "invoices.read";
+  if (activeItem === "clientes") return "clients.read";
+  return null;
+}
 
-function DashboardHome() {
-  return (
-    <>
-      <section className="page-heading">
-        <div>
-          <p className="breadcrumb">Inicio / Dashboard</p>
-          <h1>Página Principal</h1>
-          <p className="page-description">
-            Resumen general de Ferretería Francia.
-          </p>
-        </div>
-
-        <div className="heading-status">
-          <span className="status-dot"></span>
-          Sistema activo
-        </div>
-      </section>
-
-      {/* CARDS */}
-      <section className="stats-grid">
-        <article className="stat-card">
-          <div className="stat-card-top">
-            <div className="stat-icon">
-              <CartIcon />
-            </div>
-
-            <span className="stat-badge">Hoy</span>
-          </div>
-
-          <div className="stat-content">
-            <p>Ventas del día</p>
-            <h2>Bs 0.00</h2>
-            <span>0 ventas realizadas</span>
-          </div>
-        </article>
-
-        <article className="stat-card">
-          <div className="stat-card-top">
-            <div className="stat-icon">
-              <BoxIcon />
-            </div>
-
-            <span className="stat-badge">Inventario</span>
-          </div>
-
-          <div className="stat-content">
-            <p>Productos</p>
-            <h2>0</h2>
-            <span>Productos registrados</span>
-          </div>
-        </article>
-
-        <article className="stat-card">
-          <div className="stat-card-top">
-            <div className="stat-icon">
-              <UsersIcon />
-            </div>
-
-            <span className="stat-badge">Total</span>
-          </div>
-
-          <div className="stat-content">
-            <p>Clientes</p>
-            <h2>0</h2>
-            <span>Clientes registrados</span>
-          </div>
-        </article>
-      </section>
-
-      {/* CONTENIDO INFERIOR */}
-      <section className="dashboard-bottom">
-        <div className="recent-panel">
-          <div className="panel-header">
-            <div>
-              <h3>Ventas recientes</h3>
-              <p>Últimos movimientos realizados</p>
-            </div>
-
-            <button className="secondary-button">Ver todas</button>
-          </div>
-
-          <div className="empty-state">
-            <div className="empty-icon">
-              <ReceiptIcon />
-            </div>
-
-            <h4>Todavía no hay ventas</h4>
-
-            <p>
-              Cuando registres una venta aparecerá automáticamente en esta
-              sección.
-            </p>
-
-            <button className="primary-button">
-              <PlusIcon />
-              Nueva venta
-            </button>
-          </div>
-        </div>
-
-        <div className="quick-panel">
-          <div className="panel-header">
-            <div>
-              <h3>Acciones rápidas</h3>
-              <p>Accesos principales</p>
-            </div>
-          </div>
-
-          <div className="quick-actions">
-            <button className="quick-action">
-              <span>
-                <CartIcon />
-              </span>
-
-              <div>
-                <strong>Nueva venta</strong>
-                <small>Registrar una nueva venta</small>
-              </div>
-
-              <ArrowIcon />
-            </button>
-
-            <button className="quick-action">
-              <span>
-                <BoxIcon />
-              </span>
-
-              <div>
-                <strong>Nuevo producto</strong>
-                <small>Agregar producto al inventario</small>
-              </div>
-
-              <ArrowIcon />
-            </button>
-
-            <button className="quick-action">
-              <span>
-                <UsersIcon />
-              </span>
-
-              <div>
-                <strong>Nuevo cliente</strong>
-                <small>Registrar un nuevo cliente</small>
-              </div>
-
-              <ArrowIcon />
-            </button>
-          </div>
-        </div>
-      </section>
-    </>
-  );
+function AccountAccessState({ title, description }: { title: string; description: string }) {
+  return <section className="account-access-state"><div><h2>{title}</h2><p>{description}</p></div></section>;
 }
 
 /* =========================================================
@@ -614,35 +520,6 @@ function ReceiptIcon() {
     <svg viewBox="0 0 24 24">
       <path
         d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function PlusIcon() {
-  return (
-    <svg viewBox="0 0 24 24">
-      <path
-        d="M12 5v14M5 12h14"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function ArrowIcon() {
-  return (
-    <svg viewBox="0 0 24 24">
-      <path
-        d="m9 18 6-6-6-6"
         fill="none"
         stroke="currentColor"
         strokeWidth="1.8"

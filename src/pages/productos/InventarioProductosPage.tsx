@@ -10,11 +10,14 @@ import { useInventarioProductos } from "../../features/productos/inventario/hook
 import "../../features/productos/inventario/styles/inventarioProductos.css";
 
 import type { InventarioProducto } from "../../features/productos/inventario/types/inventario.types";
+import { usePermissions } from "../../features/account/hooks/useCurrentAccount";
 
 type InventarioTab = "inventario" | "ingresos";
 
 export default function InventarioProductosPage() {
   const inventario = useInventarioProductos();
+  const permissions = usePermissions();
+  const canManageInventory = permissions.can("inventory.update");
   const [tab, setTab] = useState<InventarioTab>("inventario");
   const [productoEditar, setProductoEditar] =
     useState<InventarioProducto | null>(null);
@@ -40,14 +43,14 @@ export default function InventarioProductosPage() {
           <Boxes size={16} aria-hidden="true" />
           Inventario y traslados
         </button>
-        <button
+        {canManageInventory && <button
           type="button"
           className={tab === "ingresos" ? "inv-tab inv-tab--active" : "inv-tab"}
           onClick={() => setTab("ingresos")}
         >
           <PackagePlus size={16} aria-hidden="true" />
           Ingreso de productos
-        </button>
+        </button>}
       </nav>
 
       {tab === "inventario" ? (
@@ -87,33 +90,33 @@ export default function InventarioProductosPage() {
                 productos={inventario.productosFiltrados}
                 filasExpandidas={inventario.filasExpandidas}
                 onToggleFila={inventario.toggleFila}
-                onEditarInventario={setProductoEditar}
+                onEditarInventario={canManageInventory ? setProductoEditar : undefined}
               />
             </section>
 
-            <TrasladoProductosPanel
+            {canManageInventory && <TrasladoProductosPanel
               productos={inventario.productos}
               movimientos={inventario.movimientos}
               onTrasladar={inventario.registrarTraslado}
-            />
+            />}
           </div>
         </>
-      ) : (
+      ) : canManageInventory ? (
         <IngresoProductosPanel
           productos={inventario.productos}
           movimientos={inventario.movimientos}
           onRegistrar={inventario.registrarMovimiento}
           onAnular={inventario.anularMovimiento}
         />
-      )}
+      ) : null}
 
-      <EditarInventarioModal
+      {canManageInventory && <EditarInventarioModal
         producto={productoEditar}
         movimientos={inventario.movimientos}
         onCerrar={() => setProductoEditar(null)}
         onGuardar={inventario.registrarMovimiento}
         onAnularMovimiento={inventario.anularMovimiento}
-      />
+      />}
     </div>
   );
 }

@@ -17,7 +17,7 @@ import {
 interface Props {
   producto: Producto | null;
   onCerrar: () => void;
-  onEditar: (
+  onEditar?: (
     producto: Producto
   ) => void;
 }
@@ -191,15 +191,13 @@ export default function ProductoPreviewModal({
             Cerrar
           </button>
 
-          <button
+          {onEditar && <button
             type="button"
             className="productos-btn productos-btn--primary"
-            onClick={() =>
-              onEditar(producto)
-            }
+            onClick={() => onEditar(producto)}
           >
             ✎ Editar producto
-          </button>
+          </button>}
         </footer>
       </div>
     </div>

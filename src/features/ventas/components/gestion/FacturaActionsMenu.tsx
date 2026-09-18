@@ -16,6 +16,7 @@ interface Props {
     action: FacturaAction,
     venta: GestionVenta
   ) => void;
+  canIssueInvoice?: boolean;
 }
 
 interface ActionItem {
@@ -76,6 +77,7 @@ const ACTIONS: ActionItem[] = [
 export default function FacturaActionsMenu({
   venta,
   onAction,
+  canIssueInvoice = false,
 }: Props) {
   const [abierto, setAbierto] =
     useState(false);
@@ -143,7 +145,7 @@ export default function FacturaActionsMenu({
             {venta.numeroFactura}
           </div>
 
-          {ACTIONS.map((item) => (
+          {ACTIONS.filter((item) => item.action !== "ANULAR" || canIssueInvoice).map((item) => (
             <button
               type="button"
               key={item.action}

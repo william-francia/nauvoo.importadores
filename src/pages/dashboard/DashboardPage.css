@@ -483,6 +483,7 @@ button {
     position: sticky;
     top: 0;
     z-index: 20;
+    overflow: visible;
 }
 
 .topbar-left,
@@ -538,6 +539,9 @@ button {
 
 .topbar-right {
     gap: 23px;
+    position: relative;
+    z-index: 1000;
+    overflow: visible;
 }
 
 .notification-button {

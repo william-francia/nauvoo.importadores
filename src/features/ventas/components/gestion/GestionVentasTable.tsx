@@ -22,6 +22,7 @@ interface Props {
     action: FacturaAction,
     venta: GestionVenta
   ) => void;
+  canIssueInvoice?: boolean;
 }
 
 function money(
@@ -69,6 +70,7 @@ export default function GestionVentasTable({
   filters,
   onFilterChange,
   onAction,
+  canIssueInvoice = false,
 }: Props) {
   return (
     <div className="gestion-table-scroll">
@@ -205,6 +207,7 @@ export default function GestionVentasTable({
                     onAction={
                       onAction
                     }
+                    canIssueInvoice={canIssueInvoice}
                   />
                 </td>
 

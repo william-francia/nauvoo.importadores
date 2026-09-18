@@ -14,6 +14,7 @@ import {
   habilitarClientes,
   eliminarClientes,
 } from "../../services/clientes.service";
+import { usePermissions } from "../../features/account/hooks/useCurrentAccount";
 
 type ClientStatus = "habilitado" | "restringido";
 
@@ -64,6 +65,11 @@ const EMPTY_FORM: ClientForm = {
 ========================================================= */
 
 export default function ClientesPage() {
+  const permissions = usePermissions();
+  const canCreate = permissions.can("clients.create");
+  const canUpdate = permissions.can("clients.update");
+  const canDelete = permissions.can("clients.delete");
+  const canSelect = canUpdate || canDelete;
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedClients, setSelectedClients] = useState<string[]>([]);
 
@@ -338,14 +344,14 @@ export default function ClientesPage() {
           </p>
         </div>
 
-        <button
+        {canCreate && <button
           className="clients-new-button"
           onClick={openCreateClient}
         >
           <UserPlusIcon />
 
           Nuevo cliente
-        </button>
+        </button>}
       </section>
 
       {/* CONTENEDOR */}
@@ -355,7 +361,7 @@ export default function ClientesPage() {
 
         <div className="clients-toolbar">
           <div className="clients-bulk-actions">
-            <button
+            {canDelete && <button
               className="clients-action-button clients-action-danger"
               disabled={selectedClients.length === 0}
               onClick={requestDeleteSelected}
@@ -363,9 +369,9 @@ export default function ClientesPage() {
               <TrashIcon />
 
               Eliminar
-            </button>
+            </button>}
 
-            {allSelectedEnabled || (!allSelectedEnabled && !allSelectedRestricted && selectedClientRecords.length > 0) ? (
+            {canUpdate && (allSelectedEnabled || (!allSelectedEnabled && !allSelectedRestricted && selectedClientRecords.length > 0)) ? (
               <button
                 className="clients-action-button clients-action-restrict"
                 onClick={restrictSelectedClients}
@@ -375,7 +381,7 @@ export default function ClientesPage() {
               </button>
             ) : null}
 
-            {allSelectedRestricted || (!allSelectedEnabled && !allSelectedRestricted && selectedClientRecords.length > 0) ? (
+            {canUpdate && (allSelectedRestricted || (!allSelectedEnabled && !allSelectedRestricted && selectedClientRecords.length > 0)) ? (
               <button
                 className="clients-action-button clients-action-enable"
                 onClick={enableSelectedClients}
@@ -448,6 +454,7 @@ export default function ClientesPage() {
                     checked={allVisibleSelected}
                     onChange={toggleAllVisible}
                     aria-label="Seleccionar clientes"
+                    disabled={!canSelect}
                   />
                 </th>
 
@@ -485,7 +492,7 @@ export default function ClientesPage() {
                           : "Prueba utilizando otro criterio de búsqueda."}
                       </p>
 
-                      {clients.length === 0 && (
+                      {clients.length === 0 && canCreate && (
                         <button
                           onClick={openCreateClient}
                         >
@@ -511,7 +518,7 @@ export default function ClientesPage() {
                       <div className="clients-row-actions">
                         {/* EDITAR */}
 
-                        <button
+                        {canUpdate && <button
                           className="clients-icon-button clients-edit"
                           onClick={() =>
                             openEditClient(client)
@@ -520,7 +527,7 @@ export default function ClientesPage() {
                           aria-label={`Editar ${client.businessName}`}
                         >
                           <EditLinesIcon />
-                        </button>
+                        </button>}
 
                         {/* VER */}
 
@@ -549,6 +556,7 @@ export default function ClientesPage() {
                           )
                         }
                         aria-label={`Seleccionar ${client.businessName}`}
+                        disabled={!canSelect}
                       />
                     </td>
 
@@ -608,7 +616,7 @@ export default function ClientesPage() {
 
       {/* FORMULARIO CREAR / EDITAR */}
 
-      {formOpen && (
+      {formOpen && ((editingClient && canUpdate) || (!editingClient && canCreate)) && (
         <ClientFormModal
           client={editingClient}
           allClients={clients}
@@ -630,16 +638,16 @@ export default function ClientesPage() {
             setViewOpen(false);
             setViewingClient(null);
           }}
-          onEdit={() => {
+          onEdit={canUpdate ? () => {
             setViewOpen(false);
             openEditClient(viewingClient);
-          }}
+          } : undefined}
         />
       )}
 
       {/* CONFIRMAR ELIMINAR */}
 
-      {deleteOpen && (
+      {deleteOpen && canDelete && (
         <DeleteClientsModal
           amount={selectedClients.length}
           onClose={() => setDeleteOpen(false)}
@@ -1000,7 +1008,7 @@ function ClientFormModal({
 interface ClientDetailsModalProps {
   client: Client;
   onClose: () => void;
-  onEdit: () => void;
+  onEdit?: () => void;
 }
 
 function ClientDetailsModal({
@@ -1122,7 +1130,7 @@ function ClientDetailsModal({
             Cerrar
           </button>
 
-          <button
+          {onEdit && <button
             type="button"
             className="clients-modal-save"
             onClick={onEdit}
@@ -1130,7 +1138,7 @@ function ClientDetailsModal({
             <EditLinesIcon />
 
             Editar cliente
-          </button>
+          </button>}
         </footer>
       </div>
     </ModalOverlay>

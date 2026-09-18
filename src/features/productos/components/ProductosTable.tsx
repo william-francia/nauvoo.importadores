@@ -45,6 +45,9 @@ interface Props {
   ) => void;
   homologaciones: Map<string, ProductoHomologacion>;
   onHomologar: (producto: ProductoHomologacion) => void;
+  canEdit?: boolean;
+  canDelete?: boolean;
+  canManageInvoices?: boolean;
 }
 
 function StockChip({
@@ -83,6 +86,9 @@ export default function ProductosTable({
   onEdit,
   homologaciones,
   onHomologar,
+  canEdit = false,
+  canDelete = false,
+  canManageInvoices = false,
 }: Props) {
   const todosSeleccionados =
     productos.length > 0 &&
@@ -108,6 +114,7 @@ export default function ProductosTable({
                 onChange={
                   onTogglePagina
                 }
+                disabled={!canDelete}
               />
             </th>
 
@@ -249,7 +256,7 @@ export default function ProductosTable({
                     <td>
                       <ProductoRowActions
                         onPreview={() => onPreview(producto)}
-                        onEdit={() => onEdit(producto)}
+                        onEdit={canEdit ? () => onEdit(producto) : undefined}
                       />
                     </td>
 
@@ -264,10 +271,11 @@ export default function ProductosTable({
                             producto.id
                           )
                         }
+                        disabled={!canDelete}
                       />
                     </td>
 
-                    <td><button type="button" className={`producto-status producto-status--${homologacion?.estado === "HOMOLOGADO" ? "alto" : homologacion?.estado === "INVALIDO" ? "sin_stock" : "bajo"}`} disabled={!homologacion} title={homologacion?"Administrar homologación fiscal":"El producto aún no existe en la fuente real de Supabase"} onClick={()=>homologacion&&onHomologar(homologacion)}>{estadoSiat}</button></td>
+                    <td><button type="button" className={`producto-status producto-status--${homologacion?.estado === "HOMOLOGADO" ? "alto" : homologacion?.estado === "INVALIDO" ? "sin_stock" : "bajo"}`} disabled={!homologacion || !canManageInvoices} title={homologacion && canManageInvoices ? "Administrar homologación fiscal" : homologacion ? "Sin permiso para administrar homologación" : "El producto aún no existe en la fuente real de Supabase"} onClick={()=>homologacion&&canManageInvoices&&onHomologar(homologacion)}>{estadoSiat}</button></td>
 
                     <td>
                       <button

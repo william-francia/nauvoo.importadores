@@ -34,6 +34,7 @@ import type {
   FacturaAction,
   GestionVenta,
 } from "../../features/ventas/types/gestionVentas.types";
+import { usePermissions } from "../account/hooks/useCurrentAccount";
 
 interface NotificationState {
   type:
@@ -45,6 +46,7 @@ interface NotificationState {
 }
 
 export default function GestionVentasPage() {
+  const permissions = usePermissions();
   const gestion =
     useGestionVentas(
       GESTION_VENTAS_MOCK
@@ -286,6 +288,7 @@ export default function GestionVentasPage() {
           onAction={
             handleAction
           }
+          canIssueInvoice={permissions.can("invoices.issue")}
         />
 
         <footer className="gestion-pagination">

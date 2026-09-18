@@ -3,7 +3,7 @@ import { Eye, List } from "lucide-react";
 
 interface Props {
   onPreview: () => void;
-  onEdit: () => void;
+  onEdit?: () => void;
 }
 
 export default function ProductoRowActions({ onPreview, onEdit }: Props) {
@@ -11,13 +11,13 @@ export default function ProductoRowActions({ onPreview, onEdit }: Props) {
 
   return (
     <div className="producto-row-actions">
-      <button type="button" className="producto-action producto-action--menu" title="Más acciones" aria-label="Más acciones" onClick={() => setAbierto((actual) => !actual)}>
+      {onEdit && <button type="button" className="producto-action producto-action--menu" title="Más acciones" aria-label="Más acciones" onClick={() => setAbierto((actual) => !actual)}>
         <List size={16} aria-hidden="true" />
-      </button>
+      </button>}
       <button type="button" className="producto-action producto-action--eye" title="Ver producto" aria-label="Ver producto" onClick={onPreview}>
         <Eye size={16} aria-hidden="true" />
       </button>
-      {abierto && (
+      {abierto && onEdit && (
         <div className="producto-row-menu">
           <button type="button" onClick={onEdit}>Editar producto</button>
         </div>
