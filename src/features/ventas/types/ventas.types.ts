@@ -36,6 +36,7 @@ export interface AlmacenVenta {
   id: string;
   codigo?: string | null;
   nombre: string;
+  tipo?: string | null;
 }
 
 export interface StockAlmacen {

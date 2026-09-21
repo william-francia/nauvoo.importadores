@@ -26,6 +26,8 @@ interface Props {
 
   guardando?: boolean;
 
+  errorExterno?: string | null;
+
   onSubmit: (
     values: ProductoFormValues
   ) => Promise<void> | void;
@@ -46,6 +48,8 @@ export default function ProductoForm({
   },
 
   guardando = false,
+
+  errorExterno,
 
   onSubmit,
 
@@ -91,6 +95,11 @@ export default function ProductoForm({
         "Selecciona una unidad de medida."
       );
 
+      return;
+    }
+
+    if (!form.sku.trim()) {
+      setError("Ingresa el SKU o código interno del producto.");
       return;
     }
 
@@ -486,9 +495,9 @@ export default function ProductoForm({
         </aside>
       </div>
 
-      {error && (
+      {(error || errorExterno) && (
         <div className="producto-form-error">
-          {error}
+          {error || errorExterno}
         </div>
       )}
 

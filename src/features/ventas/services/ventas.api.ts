@@ -10,6 +10,7 @@ interface AlmacenRow {
   id: string;
   codigo: string | null;
   nombre: string;
+  tipo: string | null;
   activo: boolean;
 }
 
@@ -69,6 +70,13 @@ export async function crearClienteRapido(input: NuevoClienteInput): Promise<Clie
 export async function buscarProductosVenta(termino: string): Promise<ProductoVenta[]> {
   const q = limpiarBusqueda(termino);
   if (!q) return [];
+  const filtros = [
+    `nombre.ilike.%${q}%`,
+    `codigo_interno.ilike.%${q}%`,
+    `descripcion.ilike.%${q}%`,
+    `numero.ilike.%${q}%`,
+  ];
+  if (/^\d+$/.test(q)) filtros.push(`codigo_producto_sin.eq.${Number(q)}`);
 
   const { data, error } = await supabase
     .from("productos")
@@ -76,11 +84,11 @@ export async function buscarProductosVenta(termino: string): Promise<ProductoVen
       id, codigo_interno, nombre, descripcion, medida, precio_pieza,
       stock_por_almacen (
         cantidad_disponible,
-        almacen:almacenes (id, codigo, nombre, activo)
+        almacen:almacenes (id, codigo, nombre, tipo, activo)
       )
     `)
     .eq("activo", true)
-    .or([`nombre.ilike.%${q}%`, `codigo_interno.ilike.%${q}%`, `descripcion.ilike.%${q}%`].join(","))
+    .or(filtros.join(","))
     .limit(15);
 
   if (error) throw new Error(error.message || "No se pudieron consultar los productos.");
@@ -101,6 +109,7 @@ export async function buscarProductosVenta(termino: string): Promise<ProductoVen
           id: stock.almacen.id,
           codigo: stock.almacen.codigo,
           nombre: stock.almacen.nombre,
+          tipo: stock.almacen.tipo,
         },
         cantidad: Number(stock.cantidad_disponible),
       })),

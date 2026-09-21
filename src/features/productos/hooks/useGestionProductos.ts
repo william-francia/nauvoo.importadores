@@ -22,14 +22,9 @@ const FILTROS_INICIALES: GestionProductosFilters = {
 };
 
 export function useGestionProductos(
-  initialProducts: Producto[],
+  productos: Producto[],
   homologados: Set<string> = new Set()
 ) {
-  const [productos, setProductos] =
-    useState<Producto[]>(
-      initialProducts
-    );
-
   const [filters, setFilters] =
     useState<GestionProductosFilters>(
       FILTROS_INICIALES
@@ -199,25 +194,6 @@ export function useGestionProductos(
     );
   }
 
-  function eliminarSeleccionados() {
-    if (
-      seleccionados.size === 0
-    ) {
-      return;
-    }
-
-    setProductos((current) =>
-      current.filter(
-        (item) =>
-          !seleccionados.has(
-            item.id
-          )
-      )
-    );
-
-    limpiarSeleccion();
-  }
-
   return {
     productos,
 
@@ -234,8 +210,6 @@ export function useGestionProductos(
     togglePagina,
 
     limpiarSeleccion,
-
-    eliminarSeleccionados,
 
     pagina: paginaActual,
     setPagina,

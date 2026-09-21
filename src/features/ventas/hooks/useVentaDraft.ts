@@ -13,8 +13,15 @@ export function useVentaDraft() {
     return { subtotal, descuentoLineas, descuentoAdicional, total: Math.max(0, subtotal - descuentoLineas - descuentoAdicional) };
   }, [lineas, descuentoAdicional]);
 
+  function almacenPredeterminado(producto: ProductoVenta) {
+    return producto.stocks.find((stock) => {
+      const nombre = `${stock.almacen.codigo ?? ""} ${stock.almacen.nombre}`.toLowerCase();
+      return nombre.includes("isac") && nombre.includes("tamayo");
+    }) ?? producto.stocks[0];
+  }
+
   function agregarProducto(producto: ProductoVenta) {
-    const stock = producto.stocks[0];
+    const stock = almacenPredeterminado(producto);
     if (!stock) throw new Error("El producto no tiene stock disponible.");
     setLineas(current => [...current, { id: crypto.randomUUID(), producto, almacen_id: stock.almacen.id, cantidad: 1, precio_unitario: producto.precio_pieza, descuento: 0, informacion_extra: "" }]);
   }

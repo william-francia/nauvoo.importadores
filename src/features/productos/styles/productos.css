@@ -1034,6 +1034,27 @@
     font-size: 10px;
 }
 
+.producto-form-success,
+.producto-form-info {
+    margin-bottom: 14px;
+    padding: 11px 13px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.producto-form-success {
+    border: 1px solid #bfe3c8;
+    background: #eef9f1;
+    color: #236b38;
+}
+
+.producto-form-info {
+    border: 1px solid #dce2dc;
+    background: #f5f7f5;
+    color: #626962;
+}
+
 .producto-form-actions {
     position: sticky;
 

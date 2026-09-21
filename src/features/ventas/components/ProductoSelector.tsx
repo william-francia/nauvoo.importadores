@@ -45,6 +45,8 @@ export default function ProductoSelector({
   const [abierto, setAbierto] =
     useState(false);
 
+  const [error, setError] = useState<string | null>(null);
+
   const ref =
     useRef<HTMLDivElement>(null);
 
@@ -86,6 +88,7 @@ export default function ProductoSelector({
       async () => {
         try {
           setCargando(true);
+          setError(null);
 
           const resultado =
             await buscar(
@@ -93,8 +96,9 @@ export default function ProductoSelector({
             );
 
           setProductos(resultado);
-        } catch {
+        } catch (cause) {
           setProductos([]);
+          setError(cause instanceof Error ? cause.message : "No se pudieron buscar los productos.");
         } finally {
           setCargando(false);
         }
@@ -164,7 +168,11 @@ export default function ProductoSelector({
               </div>
             )}
 
-            {!cargando &&
+            {!cargando && error && (
+              <div className="venta-dropdown__message venta-alert--error">{error}</div>
+            )}
+
+            {!cargando && !error &&
               productos.map(
                 (producto) => {
                   const stockTotal =
@@ -243,7 +251,7 @@ export default function ProductoSelector({
                 }
               )}
 
-            {!cargando &&
+            {!cargando && !error &&
               productos.length === 0 && (
                 <div className="venta-dropdown__message">
                   No encontramos productos

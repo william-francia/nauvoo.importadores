@@ -234,12 +234,20 @@ export default function VentaItemsTable({
                       value={
                         linea.almacen_id
                       }
-                      onChange={(e) =>
-                        onAlmacen(
-                          linea.id,
-                          e.target.value
-                        )
-                      }
+                      onChange={(e) => {
+                        const almacen = linea.producto.stocks.find(
+                          (stock) => stock.almacen.id === e.target.value
+                        )?.almacen;
+                        const esAlmacen = almacen?.tipo === "almacen" ||
+                          /almac[eé]n/i.test(almacen?.nombre ?? "");
+
+                        if (esAlmacen && !window.confirm("¿En serio quieres vender directamente del almacén?")) {
+                          e.currentTarget.value = linea.almacen_id;
+                          return;
+                        }
+
+                        onAlmacen(linea.id, e.target.value);
+                      }}
                     >
                       {linea.producto.stocks.map(
                         (stock) => (

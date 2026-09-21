@@ -1,7 +1,6 @@
 // src/pages/productos/ProductoFormPage.tsx
 
 import {
-  useMemo,
   useState,
 } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -15,10 +14,6 @@ import "../../features/productos/styles/productos.css";
 
 import ProductoForm from "../../features/productos/components/ProductoForm";
 
-import {
-  PRODUCTOS_MOCK,
-} from "../../features/productos/data/productos.mock";
-
 import type {
   ProductoFormValues,
 } from "../../features/productos/types/productos.types";
@@ -27,6 +22,7 @@ import { listarHomologacionesProductos } from "../../features/facturas/services/
 import type { ProductoHomologacion } from "../../features/facturas/types/siat.types";
 import { EstadoBadge } from "../../features/facturas/components/SiatShared";
 import "../../features/facturas/styles/siat.css";
+import { useActualizarProducto, useCrearProducto, useProductos } from "../../features/productos/hooks/useProductos";
 
 const INITIAL_VALUES: ProductoFormValues = {
   actividadEconomicaCodigo:
@@ -66,26 +62,28 @@ export default function ProductoFormPage() {
     productoId,
   } = useParams();
 
-  const [guardando, setGuardando] =
-    useState(false);
+  const [errorGuardado, setErrorGuardado] = useState<string | null>(null);
+  const productosQuery = useProductos();
+  const crearMutation = useCrearProducto();
+  const actualizarMutation = useActualizarProducto();
   const [homologacionAbierta,setHomologacionAbierta]=useState(false);
   const homologaciones=useQuery({queryKey:["siat-productos-homologacion"],queryFn:listarHomologacionesProductos});
 
-  const producto =
-    useMemo(
-      () =>
-        PRODUCTOS_MOCK.find(
-          (item) =>
-            item.id === productoId
-        ) ?? null,
-      [productoId]
-    );
+  const producto = productosQuery.data?.find((item) => item.id === productoId) ?? null;
 
   const mode =
     productoId
       ? "edit"
       : "create";
   const homologacion:ProductoHomologacion|null=producto ? (homologaciones.data?.find(item=>item.productoId===producto.id||item.codigoInterno.toUpperCase()===producto.sku.toUpperCase())??null) : null;
+
+  if (mode === "edit" && productosQuery.isLoading) {
+    return <div className="productos-page"><div className="producto-not-found"><h2>Cargando producto…</h2></div></div>;
+  }
+
+  if (productosQuery.error) {
+    return <div className="productos-page"><div className="producto-not-found"><h2>No se pudo cargar el producto</h2><p>{productosQuery.error.message}</p></div></div>;
+  }
 
   if (
     mode === "edit" &&
@@ -165,42 +163,15 @@ export default function ProductoFormPage() {
     values: ProductoFormValues
   ) {
     try {
-      setGuardando(true);
-
-      /*
-       * IMPORTANTE:
-       *
-       * Aquí conectaremos el servicio
-       * real de Supabase.
-       *
-       * Crear:
-       *
-       * await crearProducto(values)
-       *
-       * Editar:
-       *
-       * await actualizarProducto(
-       *   productoId,
-       *   values
-       * )
-       *
-       * No inventamos nombres SQL
-       * hasta revisar el esquema real.
-       */
-
-      console.log(
-        mode === "create"
-          ? "Nuevo producto:"
-          : "Editar producto:",
-
-        values
-      );
-
-      navigate(
-        "/productos/gestion"
-      );
-    } finally {
-      setGuardando(false);
+      setErrorGuardado(null);
+      if (mode === "create") {
+        await crearMutation.mutateAsync(values);
+      } else if (productoId) {
+        await actualizarMutation.mutateAsync({ id: productoId, values });
+      }
+      navigate("/productos/gestion", { state: { productoGuardado: mode === "create" ? "Producto creado correctamente." : "Producto actualizado correctamente." } });
+    } catch (cause) {
+      setErrorGuardado(cause instanceof Error ? cause.message : "No se pudo guardar el producto.");
     }
   }
 
@@ -239,8 +210,9 @@ export default function ProductoFormPage() {
           producto?.stockPorLocal
         }
         guardando={
-          guardando
+          crearMutation.isPending || actualizarMutation.isPending
         }
+        errorExterno={errorGuardado}
         onSubmit={
           guardar
         }
