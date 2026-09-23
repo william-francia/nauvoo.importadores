@@ -9,6 +9,7 @@ import NuevoClienteModal from "./components/NuevoClienteModal";
 import ProductoSelector from "./components/ProductoSelector";
 import VentaItemsTable from "./components/VentaItemsTable";
 import PagoPanel from "./components/PagoPanel";
+import ConfirmarVentaModal from "./components/ConfirmarVentaModal";
 
 import { useVentaDraft } from "./hooks/useVentaDraft";
 
@@ -56,6 +57,15 @@ export default function NuevaVentaPage() {
       texto: string;
     } | null>(null);
 
+  const [pagoPendiente, setPagoPendiente] = useState<{
+    metodo: MetodoPago;
+    montoRecibido: number;
+    tarjetaOfuscada: string | null;
+  } | null>(null);
+
+  const [ventaRealizada, setVentaRealizada] = useState(false);
+  const [resumenVenta, setResumenVenta] = useState<{ total: string; cliente: string } | null>(null);
+
   function handleAgregarProducto(
     producto: ProductoVenta
   ) {
@@ -87,15 +97,28 @@ export default function NuevaVentaPage() {
     });
   }
 
-  async function handlePagar(data: {
+  function handlePagar(data: {
     metodo: MetodoPago;
     montoRecibido: number;
     tarjetaOfuscada: string | null;
   }) {
-    if (venta.lineas.length === 0) {
+    if (venta.lineas.length === 0 || !venta.cliente) {
+      setMensaje({
+        tipo: "error",
+        texto: !venta.cliente
+          ? "Selecciona un cliente antes de realizar el pago."
+          : "Agrega al menos un producto antes de realizar el pago.",
+      });
       return;
     }
+    setPagoPendiente(data);
+  }
 
+  async function confirmarPago() {
+    if (!pagoPendiente || venta.lineas.length === 0 || !venta.cliente) {
+      setPagoPendiente(null);
+      return;
+    }
     try {
       setProcesando(true);
       setMensaje(null);
@@ -105,9 +128,9 @@ export default function NuevaVentaPage() {
           cliente_id:
             venta.cliente?.id ?? null,
 
-          metodo_pago: data.metodo,
+          metodo_pago: pagoPendiente.metodo,
 
-          tarjeta_ofuscada: data.tarjetaOfuscada,
+          tarjeta_ofuscada: pagoPendiente.tarjetaOfuscada,
 
           observacion:
             venta.observacion,
@@ -142,13 +165,13 @@ export default function NuevaVentaPage() {
         respuesta
       );
 
-      venta.limpiarVenta();
-
-      setMensaje({
-        tipo: "success",
-        texto:
-          "Venta registrada correctamente.",
+      setResumenVenta({
+        total: money(venta.totales.total),
+        cliente: venta.cliente?.nombre_razon_social ?? "Cliente general",
       });
+      venta.limpiarVenta();
+      setPagoPendiente(null);
+      setVentaRealizada(true);
     } catch (error) {
       setMensaje({
         tipo: "error",
@@ -403,7 +426,7 @@ export default function NuevaVentaPage() {
               venta.totales.total
             }
             bloqueado={
-              venta.lineas.length === 0
+              venta.lineas.length === 0 || !venta.cliente
             }
             procesando={procesando}
             onPagar={handlePagar}
@@ -421,6 +444,22 @@ export default function NuevaVentaPage() {
         onClienteCreado={
           handleClienteCreado
         }
+      />
+
+      <ConfirmarVentaModal
+        abierto={Boolean(pagoPendiente) || ventaRealizada}
+        exitoso={ventaRealizada}
+        total={resumenVenta?.total ?? money(venta.totales.total)}
+        cliente={resumenVenta?.cliente ?? venta.cliente?.nombre_razon_social ?? "Cliente general"}
+        procesando={procesando}
+        onCancelar={() => {
+          if (ventaRealizada) {
+            setVentaRealizada(false);
+            setResumenVenta(null);
+          }
+          else if (!procesando) setPagoPendiente(null);
+        }}
+        onConfirmar={confirmarPago}
       />
     </div>
   );
