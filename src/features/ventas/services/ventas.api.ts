@@ -103,7 +103,7 @@ export async function buscarProductosVenta(termino: string): Promise<ProductoVen
     precio_pieza: Number(row.precio_pieza ?? 0),
     stocks: (row.stock_por_almacen ?? [])
       .filter((stock): stock is StockPorAlmacenRow & { almacen: AlmacenRow } =>
-        stock.almacen !== null && stock.almacen.activo && Number(stock.cantidad_disponible) > 0
+        stock.almacen !== null && stock.almacen.activo && Number(stock.cantidad_disponible ?? 0) >= 0
       )
       .map((stock) => ({
         almacen: {

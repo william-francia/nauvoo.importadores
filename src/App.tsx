@@ -12,6 +12,21 @@ function App() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
+    // Permite editar normalmente y elimina únicamente ceros a la izquierda
+    // cuando ya existe otro dígito: 02 -> 2, 01000 -> 1000.
+    const normalizarNumero = (event: Event) => {
+      const input = event.target
+      if (!(input instanceof HTMLInputElement) || input.type !== 'number') return
+      const valor = input.value
+      if (/^0\d+/.test(valor)) {
+        input.value = valor.replace(/^0+(?=\d)/, '')
+      }
+    }
+    document.addEventListener('input', normalizarNumero)
+    return () => document.removeEventListener('input', normalizarNumero)
+  }, [])
+
+  useEffect(() => {
     let isMounted = true
 
     supabase.auth

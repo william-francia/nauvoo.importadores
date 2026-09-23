@@ -9,6 +9,7 @@ import NuevoClienteModal from "./components/NuevoClienteModal";
 import ProductoSelector from "./components/ProductoSelector";
 import VentaItemsTable from "./components/VentaItemsTable";
 import PagoPanel from "./components/PagoPanel";
+import { AlertTriangle, X } from "lucide-react";
 
 import { useVentaDraft } from "./hooks/useVentaDraft";
 
@@ -49,6 +50,12 @@ export default function NuevaVentaPage() {
     procesando,
     setProcesando,
   ] = useState(false);
+  const [confirmarStockCero, setConfirmarStockCero] = useState(false);
+  const [pagoPendiente, setPagoPendiente] = useState<{
+    metodo: MetodoPago;
+    montoRecibido: number;
+    tarjetaOfuscada: string | null;
+  } | null>(null);
 
   const [mensaje, setMensaje] =
     useState<{
@@ -87,7 +94,7 @@ export default function NuevaVentaPage() {
     });
   }
 
-  async function handlePagar(data: {
+  async function registrarPago(data: {
     metodo: MetodoPago;
     montoRecibido: number;
     tarjetaOfuscada: string | null;
@@ -161,6 +168,19 @@ export default function NuevaVentaPage() {
     } finally {
       setProcesando(false);
     }
+  }
+
+  function handlePagar(data: { metodo: MetodoPago; montoRecibido: number; tarjetaOfuscada: string | null }) {
+    const vendeSinStock = venta.lineas.some((linea) => {
+      const stock = linea.producto.stocks.find((item) => item.almacen.id === linea.almacen_id);
+      return (stock?.cantidad ?? 0) <= 0;
+    });
+    if (vendeSinStock) {
+      setPagoPendiente(data);
+      setConfirmarStockCero(true);
+      return;
+    }
+    void registrarPago(data);
   }
 
   return (
@@ -422,6 +442,22 @@ export default function NuevaVentaPage() {
           handleClienteCreado
         }
       />
+
+      {confirmarStockCero && pagoPendiente && (
+        <div className="venta-stock-modal-backdrop" role="presentation">
+          <section className="venta-stock-modal" role="dialog" aria-modal="true" aria-labelledby="venta-stock-title">
+            <button type="button" className="venta-stock-modal__close" onClick={() => setConfirmarStockCero(false)} aria-label="Cerrar"><X size={20} /></button>
+            <div className="venta-stock-modal__icon"><AlertTriangle size={28} /></div>
+            <h2 id="venta-stock-title">Venta sin stock disponible</h2>
+            <p>Uno o más productos tienen stock 0. Esta venta dejará el inventario en negativo y quedará pendiente de regularización.</p>
+            <p className="venta-stock-modal__hint">Confirma que estás consciente de que estás vendiendo un producto que actualmente no existe en inventario.</p>
+            <footer>
+              <button type="button" className="venta-button venta-button--secondary" onClick={() => setConfirmarStockCero(false)}>Cancelar</button>
+              <button type="button" className="venta-button venta-button--primary" onClick={() => { setConfirmarStockCero(false); void registrarPago(pagoPendiente); }}>Confirmar venta</button>
+            </footer>
+          </section>
+        </div>
+      )}
     </div>
   );
 }
