@@ -10,6 +10,7 @@ import ProductoSelector from "./components/ProductoSelector";
 import VentaItemsTable from "./components/VentaItemsTable";
 import PagoPanel from "./components/PagoPanel";
 import ConfirmarVentaModal from "./components/ConfirmarVentaModal";
+import { AlertTriangle, X } from "lucide-react";
 
 import { useVentaDraft } from "./hooks/useVentaDraft";
 
@@ -41,6 +42,11 @@ export default function NuevaVentaPage() {
     setModalClienteAbierto,
   ] = useState(false);
 
+  const [confirmarStockCero, setConfirmarStockCero] = useState(false);
+  const [pagoPendiente, setPagoPendiente] = useState<{ metodo: MetodoPago; montoRecibido: number; tarjetaOfuscada: string | null } | null>(null);
+  const [ventaRealizada, setVentaRealizada] = useState(false);
+  const [resumenVenta, setResumenVenta] = useState<{ total: string; cliente: string } | null>(null);
+
   const [
     detalleExtraAbierto,
     setDetalleExtraAbierto,
@@ -56,15 +62,6 @@ export default function NuevaVentaPage() {
       tipo: "success" | "error";
       texto: string;
     } | null>(null);
-
-  const [pagoPendiente, setPagoPendiente] = useState<{
-    metodo: MetodoPago;
-    montoRecibido: number;
-    tarjetaOfuscada: string | null;
-  } | null>(null);
-
-  const [ventaRealizada, setVentaRealizada] = useState(false);
-  const [resumenVenta, setResumenVenta] = useState<{ total: string; cliente: string } | null>(null);
 
   function handleAgregarProducto(
     producto: ProductoVenta
@@ -97,7 +94,7 @@ export default function NuevaVentaPage() {
     });
   }
 
-  function handlePagar(data: {
+  async function registrarPago(data: {
     metodo: MetodoPago;
     montoRecibido: number;
     tarjetaOfuscada: string | null;
@@ -111,14 +108,7 @@ export default function NuevaVentaPage() {
       });
       return;
     }
-    setPagoPendiente(data);
-  }
 
-  async function confirmarPago() {
-    if (!pagoPendiente || venta.lineas.length === 0 || !venta.cliente) {
-      setPagoPendiente(null);
-      return;
-    }
     try {
       setProcesando(true);
       setMensaje(null);
@@ -128,9 +118,9 @@ export default function NuevaVentaPage() {
           cliente_id:
             venta.cliente?.id ?? null,
 
-          metodo_pago: pagoPendiente.metodo,
+          metodo_pago: data.metodo,
 
-          tarjeta_ofuscada: pagoPendiente.tarjetaOfuscada,
+          tarjeta_ofuscada: data.tarjetaOfuscada,
 
           observacion:
             venta.observacion,
@@ -167,7 +157,7 @@ export default function NuevaVentaPage() {
 
       setResumenVenta({
         total: money(venta.totales.total),
-        cliente: venta.cliente?.nombre_razon_social ?? "Cliente general",
+        cliente: venta.cliente.nombre_razon_social,
       });
       venta.limpiarVenta();
       setPagoPendiente(null);
@@ -184,6 +174,29 @@ export default function NuevaVentaPage() {
     } finally {
       setProcesando(false);
     }
+  }
+
+  function handlePagar(data: { metodo: MetodoPago; montoRecibido: number; tarjetaOfuscada: string | null }) {
+    if (venta.lineas.length === 0 || !venta.cliente) {
+      setMensaje({
+        tipo: "error",
+        texto: !venta.cliente
+          ? "Selecciona un cliente antes de realizar el pago."
+          : "Agrega al menos un producto antes de realizar el pago.",
+      });
+      return;
+    }
+
+    const sinStock = venta.lineas.some((linea) => {
+      const stock = linea.producto.stocks.find((item) => item.almacen.id === linea.almacen_id);
+      return (stock?.cantidad ?? 0) <= 0;
+    });
+    if (sinStock) {
+      setPagoPendiente(data);
+      setConfirmarStockCero(true);
+      return;
+    }
+    setPagoPendiente(data);
   }
 
   return (
@@ -445,9 +458,8 @@ export default function NuevaVentaPage() {
           handleClienteCreado
         }
       />
-
       <ConfirmarVentaModal
-        abierto={Boolean(pagoPendiente) || ventaRealizada}
+        abierto={!confirmarStockCero && (Boolean(pagoPendiente) || ventaRealizada)}
         exitoso={ventaRealizada}
         total={resumenVenta?.total ?? money(venta.totales.total)}
         cliente={resumenVenta?.cliente ?? venta.cliente?.nombre_razon_social ?? "Cliente general"}
@@ -456,11 +468,29 @@ export default function NuevaVentaPage() {
           if (ventaRealizada) {
             setVentaRealizada(false);
             setResumenVenta(null);
+          } else if (!procesando) {
+            setPagoPendiente(null);
           }
-          else if (!procesando) setPagoPendiente(null);
         }}
-        onConfirmar={confirmarPago}
+        onConfirmar={() => {
+          if (pagoPendiente) void registrarPago(pagoPendiente);
+        }}
       />
+      {confirmarStockCero && pagoPendiente && (
+        <div className="venta-stock-modal-backdrop" role="presentation">
+          <section className="venta-stock-modal" role="dialog" aria-modal="true" aria-labelledby="venta-stock-title">
+            <button type="button" className="venta-stock-modal__close" onClick={() => { setConfirmarStockCero(false); setPagoPendiente(null); }} aria-label="Cerrar"><X size={20} /></button>
+            <div className="venta-stock-modal__icon"><AlertTriangle size={28} /></div>
+            <h2 id="venta-stock-title">Venta sin stock disponible</h2>
+            <p>Uno o más productos tienen stock 0. La venta se registrará, pero no se descontará inventario inexistente.</p>
+            <p className="venta-stock-modal__hint">Confirma que deseas continuar con la venta.</p>
+            <footer>
+              <button type="button" className="venta-button venta-button--secondary" onClick={() => { setConfirmarStockCero(false); setPagoPendiente(null); }}>Cancelar</button>
+              <button type="button" className="venta-button venta-button--primary" onClick={() => setConfirmarStockCero(false)}>Continuar</button>
+            </footer>
+          </section>
+        </div>
+      )}
     </div>
   );
 }

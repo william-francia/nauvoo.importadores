@@ -95,7 +95,7 @@ BEGIN
     WHERE producto_id = v_item.producto_id AND almacen_id = v_item.almacen_id
     FOR UPDATE;
 
-    IF NOT FOUND OR v_stock_disponible < v_item.cantidad THEN
+    IF NOT FOUND THEN
       RAISE EXCEPTION 'Stock insuficiente para el producto % en el almacén %.',
         v_item.producto_id, v_item.almacen_id;
     END IF;
