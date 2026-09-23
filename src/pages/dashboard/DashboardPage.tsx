@@ -30,6 +30,7 @@ export default function DashboardPage() {
   const rutaActual = location.pathname.replace(/\/+$/, "") || "/";
   const ventasActiva = rutaActual.startsWith("/ventas/");
   const productosActiva = rutaActual.startsWith("/productos/");
+  const clientesActiva = rutaActual === "/clientes";
   const facturasActiva = rutaActual === "/facturas" || rutaActual.startsWith("/facturas/");
   const offlineActiva = rutaActual.startsWith("/facturas/offline/");
   const gestionProductosActiva =
@@ -40,6 +41,7 @@ export default function DashboardPage() {
   const [activeItem, setActiveItem] = useState<MenuItem>("dashboard");
   const [ventasOpen, setVentasOpen] = useState(ventasActiva);
   const [productosOpen, setProductosOpen] = useState(productosActiva);
+  const [clientesOpen, setClientesOpen] = useState(clientesActiva);
   const [facturasOpen, setFacturasOpen] = useState(facturasActiva);
   const [offlineOpen, setOfflineOpen] = useState(offlineActiva);
   const [accountSection, setAccountSection] = useState<AccountSection | null>(null);
@@ -193,14 +195,16 @@ export default function DashboardPage() {
           )}
           </>}
 
-          {account.can("clients.read") && (
+          {account.can("clients.read") && <>
           <button
-            className={`nav-item ${
-              activeItem === "clientes" ? "active" : ""
-            }`}
+            className={`nav-item ${clientesActiva ? "active" : ""}`}
             onClick={() => {
-              setActiveItem("clientes");
-              navigate("/dashboard");
+              if (!sidebarOpen) {
+                setSidebarOpen(true);
+                setClientesOpen(true);
+                return;
+              }
+              setClientesOpen((actual) => !actual);
             }}
           >
             <span className="nav-icon">
@@ -208,8 +212,35 @@ export default function DashboardPage() {
             </span>
 
             {sidebarOpen && <span>Clientes</span>}
+
+            {sidebarOpen && (
+              <span className={`nav-chevron ${clientesOpen ? "open" : ""}`}>
+                {"\u203a"}
+                {/*
+                â€º
+                */}
+              </span>
+            )}
           </button>
+
+          {sidebarOpen && clientesOpen && (
+            <div className="nav-submenu">
+              <button
+                className={`nav-subitem nav-subitem--clients ${clientesActiva ? "active" : ""}`}
+                aria-label={"Gesti\u00f3n de clientes"}
+                onClick={() => {
+                  setActiveItem("clientes");
+                  navigate("/clientes");
+                }}
+              >
+                {"Gestión de clientes"}
+                {/*
+                GestiÃ³n de clientes
+                */}
+              </button>
+            </div>
           )}
+          </>}
 
           {canUseInvoices && <>
           <button
@@ -324,6 +355,8 @@ export default function DashboardPage() {
 
           {routeAllowed && rutaActual === "/productos/reportes" && <ReportesPage />}
 
+          {routeAllowed && clientesActiva && <ClientesPage />}
+
           {routeAllowed && facturasActiva && <Suspense fallback={<div className="siat-state">Cargando módulo fiscal…</div>}>
             {rutaActual === "/facturas" && <FacturasPage />}
             {rutaActual === "/facturas/contingencias" && <ContingenciasPage />}
@@ -332,13 +365,13 @@ export default function DashboardPage() {
             {rutaActual === "/facturas/offline/eventos" && <EventosPage />}
           </Suspense>}
 
-          {!ventasActiva && !productosActiva && !facturasActiva && activeItem === "dashboard" && (
+          {!ventasActiva && !productosActiva && !clientesActiva && !facturasActiva && activeItem === "dashboard" && (
             <Suspense fallback={<div className="business-dashboard-state">Cargando Dashboard…</div>}>
               <DashboardHome />
             </Suspense>
           )}
 
-          {!ventasActiva && !productosActiva && !facturasActiva && activeItem === "ventas" && (
+          {!ventasActiva && !productosActiva && !clientesActiva && !facturasActiva && activeItem === "ventas" && (
             <PlaceholderPage
               title="Ventas"
               description="Desde aquí administraremos las ventas y facturación."
@@ -346,15 +379,13 @@ export default function DashboardPage() {
             />
           )}
 
-          {!ventasActiva && !productosActiva && !facturasActiva && activeItem === "productos" && (
+          {!ventasActiva && !productosActiva && !clientesActiva && !facturasActiva && activeItem === "productos" && (
             <PlaceholderPage
               title="Productos"
               description="Desde aquí administraremos el inventario y los productos."
               icon={<BoxIcon />}
             />
           )}
-
-          {routeAllowed && !ventasActiva && !productosActiva && !facturasActiva && activeItem === "clientes" && <ClientesPage />}
 
         </main>
       </div>
@@ -375,6 +406,7 @@ function getRequiredPermission(path: string, activeItem: MenuItem): string | nul
   if (path === "/productos/gestion") return "products.read";
   if (path === "/productos/inventario") return "inventory.read";
   if (path === "/productos/reportes") return "history.read";
+  if (path === "/clientes") return "clients.read";
   if (path.startsWith("/facturas/offline/") || path === "/facturas/contingencias") return "invoices.issue";
   if (path === "/facturas" || path.startsWith("/facturas/")) return "invoices.read";
   if (activeItem === "clientes") return "clients.read";

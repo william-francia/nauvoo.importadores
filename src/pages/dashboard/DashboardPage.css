@@ -407,6 +407,15 @@ button {
     color: var(--primary1-color);
 }
 
+.nav-subitem--clients {
+    font-size: 0;
+}
+
+.nav-subitem--clients::after {
+    content: "Gesti\00f3n de clientes";
+    font-size: 12px;
+}
+
 .nav-icon {
     width: 23px;
     height: 23px;
