@@ -9,7 +9,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
-      includeAssets: ['nuvoo-icon.svg'],
+      includeAssets: ['ico.png'],
       manifest: {
         name: 'Nuvoo Importadores',
         short_name: 'Nuvoo',
@@ -25,14 +25,15 @@ export default defineConfig({
         categories: ['business', 'productivity'],
         icons: [
           {
-            src: '/nuvoo-icon.svg',
-            sizes: 'any',
-            type: 'image/svg+xml',
+            src: '/ico.png',
+            sizes: '1254x1254',
+            type: 'image/png',
             purpose: 'any maskable',
           },
         ],
       },
       workbox: {
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         // Mantiene disponible el contenedor de React al abrir enlaces internos
         // o cuando la conexión es intermitente. Los datos de Supabase se
         // solicitarán de nuevo cuando haya conexión.

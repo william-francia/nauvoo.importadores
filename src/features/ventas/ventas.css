@@ -47,7 +47,26 @@
 ========================================================== */
 
 .venta-page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
     margin-bottom: 18px;
+}
+
+.venta-button--reset {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    flex-shrink: 0;
+    border: 1px solid #f0b7bd;
+    background: #fff7f7;
+    color: #b4232f;
+}
+
+.venta-button--reset:hover {
+    border-color: #dc3545;
+    background: #fff0f1;
 }
 
 .venta-page-header h1 {
