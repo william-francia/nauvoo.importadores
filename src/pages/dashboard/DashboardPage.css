@@ -45,7 +45,8 @@ button {
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
-    transition: width 0.25s ease;
+    overflow: hidden;
+    transition: width 0.34s cubic-bezier(.22, 1, .36, 1), box-shadow 0.34s ease;
     position: sticky;
     top: 0;
     height: 100vh;
@@ -74,10 +75,12 @@ button {
 
 .sidebar.open {
     width: var(--sidebar-width);
+    box-shadow: 8px 0 24px rgba(0, 0, 0, .08);
 }
 
 .sidebar.closed {
     width: var(--sidebar-collapsed);
+    box-shadow: 3px 0 14px rgba(0, 0, 0, .05);
 }
 
 .sidebar-header {
@@ -87,6 +90,7 @@ button {
     gap: 12px;
     padding: 0 18px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    transition: padding 0.34s ease, gap 0.34s ease;
 }
 
 .brand-icon {
@@ -105,6 +109,7 @@ button {
     font-style: italic;
     letter-spacing: -2px;
     box-shadow: 0 5px 15px rgba(203, 212, 194, 0.18);
+    transition: width 0.34s cubic-bezier(.22, 1, .36, 1), min-width 0.34s cubic-bezier(.22, 1, .36, 1), height 0.34s ease, transform 0.34s ease;
 }
 
 .brand-icon::after,
@@ -194,6 +199,7 @@ button {
     width: 168px;
     min-width: 168px;
     height: 52px;
+    transform: translateX(0);
 }
 
 .sidebar.open .brand-text { display: none; }
@@ -204,6 +210,7 @@ button {
     width: 39px;
     min-width: 39px;
     height: 39px;
+    transform: translateX(-1px);
 }
 
 .sidebar.closed .brand-icon img {
@@ -331,6 +338,7 @@ button {
     font-weight: 700;
     letter-spacing: 1px;
     color: var(--secondary-color);
+    animation: sidebar-item-in .28s ease both;
 }
 
 .nav-item {
@@ -348,7 +356,7 @@ button {
     font-size: 14px;
     font-weight: 600;
     text-align: left;
-    transition: 0.2s ease;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.34s ease, padding 0.34s ease;
     margin-bottom: 5px;
 }
 
@@ -377,6 +385,7 @@ button {
     margin: -1px 0 7px 36px;
     display: grid;
     gap: 3px;
+    animation: sidebar-submenu-in .25s ease both;
 }
 
 .nav-subitem {
@@ -420,6 +429,7 @@ button {
     flex-direction: column;
     align-items: center;
     gap: 13px;
+    animation: sidebar-item-in .28s ease both;
 }
 
 .logout-button {
@@ -466,6 +476,31 @@ button {
 .dashboard-content {
     min-width: 0;
     flex: 1;
+}
+
+@keyframes sidebar-item-in {
+    from { opacity: 0; transform: translateX(-8px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes sidebar-submenu-in {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sidebar,
+    .sidebar-header,
+    .brand-icon,
+    .nav-item {
+        transition: none;
+    }
+
+    .nav-section,
+    .nav-submenu,
+    .sidebar-footer {
+        animation: none;
+    }
 }
 
 /* =========================================

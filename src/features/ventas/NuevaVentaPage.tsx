@@ -9,7 +9,7 @@ import NuevoClienteModal from "./components/NuevoClienteModal";
 import ProductoSelector from "./components/ProductoSelector";
 import VentaItemsTable from "./components/VentaItemsTable";
 import PagoPanel from "./components/PagoPanel";
-import { AlertTriangle, X } from "lucide-react";
+import { AlertTriangle, RotateCcw, X } from "lucide-react";
 
 import { useVentaDraft } from "./hooks/useVentaDraft";
 
@@ -180,6 +180,22 @@ export default function NuevaVentaPage() {
     void registrarPago(data);
   }
 
+  function handleRestablecerDatos() {
+    const confirmado = window.confirm(
+      "Se eliminarán todos los datos de esta venta sin registrarla. ¿Deseas continuar?",
+    );
+    if (!confirmado) return;
+
+    venta.limpiarVenta();
+    setMensaje({ tipo: "success", texto: "Datos de la venta restablecidos." });
+  }
+
+  const hayDatosParaRestablecer =
+    venta.lineas.length > 0 ||
+    venta.cliente !== null ||
+    venta.observacion.trim() !== "" ||
+    venta.descuentoAdicional > 0;
+
   return (
     <div className="nueva-venta-page">
       <header className="venta-page-header">
@@ -199,6 +215,16 @@ export default function NuevaVentaPage() {
             pago.
           </p>
         </div>
+        {hayDatosParaRestablecer && (
+          <button
+            type="button"
+            className="venta-button venta-button--reset"
+            onClick={handleRestablecerDatos}
+          >
+            <RotateCcw size={15} aria-hidden="true" />
+            Restablecer datos
+          </button>
+        )}
       </header>
 
       {mensaje && (
