@@ -41,44 +41,6 @@ h2 {
   color: var(--text);
 }
 
-/* Icono de marca para los contenedores cuadrados de la aplicación.
-   Los controles funcionales conservan sus iconos propios. */
-:is(
-  .nav-icon,
-  .stat-icon,
-  .business-stat__icon,
-  .weekly-sales-card__icon,
-  .empty-icon,
-  .placeholder-icon,
-  .report-card__icon,
-  .inv-summary-icon,
-  .venta-carrito-vacio__icon,
-  .clients-empty-icon,
-  .gestion-actions__icon
-) {
-  background-image: url("./assets/ico.png") !important;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  color: transparent;
-}
-
-:is(
-  .nav-icon,
-  .stat-icon,
-  .business-stat__icon,
-  .weekly-sales-card__icon,
-  .empty-icon,
-  .placeholder-icon,
-  .report-card__icon,
-  .inv-summary-icon,
-  .venta-carrito-vacio__icon,
-  .clients-empty-icon,
-  .gestion-actions__icon
-) > svg {
-  display: none;
-}
-
 h1 {
   font-size: clamp(2rem, 4vw, 3.5rem);
   line-height: 1;
