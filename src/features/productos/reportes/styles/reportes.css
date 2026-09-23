@@ -699,3 +699,27 @@
             1fr;
     }
 }
+
+/* Lectura cómoda en pantallas densas sin aumentar el ancho de las tarjetas. */
+.reportes-page .reportes-breadcrumb,
+.reportes-page .report-period span,
+.reportes-page__header p,
+.report-card__header span,
+.report-card__description,
+.reports-info p,
+.reports-tip p {
+    font-size: 11px;
+}
+
+.report-card__header h2,
+.reports-info h2 {
+    font-size: 14px;
+}
+
+.report-download,
+.reports-btn,
+.result-preview > div,
+.cash-preview > div,
+.ranking-preview > div {
+    font-size: 11px;
+}

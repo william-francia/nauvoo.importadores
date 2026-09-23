@@ -1127,3 +1127,28 @@
         border-radius: 5px;
     }
 }
+
+/* Tipografía legible conservando el ancho de la tabla y de los menús. */
+.gestion-ventas-page .gestion-table {
+    font-size: 12px;
+}
+
+.gestion-ventas-page .gestion-table th,
+.gestion-filter-row input,
+.gestion-card-header span,
+.gestion-pagination,
+.gestion-actions__item,
+.gestion-clear-filters {
+    font-size: 11px;
+}
+
+.gestion-status,
+.gestion-actions__title,
+.gestion-email-info,
+.gestion-field > span,
+.gestion-email-list__title,
+.gestion-email-chip,
+.gestion-form-error,
+.gestion-notification {
+    font-size: 10px;
+}

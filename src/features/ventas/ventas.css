@@ -1612,6 +1612,31 @@
             1fr;
     }
 
+    .venta-main,
+    .venta-sidebar,
+    .venta-panel,
+    .venta-table-container {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .venta-table-container {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    .venta-table-wrapper {
+        min-width: 760px;
+    }
+
+    .venta-totales {
+        width: 100%;
+    }
+
+    .venta-totales > div {
+        width: min(100%, 520px);
+    }
+
     .venta-sidebar {
         display: grid;
 
@@ -1657,3 +1682,118 @@
 .venta-stock-modal__close { position: absolute; top: 12px; right: 12px; border: 0; background: transparent; cursor: pointer; }
 .venta-stock-modal footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
 .venta-button--secondary { border: 1px solid #cbd5e1; background: white; color: var(--venta-text); }
+
+/* Tamaños mínimos para que formularios, tablas y opciones se lean bien. */
+.nueva-venta-page .venta-field label {
+    font-size: 12px;
+}
+
+.nueva-venta-page .venta-section-title {
+    font-size: 14px;
+}
+
+.nueva-venta-page .venta-table {
+    font-size: 12px;
+}
+
+.nueva-venta-page .venta-product-cell strong,
+.nueva-venta-page .venta-table-select,
+.nueva-venta-page .venta-op-button,
+.nueva-venta-page .venta-pay-button,
+.nueva-venta-page .venta-button {
+    font-size: 11px;
+}
+
+.nueva-venta-page .venta-product-cell span,
+.nueva-venta-page .venta-product-cell small,
+.nueva-venta-page .venta-extra-producto label,
+.nueva-venta-page .venta-check,
+.nueva-venta-page .venta-discount-input span {
+    font-size: 10px;
+}
+
+.nueva-venta-page .venta-dropdown__message,
+.nueva-venta-page .venta-collapse-header,
+.nueva-venta-page .venta-totales span,
+.nueva-venta-page .venta-payment__title {
+    font-size: 12px;
+}
+
+.nueva-venta-page .venta-table-select option {
+    font-size: 12px;
+}
+
+/* El zoom del navegador reduce el ancho CSS disponible. En ese caso
+   compactamos los controles para conservar la lectura y evitar desbordes. */
+@media (max-width: 900px) {
+    .nueva-venta-page {
+        padding: 12px;
+    }
+
+    .nueva-venta-page .venta-table-wrapper {
+        min-width: 650px;
+    }
+
+    .nueva-venta-page .venta-table {
+        font-size: 10px;
+    }
+
+    .nueva-venta-page .venta-table th {
+        padding: 7px 6px;
+        font-size: 10px;
+    }
+
+    .nueva-venta-page .venta-table td {
+        padding: 6px;
+    }
+
+    .nueva-venta-page .venta-product-cell {
+        min-width: 190px;
+    }
+
+    .nueva-venta-page .venta-product-cell strong {
+        font-size: 10px;
+    }
+
+    .nueva-venta-page .venta-product-cell span,
+    .nueva-venta-page .venta-product-cell small,
+    .nueva-venta-page .stock-info {
+        font-size: 9px;
+    }
+
+    .nueva-venta-page .cantidad-control {
+        width: 96px;
+        grid-template-columns: 26px 1fr 26px;
+    }
+
+    .nueva-venta-page .venta-table-select {
+        width: 122px;
+        height: 32px;
+        font-size: 10px;
+    }
+
+    .nueva-venta-page .venta-table-select option {
+        font-size: 10px;
+    }
+
+    .nueva-venta-page .money-input {
+        width: 92px;
+    }
+
+    .nueva-venta-page .money-input input {
+        width: 56px;
+        height: 30px;
+    }
+
+    .nueva-venta-page .money-input span {
+        font-size: 8px;
+    }
+
+    .nueva-venta-page .venta-totales span {
+        font-size: 11px;
+    }
+
+    .nueva-venta-page .venta-totales strong {
+        font-size: 11px;
+    }
+}

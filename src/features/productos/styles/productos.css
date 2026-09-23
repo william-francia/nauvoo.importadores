@@ -1169,3 +1169,50 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Controles de la tabla: el contenido debe caber dentro de su fila. */
+.productos-table th,
+.productos-table td {
+    overflow: hidden;
+}
+
+.productos-table th {
+    height: 42px;
+}
+
+.productos-table td {
+    height: 50px;
+}
+
+.productos-filters th {
+    height: 52px;
+    vertical-align: middle;
+}
+
+.productos-filters select {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: 34px;
+    padding: 0 8px;
+    border: 1px solid var(--prod-border-dark);
+    border-radius: 4px;
+    background: white;
+    color: var(--prod-text);
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+.productos-table input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    vertical-align: middle;
+}
+
+.productos-table .producto-status {
+    min-height: 28px;
+    padding: 0 10px;
+    font-size: 11px;
+    line-height: 1;
+}
