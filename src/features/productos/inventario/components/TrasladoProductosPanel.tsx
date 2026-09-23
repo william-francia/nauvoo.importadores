@@ -3,6 +3,8 @@ import {
 } from "react";
 import type { FormEvent } from "react";
 
+import ConfirmarAccionInventarioModal from "./ConfirmarAccionInventarioModal";
+
 import {
   TIENDAS,
 } from "../constants/inventario.constants";
@@ -21,7 +23,7 @@ interface Props {
 
   onTrasladar: (
     input: RegistrarTrasladoInput
-  ) => void;
+  ) => void | Promise<void>;
 }
 
 function fechaHoy() {
@@ -61,6 +63,12 @@ export default function TrasladoProductosPanel({
   const [error, setError] =
     useState("");
 
+  const [trasladoPendiente, setTrasladoPendiente] =
+    useState<RegistrarTrasladoInput | null>(null);
+
+  const [confirmando, setConfirmando] =
+    useState(false);
+
   function handleSubmit(
     event: FormEvent
   ) {
@@ -74,29 +82,33 @@ export default function TrasladoProductosPanel({
       return;
     }
 
+    setError("");
+    setTrasladoPendiente({
+      productoId,
+      cantidad,
+      destino,
+      fecha,
+      observacion: "Traslado desde Almacén Uquisamaña",
+    });
+  }
+
+  async function confirmarTraslado() {
+    if (!trasladoPendiente) return;
+
     try {
-      setError("");
-
-      onTrasladar({
-        productoId,
-
-        cantidad,
-
-        destino,
-
-        fecha,
-
-        observacion:
-          "Traslado desde Almacén Uquisamaña",
-      });
-
+      setConfirmando(true);
+      await onTrasladar(trasladoPendiente);
+      setTrasladoPendiente(null);
       setCantidad(1);
     } catch (err) {
+      setTrasladoPendiente(null);
       setError(
         err instanceof Error
           ? err.message
           : "No se pudo realizar el traslado."
       );
+    } finally {
+      setConfirmando(false);
     }
   }
 
@@ -340,6 +352,23 @@ export default function TrasladoProductosPanel({
           </tbody>
         </table>
       </div>
+
+      <ConfirmarAccionInventarioModal
+        abierto={Boolean(trasladoPendiente)}
+        titulo="¿Confirmar traslado de productos?"
+        descripcion="El stock se descontará del almacén Uquisamaña y se sumará al local seleccionado."
+        detalles={[
+          { etiqueta: "Producto", valor: productos.find((item) => item.id === trasladoPendiente?.productoId)?.nombre ?? "-" },
+          { etiqueta: "Cantidad", valor: `${trasladoPendiente?.cantidad ?? 0} unidades` },
+          { etiqueta: "Origen", valor: "Almacén Uquisamaña" },
+          { etiqueta: "Destino", valor: TIENDAS.find((item) => item.id === trasladoPendiente?.destino)?.nombre ?? "-" },
+          { etiqueta: "Fecha", valor: trasladoPendiente?.fecha ?? "-" },
+        ]}
+        procesando={confirmando}
+        etiquetaConfirmar="Confirmar traslado"
+        onCancelar={() => setTrasladoPendiente(null)}
+        onConfirmar={confirmarTraslado}
+      />
     </section>
   );
 }

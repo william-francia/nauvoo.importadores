@@ -16,7 +16,7 @@ interface Props {
 
   onRegistrar: (
     input: RegistrarMovimientoInput
-  ) => void;
+  ) => void | Promise<void>;
 
   onAnular: (
     movimientoId: string
@@ -57,7 +57,7 @@ export default function IngresoProductosPanel({
   const [error, setError] =
     useState("");
 
-  function submit(
+  async function submit(
     event: FormEvent
   ) {
     event.preventDefault();
@@ -71,7 +71,7 @@ export default function IngresoProductosPanel({
     }
 
     try {
-      onRegistrar({
+      await onRegistrar({
         productoId,
 
         tipo: "INGRESO",

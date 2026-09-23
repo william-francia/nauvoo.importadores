@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Boxes, Download, PackagePlus, Search } from "lucide-react";
+import { Boxes, CheckCircle2, Download, PackagePlus, Search, X } from "lucide-react";
 
 import EditarInventarioModal from "../../features/productos/inventario/components/EditarInventarioModal";
 import IngresoProductosPanel from "../../features/productos/inventario/components/IngresoProductosPanel";
@@ -24,6 +24,18 @@ export default function InventarioProductosPage() {
 
   return (
     <div className="inventario-productos-page">
+      {inventario.notificacion && (
+        <div className="inv-notificacion" role="status">
+          <CheckCircle2 size={28} aria-hidden="true" />
+          <div>
+            <strong>Inventario actualizado</strong>
+            <span>{inventario.notificacion}</span>
+          </div>
+          <button type="button" onClick={inventario.cerrarNotificacion} aria-label="Cerrar notificación">
+            <X size={20} aria-hidden="true" />
+          </button>
+        </div>
+      )}
       <header className="inv-page-header">
         <div className="inv-breadcrumb">
           Productos <span>›</span> Inventario de productos

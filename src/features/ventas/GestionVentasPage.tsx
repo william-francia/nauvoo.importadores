@@ -17,6 +17,7 @@ function GestionVentasPagePlaceholder() {
 */
 
 import {
+  useEffect,
   useState,
 } from "react";
 
@@ -26,9 +27,8 @@ import GestionVentasTable from "../../features/ventas/components/gestion/Gestion
 import ResendEmailModal from "../../features/ventas/components/gestion/ResendEmailModal";
 import SinDetailsModal from "../../features/ventas/components/gestion/SinDetailsModal";
 
-import { GESTION_VENTAS_MOCK } from "../../features/ventas/data/gestionVentas.mock";
-
 import { useGestionVentas } from "../../features/ventas/hooks/useGestionVentas";
+import { listarVentasGestion } from "./services/ventas.api";
 
 import type {
   FacturaAction,
@@ -47,10 +47,29 @@ interface NotificationState {
 
 export default function GestionVentasPage() {
   const permissions = usePermissions();
-  const gestion =
-    useGestionVentas(
-      GESTION_VENTAS_MOCK
-    );
+  const [ventas, setVentas] = useState<GestionVenta[]>([]);
+  const [cargandoVentas, setCargandoVentas] = useState(true);
+  const [errorVentas, setErrorVentas] = useState<string | null>(null);
+  const gestion = useGestionVentas(ventas);
+
+  useEffect(() => {
+    let activo = true;
+
+    void listarVentasGestion()
+      .then((ventasReales) => {
+        if (activo) setVentas(ventasReales);
+      })
+      .catch((error) => {
+        if (activo) setErrorVentas(error instanceof Error ? error.message : "No se pudo cargar el historial de ventas.");
+      })
+      .finally(() => {
+        if (activo) setCargandoVentas(false);
+      });
+
+    return () => {
+      activo = false;
+    };
+  }, []);
 
   const [
     ventaSin,
@@ -250,17 +269,9 @@ export default function GestionVentasPage() {
             </h2>
 
             <span>
-              {
-                gestion
-                  .ventasFiltradas
-                  .length
-              }{" "}
-              resultado
-              {gestion
-                .ventasFiltradas
-                .length === 1
-                ? ""
-                : "s"}
+              {cargandoVentas
+                ? "Cargando ventas reales..."
+                : `${gestion.ventasFiltradas.length} resultado${gestion.ventasFiltradas.length === 1 ? "" : "s"}`}
             </span>
           </div>
 
@@ -290,6 +301,13 @@ export default function GestionVentasPage() {
           }
           canIssueInvoice={permissions.can("invoices.issue")}
         />
+
+        {errorVentas && (
+          <div className="gestion-notification gestion-notification--warning">
+            <span>!</span>
+            <p>{errorVentas}</p>
+          </div>
+        )}
 
         <footer className="gestion-pagination">
           <div className="gestion-page-size">

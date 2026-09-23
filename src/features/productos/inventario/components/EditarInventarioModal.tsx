@@ -4,9 +4,7 @@ import {
 } from "react";
 import type { FormEvent } from "react";
 
-import {
-  UBICACIONES,
-} from "../constants/inventario.constants";
+import ConfirmarAccionInventarioModal from "./ConfirmarAccionInventarioModal";
 
 import type {
   InventarioMovimiento,
@@ -27,7 +25,7 @@ interface Props {
 
   onGuardar: (
     input: RegistrarMovimientoInput
-  ) => void;
+  ) => void | Promise<void>;
 
   onAnularMovimiento: (
     movimientoId: string
@@ -66,7 +64,6 @@ export default function EditarInventarioModal({
 
   const [
     ubicacion,
-    setUbicacion,
   ] =
     useState<InventarioUbicacionId>(
       "almacen_uquisamana"
@@ -79,6 +76,12 @@ export default function EditarInventarioModal({
 
   const [error, setError] =
     useState("");
+
+  const [movimientoPendiente, setMovimientoPendiente] =
+    useState<RegistrarMovimientoInput | null>(null);
+
+  const [confirmando, setConfirmando] =
+    useState(false);
 
   const movimientosProducto =
     useMemo(
@@ -107,32 +110,23 @@ export default function EditarInventarioModal({
   ) {
     event.preventDefault();
 
+    setError("");
+    setMovimientoPendiente({ productoId, tipo, cantidad, fecha, ubicacion, observacion });
+  }
+
+  async function confirmarMovimiento() {
+    if (!movimientoPendiente) return;
     try {
-      setError("");
-
-      onGuardar({
-        productoId:
-          productoId,
-
-        tipo,
-
-        cantidad,
-
-        fecha,
-
-        ubicacion,
-
-        observacion,
-      });
-
+      setConfirmando(true);
+      await onGuardar(movimientoPendiente);
+      setMovimientoPendiente(null);
       setCantidad(1);
       setObservacion("");
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "No se pudo actualizar el inventario."
-      );
+      setMovimientoPendiente(null);
+      setError(err instanceof Error ? err.message : "No se pudo actualizar el inventario.");
+    } finally {
+      setConfirmando(false);
     }
   }
 
@@ -260,36 +254,18 @@ export default function EditarInventarioModal({
 
               <label className="inv-field">
                 <span>
-                  Ubicación *
+                  Ubicación de ingreso *
                 </span>
 
                 <select
                   value={
                     ubicacion
                   }
-                  onChange={(event) =>
-                    setUbicacion(
-                      event.target
-                        .value as InventarioUbicacionId
-                    )
-                  }
+                  disabled
                 >
-                  {UBICACIONES.map(
-                    (item) => (
-                      <option
-                        value={
-                          item.id
-                        }
-                        key={
-                          item.id
-                        }
-                      >
-                        {
-                          item.nombre
-                        }
-                      </option>
-                    )
-                  )}
+                  <option value="almacen_uquisamana">
+                    Almacén Uquisamaña
+                  </option>
                 </select>
               </label>
             </div>
@@ -449,6 +425,23 @@ export default function EditarInventarioModal({
             </button>
           </footer>
         </form>
+
+        <ConfirmarAccionInventarioModal
+          abierto={Boolean(movimientoPendiente)}
+          titulo="¿Confirmar movimiento de inventario?"
+          descripcion="Revisa los datos antes de modificar las existencias."
+          detalles={[
+            { etiqueta: "Producto", valor: producto.nombre },
+            { etiqueta: "Operación", valor: movimientoPendiente?.tipo === "INGRESO" ? "Registrar ingreso" : movimientoPendiente?.tipo === "AJUSTE_AUMENTO" ? "Aumentar inventario" : "Disminuir inventario" },
+            { etiqueta: "Cantidad", valor: `${movimientoPendiente?.cantidad ?? 0} unidades` },
+            { etiqueta: "Ubicación", valor: "Almacén Uquisamaña" },
+            { etiqueta: "Fecha", valor: movimientoPendiente?.fecha ?? "-" },
+          ]}
+          procesando={confirmando}
+          etiquetaConfirmar="Confirmar movimiento"
+          onCancelar={() => setMovimientoPendiente(null)}
+          onConfirmar={confirmarMovimiento}
+        />
       </div>
     </div>
   );
