@@ -30,6 +30,13 @@ interface ProductoVentaRow {
   stock_por_almacen: StockPorAlmacenRow[] | null;
 }
 
+const UBICACIONES_VENTA = [
+  "LOC-SANTA-CRUZ",
+  "LOC-CALACOTO",
+  "LOC-ISAC-TAMAYO",
+  "ALM-UQUISAMANA",
+] as const;
+
 function limpiarBusqueda(value: string) {
   return value.trim().replace(/[(),]/g, " ").replace(/\s+/g, " ");
 }
@@ -57,7 +64,7 @@ export async function crearClienteRapido(input: NuevoClienteInput): Promise<Clie
       nombre_razon_social: input.nombre_razon_social.trim(),
       numero_documento: input.numero_documento.trim(),
       complemento: input.complemento?.trim() || null,
-      correo: input.correo.trim(),
+      correo: input.correo.trim() || null,
       telefono: input.telefono?.trim() || null,
       activo: true,
     })
@@ -79,41 +86,51 @@ export async function buscarProductosVenta(termino: string): Promise<ProductoVen
   ];
   if (/^\d+$/.test(q)) filtros.push(`codigo_producto_sin.eq.${Number(q)}`);
 
-  const { data, error } = await supabase
-    .from("productos")
-    .select(`
-      id, codigo_interno, nombre, descripcion, medida, precio_pieza,
-      stock_por_almacen (
-        cantidad_disponible,
-        almacen:almacenes (id, codigo, nombre, tipo, activo)
-      )
-    `)
-    .eq("activo", true)
-    .or(filtros.join(","))
-    .limit(15);
+  const [productosResponse, almacenesResponse] = await Promise.all([
+    supabase
+      .from("productos")
+      .select(`
+        id, codigo_interno, nombre, descripcion, medida, precio_pieza,
+        stock_por_almacen (
+          cantidad_disponible,
+          almacen:almacenes (id, codigo, nombre, tipo, activo)
+        )
+      `)
+      .eq("activo", true)
+      .or(filtros.join(","))
+      .limit(15),
+    supabase
+      .from("almacenes")
+      .select("id, codigo, nombre, tipo, activo")
+      .eq("activo", true)
+      .in("codigo", [...UBICACIONES_VENTA]),
+  ]);
 
-  if (error) throw new Error(error.message || "No se pudieron consultar los productos.");
+  if (productosResponse.error) throw new Error(productosResponse.error.message || "No se pudieron consultar los productos.");
+  if (almacenesResponse.error) throw new Error(almacenesResponse.error.message || "No se pudieron consultar las ubicaciones de venta.");
 
-  return ((data ?? []) as unknown as ProductoVentaRow[]).map((row): ProductoVenta => ({
+  const almacenes = ((almacenesResponse.data ?? []) as AlmacenRow[])
+    .sort((a, b) => UBICACIONES_VENTA.indexOf(a.codigo as typeof UBICACIONES_VENTA[number]) - UBICACIONES_VENTA.indexOf(b.codigo as typeof UBICACIONES_VENTA[number]));
+
+  return ((productosResponse.data ?? []) as unknown as ProductoVentaRow[]).map((row): ProductoVenta => ({
     id: row.id,
     codigo_interno: row.codigo_interno,
     nombre: row.nombre,
     descripcion: row.descripcion,
     medida: row.medida,
     precio_pieza: Number(row.precio_pieza ?? 0),
-    stocks: (row.stock_por_almacen ?? [])
-      .filter((stock): stock is StockPorAlmacenRow & { almacen: AlmacenRow } =>
-        stock.almacen !== null && stock.almacen.activo && Number(stock.cantidad_disponible) > 0
-      )
-      .map((stock) => ({
+    stocks: almacenes.map((almacen) => {
+      const stock = (row.stock_por_almacen ?? []).find((item) => item.almacen?.id === almacen.id);
+      return {
         almacen: {
-          id: stock.almacen.id,
-          codigo: stock.almacen.codigo,
-          nombre: stock.almacen.nombre,
-          tipo: stock.almacen.tipo,
+          id: almacen.id,
+          codigo: almacen.codigo,
+          nombre: almacen.nombre,
+          tipo: almacen.tipo,
         },
-        cantidad: Number(stock.cantidad_disponible),
-      })),
+        cantidad: Number(stock?.cantidad_disponible ?? 0),
+      };
+    }),
   }));
 }
 

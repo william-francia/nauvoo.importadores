@@ -64,6 +64,7 @@ export default function VentaItemsTable({
     new Set()
   );
 
+
   function toggleDetalle(id: string) {
     setDetallesAbiertos(
       (actual) => {
@@ -255,6 +256,8 @@ export default function VentaItemsTable({
                             key={
                               stock.almacen.id
                             }
+                            className={stock.almacen.tipo === "almacen" ? "venta-option--warehouse" : undefined}
+                            style={stock.almacen.tipo === "almacen" ? { color: "#b42318", fontWeight: 700 } : undefined}
                             value={
                               stock.almacen.id
                             }

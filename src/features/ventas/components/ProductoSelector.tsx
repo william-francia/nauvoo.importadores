@@ -188,9 +188,6 @@ export default function ProductoSelector({
                       type="button"
                       key={producto.id}
                       className="producto-resultado"
-                      disabled={
-                        stockTotal <= 0
-                      }
                       onClick={() =>
                         agregar(producto)
                       }

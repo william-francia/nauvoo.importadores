@@ -1566,6 +1566,11 @@
     opacity: 0.65;
 }
 
+.venta-table-select option.venta-option--warehouse {
+    color: #b42318;
+    font-weight: 700;
+}
+
 .venta-error {
     padding: 9px 10px;
 
