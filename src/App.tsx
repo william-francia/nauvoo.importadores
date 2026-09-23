@@ -12,6 +12,16 @@ function App() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
+    const normalizarNumero = (event: Event) => {
+      const input = event.target
+      if (!(input instanceof HTMLInputElement) || input.type !== 'number') return
+      if (/^0\d+/.test(input.value)) input.value = input.value.replace(/^0+(?=\d)/, '')
+    }
+    document.addEventListener('input', normalizarNumero)
+    return () => document.removeEventListener('input', normalizarNumero)
+  }, [])
+
+  useEffect(() => {
     let isMounted = true
 
     supabase.auth
