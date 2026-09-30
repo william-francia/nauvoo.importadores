@@ -19,12 +19,7 @@ export const configuracionSiatSchema = z.object({
   sucursalPredeterminadaId: z.string(),
   puntoVentaPredeterminadoId: z.string(),
 }).superRefine((value, context) => {
-  if (value.versionNormativa === "SIAT_LEY_1733_PILOTO" && value.siatHabilitado) {
-    context.addIssue({ code: "custom", path: ["siatHabilitado"], message: "La versión piloto no puede habilitar operaciones reales." });
-  }
-  if (value.siatHabilitado && !z.string().uuid().safeParse(value.sucursalPredeterminadaId).success) {
-    context.addIssue({ code: "custom", path: ["sucursalPredeterminadaId"], message: "Selecciona la sucursal tributaria predeterminada." });
-  }
+  if (value.siatHabilitado) context.addIssue({ code: "custom", path: ["siatHabilitado"], message: "SIAT permanece deshabilitado durante la preparación de piloto." });
 });
 
 export const homologacionProductoSchema = z.object({

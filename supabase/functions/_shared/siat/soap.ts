@@ -17,11 +17,20 @@ const escapeXml = (value: unknown) => String(value ?? "")
   .replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
   .replaceAll('"', "&quot;").replaceAll("'", "&apos;");
 
-const sensitiveKeys = /(token|apikey|cert|private|clave|archivo)/i;
+const sensitiveKeys = /(token|apikey|authorization|cert|private|secret|clave|archivo)/i;
 export function sanitize(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(sanitize);
   if (value && typeof value === "object") return Object.fromEntries(Object.entries(value as Record<string, unknown>).map(([key, item]) => [key, sensitiveKeys.test(key) ? "[REDACTED]" : sanitize(item)]));
   return typeof value === "string" && value.length > 1000 ? `${value.slice(0, 200)}…[TRUNCATED]` : value;
+}
+
+export function sanitizeErrorMessage(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error ?? "");
+  return message
+    .replace(/TokenApi\s+[^\s,;]+/gi, "TokenApi [REDACTED]")
+    .replace(/(apikey|authorization)\s*[:=]\s*[^\s,;]+/gi, "$1=[REDACTED]")
+    .replace(/-----BEGIN[\s\S]*?-----END[^-]*-----/g, "[REDACTED]")
+    .slice(0, 500);
 }
 
 export function deepFind(value: unknown, target: string): unknown {
@@ -93,6 +102,6 @@ export class SoapClient {
         clearTimeout(timer);
       }
     }
-    throw lastError instanceof Error ? lastError : new Error("No fue posible comunicarse con el SIN.");
+    throw new Error(lastError ? sanitizeErrorMessage(lastError) : "No fue posible comunicarse con el SIN.");
   }
 }

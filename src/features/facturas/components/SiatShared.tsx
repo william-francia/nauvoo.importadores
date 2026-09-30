@@ -16,7 +16,7 @@ export function EstadoBadge({ estado }: { estado: string }) {
     ? "success"
     : ["RECHAZADA", "RECHAZADO", "INVALIDO", "CON_ERROR", "VENCIDO", "ANULADA"].includes(normalized)
       ? "danger"
-      : ["PENDIENTE", "EN_COLA", "OBSERVADA", "OBSERVADO", "OFFLINE", "EN_CONFIGURACION", "GATEWAY_PENDIENTE"].includes(normalized)
+      : ["PENDIENTE", "EN_COLA", "OBSERVADA", "OBSERVADO", "OFFLINE", "EN_CONFIGURACION", "CREDENCIALES_CONFIGURADAS", "GATEWAY_PENDIENTE"].includes(normalized)
         ? "warning" : "neutral";
   return <span className={`siat-status siat-status--${tone}`}>{ETIQUETAS_ESTADO_FISCAL[normalized] ?? estado.replaceAll("_", " ")}</span>;
 }

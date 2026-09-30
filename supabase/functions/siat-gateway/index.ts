@@ -1,5 +1,6 @@
 import { SiatRepository } from "../_shared/siat/repository.ts";
-import { authenticatedUser, corsHeaders, json, officialAdapter, serviceClient } from "../_shared/siat/runtime.ts";
+import { authenticatedUser, corsHeaders, json, officialAdapter, serviceClient, siatCredentialStatus } from "../_shared/siat/runtime.ts";
+import { sanitizeErrorMessage } from "../_shared/siat/soap.ts";
 
 const requests = new Map<string, { count: number; reset: number }>();
 const rateLimit = (key: string, limit = 30) => {
@@ -25,7 +26,7 @@ Deno.serve(async (request) => {
         db.from("siat_cufd").select("id,fecha_expiracion").eq("estado", "VIGENTE").order("fecha_expiracion", { ascending: false }).limit(1).maybeSingle(),
         db.from("siat_outbox").select("id", { count: "exact", head: true }).in("estado", ["PENDIENTE", "REINTENTAR", "PROCESANDO"]),
       ]);
-      return json({ ambiente: config.ambiente, version: config.version_normativa, habilitado: config.siat_habilitado, secretos: { token: Boolean(Deno.env.get("SIAT_TOKEN_DELEGADO")), firma: Boolean(Deno.env.get("SIAT_PRIVATE_KEY_PEM") && Deno.env.get("SIAT_CERTIFICATE_PEM")) }, cuis: cuis.data, cufd: cufd.data, ultimaSincronizacion: config.ultima_sincronizacion_exitosa, pendientes: pending.count ?? 0 }, 200, origin);
+      return json({ ambiente: config.ambiente, version: config.version_normativa, habilitado: config.siat_habilitado, credenciales: siatCredentialStatus(), conectividad: "NO_VERIFICADA", cuis: cuis.data, cufd: cufd.data, ultimaSincronizacion: config.ultima_sincronizacion_exitosa, pendientes: pending.count ?? 0 }, 200, origin);
     }
     if (action === "verify-service") {
       if (!isAdmin(String(user.profile.rol))) throw new Error("Operación reservada a administración.");
@@ -61,8 +62,8 @@ Deno.serve(async (request) => {
     }
     throw new Error("Acción SIAT no soportada.");
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Error interno.";
+    const message = sanitizeErrorMessage(error) || "Error interno.";
     const status = /Sesión|autorizado|permisos|reservada/i.test(message) ? 403 : 400;
-    return json({ error: message.replace(/TokenApi\s+\S+/gi, "TokenApi [REDACTED]").slice(0, 500) }, status, origin);
+    return json({ error: message }, status, origin);
   }
 });

@@ -1,5 +1,28 @@
 # Despliegue SIAT: motor online, contingencia y agente local
 
+## Paso 2: configuración segura de piloto
+
+Antes de desplegar, cargar las credenciales reales solamente como secretos de Supabase. No almacenar token, certificado, clave privada ni secretos compartidos en la base de datos, archivos `.env` versionados o variables `VITE_`. Los campos persistidos en `siat_configuracion` son no secretos: NIT, código de sistema, ambiente, modalidad, documento sector, sucursal y punto de venta.
+
+Los endpoints de piloto vigentes no usan el sufijo `?wsdl`. Sustituir los marcadores sin incluir comillas ni valores reales en documentación:
+
+```powershell
+supabase secrets set SIAT_TOKEN_DELEGADO=<TOKEN_DELEGADO_PILOTO>
+supabase secrets set SIAT_PRIVATE_KEY_PEM=<CLAVE_PRIVADA_PEM>
+supabase secrets set SIAT_CERTIFICATE_PEM=<CERTIFICADO_PEM>
+supabase secrets set SIAT_CODIGOS_URL=https://pilotosiatservicios.impuestos.gob.bo/v2/FacturacionCodigos
+supabase secrets set SIAT_SINCRONIZACION_URL=https://pilotosiatservicios.impuestos.gob.bo/v2/FacturacionSincronizacion
+supabase secrets set SIAT_OPERACIONES_URL=https://pilotosiatservicios.impuestos.gob.bo/v2/FacturacionOperaciones
+supabase secrets set SIAT_COMPRA_VENTA_URL=https://pilotosiatservicios.impuestos.gob.bo/v2/ServicioFacturacionCompraVenta
+supabase secrets set SIAT_TIMEOUT_MS=20000
+supabase secrets set SIAT_ALLOWED_ORIGINS=<ORIGENES_PERMITIDOS_SEPARADOS_POR_COMA>
+supabase secrets set SIAT_WORKER_SECRET=<SECRETO_WORKER_MINIMO_32_CARACTERES>
+supabase secrets set SIAT_SCHEDULER_SECRET=<SECRETO_SCHEDULER_MINIMO_32_CARACTERES>
+supabase secrets set SIAT_AGENT_SHARED_SECRET=<SECRETO_AGENTE_MINIMO_32_CARACTERES>
+```
+
+Estos comandos son únicamente instrucciones: no se ejecutaron como parte de este paso. La salud del gateway informa solo indicadores booleanos de configuración y nunca confirma conectividad con el SIN. Solicitar CUIS/CUFD, sincronizar, verificar conectividad y habilitar SIAT siguen fuera de alcance.
+
 Esta entrega permanece bloqueada a `PRUEBAS`. Compilar el software no habilita producción ni sustituye la autorización del SIN.
 
 ## Orden de instalación

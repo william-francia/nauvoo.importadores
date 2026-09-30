@@ -1,5 +1,6 @@
 import { fromBase64, gunzipBytes, sha256Hex } from "../_shared/siat/encoding.ts";
 import { json, officialAdapter, secureEquals, serviceClient } from "../_shared/siat/runtime.ts";
+import { sanitizeErrorMessage } from "../_shared/siat/soap.ts";
 import { validateElectronicInvoiceXml, validateXmlAgainstXsd } from "../_shared/siat/xsd.ts";
 
 const record = (value: unknown) => value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
@@ -67,7 +68,7 @@ Deno.serve(async (request) => {
         const response = await officialAdapter().verificarComunicacion();
         return json({ siatOnline: response.transaccion === true, codigoEstado: response.codigoEstado, detail: response.codigoDescripcion ?? response.mensajes.map((item) => item.descripcion).join("; ") });
       } catch (error) {
-        return json({ siatOnline: false, detail: error instanceof Error ? error.message.slice(0, 300) : "Servicio SIAT inaccesible" });
+        return json({ siatOnline: false, detail: sanitizeErrorMessage(error) || "Servicio SIAT inaccesible" });
       }
     }
 
@@ -129,7 +130,7 @@ Deno.serve(async (request) => {
     }
     throw new Error("Acción del agente no soportada.");
   } catch (error) {
-    const message = (error instanceof Error ? error.message : String(error)).replace(/TokenApi\s+\S+/gi, "TokenApi [REDACTED]").slice(0, 500);
+    const message = sanitizeErrorMessage(error) || "Error interno.";
     return json({ error: message }, /firma|agente|nonce|expirada/i.test(message) ? 401 : 400);
   }
 });

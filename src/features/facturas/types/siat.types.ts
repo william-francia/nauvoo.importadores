@@ -61,7 +61,8 @@ export interface GatewayHealthSiat {
   ambiente: AmbienteSiat;
   version: VersionNormativaSiat;
   habilitado: boolean;
-  secretos: { token: boolean; firma: boolean };
+  credenciales: { tokenConfigurado: boolean; firmaConfigurada: boolean };
+  conectividad: "NO_VERIFICADA";
   cuis: { id: string; fecha_expiracion: string | null } | null;
   cufd: { id: string; fecha_expiracion: string | null } | null;
   ultimaSincronizacion: string | null;
@@ -84,7 +85,7 @@ export interface AuditoriaSiat {
 }
 
 export interface EstadoSiatResumen {
-  servicio: "EN_CONFIGURACION" | "GATEWAY_PENDIENTE" | "OPERATIVO";
+  servicio: "EN_CONFIGURACION" | "CREDENCIALES_CONFIGURADAS" | "GATEWAY_PENDIENTE" | "OPERATIVO";
   ambiente: AmbienteSiat;
   cuis: "VIGENTE" | "VENCIDO" | "NO_CONFIGURADO";
   cufd: "VIGENTE" | "VENCIDO" | "NO_CONFIGURADO";

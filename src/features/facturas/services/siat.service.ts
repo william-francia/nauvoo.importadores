@@ -152,7 +152,7 @@ export async function guardarConfiguracionSiat(input: SiatConfiguracion): Promis
     municipio: input.municipio.trim() || null, domicilio: input.domicilio.trim() || null, telefono: input.telefono.trim() || null,
     codigo_sistema: input.codigoSistema.trim() || null, modalidad: input.modalidad, documento_sector: input.documentoSector ? Number(input.documentoSector) : null,
     tipo_factura: input.tipoFactura ? Number(input.tipoFactura) : null, actividad_economica: input.actividadEconomica.trim() || null,
-    ambiente: "PRUEBAS", version_normativa: input.versionNormativa, zona_horaria: "America/La_Paz", siat_habilitado: input.siatHabilitado,
+    ambiente: "PRUEBAS", version_normativa: input.versionNormativa, zona_horaria: "America/La_Paz", siat_habilitado: false,
     sucursal_predeterminada_id: input.sucursalPredeterminadaId || null,
     punto_venta_predeterminado_id: input.puntoVentaPredeterminadoId || null,
   });
@@ -196,7 +196,7 @@ export async function obtenerEstadoSiat(): Promise<EstadoSiatResumen> {
   const now = Date.now();
   const isCurrent = (value: unknown) => Boolean(value) && new Date(text(value)).getTime() > now;
   return {
-    servicio: health.habilitado && health.secretos.token ? "OPERATIVO" : configRow.siat_habilitado ? "GATEWAY_PENDIENTE" : "EN_CONFIGURACION",
+    servicio: health.credenciales.tokenConfigurado ? "CREDENCIALES_CONFIGURADAS" : configRow.siat_habilitado ? "GATEWAY_PENDIENTE" : "EN_CONFIGURACION",
     ambiente: text(configRow.ambiente, "PRUEBAS") as EstadoSiatResumen["ambiente"],
     cuis: !cuis.data ? "NO_CONFIGURADO" : isCurrent(object(cuis.data).fecha_expiracion) || !object(cuis.data).fecha_expiracion ? "VIGENTE" : "VENCIDO",
     cufd: !cufd.data ? "NO_CONFIGURADO" : isCurrent(object(cufd.data).fecha_expiracion) ? "VIGENTE" : "VENCIDO",

@@ -1,5 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { OfficialVigenteAdapter } from "./official-vigente.adapter.ts";
+import { OFFICIAL_TEST_ENDPOINTS, OfficialVigenteAdapter } from "./official-vigente.adapter.ts";
 
 export const corsHeaders = (origin: string | null) => {
   const allowed = (Deno.env.get("SIAT_ALLOWED_ORIGINS") ?? "http://localhost:5173").split(",").map((item) => item.trim());
@@ -15,12 +15,51 @@ export function serviceClient() {
   return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 }
 
+type SiatEndpoints = Partial<typeof OFFICIAL_TEST_ENDPOINTS>;
+
+interface SiatRuntimeConfiguration {
+  tokenDelegado: string;
+  privateKeyPem: string;
+  certificatePem: string;
+  workerSecret: string;
+  schedulerSecret: string;
+  agentSharedSecret: string;
+  endpoints: SiatEndpoints;
+  timeoutMs: number;
+}
+
+const configuredTimeout = () => {
+  const value = Number(Deno.env.get("SIAT_TIMEOUT_MS") ?? "20000");
+  return Number.isFinite(value) && value > 0 ? value : 20000;
+};
+
+export const siatRuntimeConfiguration = (): SiatRuntimeConfiguration => ({
+  tokenDelegado: Deno.env.get("SIAT_TOKEN_DELEGADO") ?? "",
+  privateKeyPem: Deno.env.get("SIAT_PRIVATE_KEY_PEM") ?? "",
+  certificatePem: Deno.env.get("SIAT_CERTIFICATE_PEM") ?? "",
+  workerSecret: Deno.env.get("SIAT_WORKER_SECRET") ?? "",
+  schedulerSecret: Deno.env.get("SIAT_SCHEDULER_SECRET") ?? "",
+  agentSharedSecret: Deno.env.get("SIAT_AGENT_SHARED_SECRET") ?? "",
+  endpoints: {
+    codigos: Deno.env.get("SIAT_CODIGOS_URL") || undefined,
+    sincronizacion: Deno.env.get("SIAT_SINCRONIZACION_URL") || undefined,
+    operaciones: Deno.env.get("SIAT_OPERACIONES_URL") || undefined,
+    compraVenta: Deno.env.get("SIAT_COMPRA_VENTA_URL") || undefined,
+  },
+  timeoutMs: configuredTimeout(),
+});
+
+export const siatCredentialStatus = () => {
+  const configuration = siatRuntimeConfiguration();
+  return {
+    tokenConfigurado: Boolean(configuration.tokenDelegado),
+    firmaConfigurada: Boolean(configuration.privateKeyPem && configuration.certificatePem),
+  };
+};
+
 export function officialAdapter() {
-  const token = Deno.env.get("SIAT_TOKEN_DELEGADO") ?? "";
-  const overrides: Record<string, string> = {};
-  const codes = Deno.env.get("SIAT_CODIGOS_URL"); const sync = Deno.env.get("SIAT_SINCRONIZACION_URL"); const invoice = Deno.env.get("SIAT_COMPRA_VENTA_URL");
-  if (codes) overrides.codigos = codes; if (sync) overrides.sincronizacion = sync; if (invoice) overrides.compraVenta = invoice;
-  return new OfficialVigenteAdapter(token, overrides, Number(Deno.env.get("SIAT_TIMEOUT_MS") ?? 20000));
+  const configuration = siatRuntimeConfiguration();
+  return new OfficialVigenteAdapter(configuration.tokenDelegado, configuration.endpoints, configuration.timeoutMs);
 }
 
 export async function authenticatedUser(request: Request, client = serviceClient()) {

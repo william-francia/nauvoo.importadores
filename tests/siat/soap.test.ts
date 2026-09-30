@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { OfficialVigenteAdapter } from "../../supabase/functions/_shared/siat/official-vigente.adapter.ts";
-import { SoapClient } from "../../supabase/functions/_shared/siat/soap.ts";
+import { sanitizeErrorMessage, SoapClient } from "../../supabase/functions/_shared/siat/soap.ts";
 import { AmbiguousSiatError } from "../../supabase/functions/_shared/siat/types.ts";
 
 const context = { ambiente: "PRUEBAS" as const, versionNormativa: "SIAT_VIGENTE" as const, codigoSistema: "ABC", nit: "123", modalidad: "COMPUTARIZADA" as const, codigoSucursal: 0, codigoPuntoVenta: 0, cuis: "CUIS" };
@@ -38,6 +38,15 @@ describe("SOAP SIAT", () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new DOMException("timeout", "AbortError")));
     const client = new SoapClient("https://pilotosiatservicios.impuestos.gob.bo/test", "token", 10);
     await expect(client.call("recepcionFactura", "ServicioRecepcionFactura", { archivo: "AA==" }, { ambiguousOnTimeout: true })).rejects.toBeInstanceOf(AmbiguousSiatError);
+  });
+
+  it("redacta tokens y material PEM de los errores antes de propagarlos", () => {
+    const message = sanitizeErrorMessage("falló TokenApi secreto-super-sensible; apikey: otra-clave -----BEGIN PRIVATE KEY-----\nclave\n-----END PRIVATE KEY-----");
+    expect(message).toContain("TokenApi [REDACTED]");
+    expect(message).toContain("[REDACTED]");
+    expect(message).not.toContain("secreto-super-sensible");
+    expect(message).not.toContain("otra-clave");
+    expect(message).not.toContain("clave");
   });
 
   it("no procesa entidades XML externas", async () => {
