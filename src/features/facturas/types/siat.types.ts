@@ -62,9 +62,10 @@ export interface GatewayHealthSiat {
   version: VersionNormativaSiat;
   habilitado: boolean;
   credenciales: { tokenConfigurado: boolean; firmaConfigurada: boolean };
-  conectividad: "NO_VERIFICADA";
+  conectividad: "NO_CONFIGURADO";
   cuis: { id: string; fecha_expiracion: string | null } | null;
   cufd: { id: string; fecha_expiracion: string | null } | null;
+  ultimaVerificacionServicio: string | null;
   ultimaSincronizacion: string | null;
   pendientes: number;
 }

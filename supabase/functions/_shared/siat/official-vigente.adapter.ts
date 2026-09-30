@@ -55,7 +55,7 @@ export class OfficialVigenteAdapter implements SiatAdapter {
   }
 
   async verificarComunicacion(): Promise<SiatResponse> {
-    return normalizeSiatResponse(await this.invoice.call("verificarComunicacion", null, {}, { retries: 1 }));
+    return normalizeSiatResponse(await this.codes.call("verificarComunicacion", null, {}, { retries: 1 }));
   }
 
   async solicitarCuis(context: SiatContext): Promise<CuisResult> {

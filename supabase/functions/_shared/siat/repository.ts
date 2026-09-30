@@ -186,14 +186,14 @@ export class SiatRepository {
 
   async activeCuis(config: Record<string, unknown>) {
     let query = this.db.from("siat_cuis").select("*")
-      .eq("sucursal_id", config.sucursal_predeterminada_id).eq("ambiente", config.ambiente).eq("estado", "VIGENTE");
+      .eq("sucursal_id", config.sucursal_predeterminada_id).eq("ambiente", config.ambiente).eq("estado", "VIGENTE").gt("fecha_expiracion", new Date().toISOString());
     query = config.punto_venta_predeterminado_id ? query.eq("punto_venta_id", config.punto_venta_predeterminado_id) : query.is("punto_venta_id", null);
     const { data, error } = await query.order("fecha_expiracion", { ascending: false }).limit(1).maybeSingle();
     if (error) fail(error, "No se pudo consultar CUIS.");
     return data as Record<string, unknown> | null;
   }
 
-  async saveCuis(config: Record<string, unknown>, result: { codigo: string; fechaVigencia: string | null }) {
+  async saveCuis(config: Record<string, unknown>, result: { codigo: string; fechaVigencia: string }) {
     const { error } = await this.db.rpc("siat_guardar_cuis", { p_sucursal_id: config.sucursal_predeterminada_id, p_punto_venta_id: config.punto_venta_predeterminado_id, p_ambiente: config.ambiente, p_codigo: result.codigo, p_fecha_expiracion: result.fechaVigencia });
     if (error) fail(error, "No se pudo guardar el CUIS.");
   }

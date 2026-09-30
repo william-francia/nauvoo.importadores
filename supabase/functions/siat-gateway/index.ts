@@ -11,6 +11,16 @@ const rateLimit = (key: string, limit = 30) => {
 const record = (value: unknown) => value && typeof value === "object" ? value as Record<string, unknown> : {};
 const isAdmin = (role: string) => role.toLowerCase() === "administrador";
 
+async function dispatchWorker() {
+  const workerSecret = Deno.env.get("SIAT_WORKER_SECRET") ?? "";
+  const baseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+  if (!workerSecret || !baseUrl) throw new Error("La solicitud CUIS fue encolada, pero el worker SIAT no está configurado.");
+  const response = await fetch(`${baseUrl}/functions/v1/siat-worker`, { method: "POST", headers: { "x-worker-secret": workerSecret } });
+  const payload = record(await response.json().catch(() => ({})));
+  if (!response.ok) throw new Error(`No fue posible activar el worker SIAT (HTTP ${response.status}).`);
+  return { processed: Number(payload.processed ?? 0), failures: Array.isArray(payload.failures) ? payload.failures.map((item) => sanitizeErrorMessage(item)) : [] };
+}
+
 Deno.serve(async (request) => {
   const origin = request.headers.get("origin");
   if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders(origin) });
@@ -22,23 +32,33 @@ Deno.serve(async (request) => {
     if (action === "health") {
       const config = await repository.configuration();
       const [cuis, cufd, pending] = await Promise.all([
-        db.from("siat_cuis").select("id,fecha_expiracion").eq("estado", "VIGENTE").order("fecha_expiracion", { ascending: false }).limit(1).maybeSingle(),
+        db.from("siat_cuis").select("id,fecha_expiracion").eq("estado", "VIGENTE").gt("fecha_expiracion", new Date().toISOString()).order("fecha_expiracion", { ascending: false }).limit(1).maybeSingle(),
         db.from("siat_cufd").select("id,fecha_expiracion").eq("estado", "VIGENTE").order("fecha_expiracion", { ascending: false }).limit(1).maybeSingle(),
         db.from("siat_outbox").select("id", { count: "exact", head: true }).in("estado", ["PENDIENTE", "REINTENTAR", "PROCESANDO"]),
       ]);
-      return json({ ambiente: config.ambiente, version: config.version_normativa, habilitado: config.siat_habilitado, credenciales: siatCredentialStatus(), conectividad: "NO_VERIFICADA", cuis: cuis.data, cufd: cufd.data, ultimaSincronizacion: config.ultima_sincronizacion_exitosa, pendientes: pending.count ?? 0 }, 200, origin);
+      return json({ ambiente: config.ambiente, version: config.version_normativa, habilitado: config.siat_habilitado, credenciales: siatCredentialStatus(), conectividad: "NO_CONFIGURADO", cuis: cuis.data, cufd: cufd.data, ultimaVerificacionServicio: config.ultima_verificacion_servicio, ultimaSincronizacion: config.ultima_sincronizacion_exitosa, pendientes: pending.count ?? 0 }, 200, origin);
     }
     if (action === "verify-service") {
       if (!isAdmin(String(user.profile.rol))) throw new Error("Operación reservada a administración.");
       const response = await officialAdapter().verificarComunicacion();
-      await db.from("siat_configuracion").update({ ultima_verificacion_servicio: new Date().toISOString() }).eq("id", true);
+      if (response.transaccion === true) {
+        const { error } = await db.from("siat_configuracion").update({ ultima_verificacion_servicio: new Date().toISOString() }).eq("id", true);
+        if (error) throw error;
+      }
+      const { error: auditError } = await db.from("siat_auditoria").insert({ actor_auth_user_id: user.authId, entidad: "siat_configuracion", entidad_id: "true", accion: "VERIFICAR_COMUNICACION", contexto: { codigoEstado: response.codigoEstado, mensajes: response.mensajes.map((item) => ({ codigo: item.codigo, descripcion: item.descripcion })) }, resultado: response.transaccion === true ? "EXITOSO" : "RECHAZADO" });
+      if (auditError) throw auditError;
       return json({ transaccion: response.transaccion, codigoEstado: response.codigoEstado, mensajes: response.mensajes }, 200, origin);
     }
-    if (["request-cuis", "request-cufd", "sync"].includes(action)) {
+    if (action === "request-cuis") {
       if (!isAdmin(String(user.profile.rol))) throw new Error("Operación reservada a administración.");
-      const type = action === "request-cuis" ? "RENOVAR_CUIS" : action === "request-cufd" ? "RENOVAR_CUFD" : "SINCRONIZAR_CATALOGOS";
-      await repository.enqueue(null, type, `${type.toLowerCase()}:${new Date().toISOString().slice(0, 10)}`, { actor: user.authId });
-      return json({ estado: "EN_COLA" }, 202, origin);
+      const config = await repository.configuration();
+      if (!config.ultima_verificacion_servicio) throw new Error("Primero verifica la comunicación real con SIAT Piloto.");
+      await repository.enqueue(null, "RENOVAR_CUIS", `renovar_cuis:${new Date().toISOString().slice(0, 10)}`, { actor: user.authId, origen: "ADMINISTRACION" });
+      const worker = await dispatchWorker();
+      return json({ estado: worker.processed > 0 ? "PROCESADA" : "EN_COLA", worker }, 202, origin);
+    }
+    if (["request-cufd", "sync", "prepare-invoice", "cancel", "reverse"].includes(action)) {
+      return json({ error: "Esta operación fiscal permanece bloqueada hasta un paso posterior." }, 409, origin);
     }
     if (action === "prepare-invoice") {
       if (!["administrador", "vendedor", "caja"].includes(String(user.profile.rol).toLowerCase())) throw new Error("Su rol no puede emitir facturas fiscales.");

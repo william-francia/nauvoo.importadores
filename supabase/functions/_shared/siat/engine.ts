@@ -354,9 +354,13 @@ export class SiatEngine {
   async requestCuis(job: Record<string, unknown>) {
     const config = await this.repository.configuration(); const branch = await this.repository.branch(stringValue(config.sucursal_predeterminada_id, "Sucursal predeterminada"));
     const point = config.punto_venta_predeterminado_id ? await this.repository.point(String(config.punto_venta_predeterminado_id)) : null;
+    if (config.modalidad !== "ELECTRONICA") throw new Error("La solicitud CUIS piloto requiere modalidad ELECTRONICA (código 1).");
+    stringValue(config.documento_sector, "Documento sector");
     const context = this.context(config, { codigoSucursal: numberValue(branch.codigo, "Sucursal"), codigoPuntoVenta: point ? numberValue(point.codigo, "Punto de venta") : null, cuis: "" }); const result = await this.adapter.solicitarCuis(context);
-    if (!result.transaccion || !result.codigo) throw new Error(result.mensajes.map((item) => item.descripcion).join("; ") || "El SIN no entregó CUIS.");
-    await this.repository.saveCuis(config, { codigo: result.codigo, fechaVigencia: result.fechaVigencia }); await this.repository.completeJob(String(job.id));
+    if (!result.transaccion || !result.codigo || !result.fechaVigencia || Number.isNaN(new Date(result.fechaVigencia).getTime())) throw new Error(result.mensajes.map((item) => item.descripcion).join("; ") || "El SIN no entregó un CUIS con vigencia válida.");
+    await this.repository.saveCuis(config, { codigo: result.codigo, fechaVigencia: result.fechaVigencia });
+    await this.repository.auditEntity("siat_cuis", String(config.sucursal_predeterminada_id), "CUIS_OBTENIDO", null, "VIGENTE", { ambiente: config.ambiente, sucursalId: config.sucursal_predeterminada_id, puntoVentaId: config.punto_venta_predeterminado_id ?? null, fechaVigencia: result.fechaVigencia });
+    await this.repository.completeJob(String(job.id));
   }
 
   async requestCufd(job: Record<string, unknown>) {

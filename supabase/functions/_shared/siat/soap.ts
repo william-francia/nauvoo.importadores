@@ -88,15 +88,16 @@ export class SoapClient {
           body: envelope,
         });
         const text = await response.text();
-        if (!response.ok) throw new Error(`Servicio SIN respondió HTTP ${response.status}.`);
+        if (!response.ok) throw new Error(`SIAT_HTTP_${response.status}: el servicio SIN rechazó la solicitud.`);
         const parsed = parser.parse(text);
         const fault = deepFind(parsed, "Fault");
-        if (fault) throw new Error(`SOAP Fault: ${asText(deepFind(fault, "faultstring")) ?? "respuesta rechazada"}`);
+        if (fault) throw new Error(`SIAT_SOAP_FAULT: ${asText(deepFind(fault, "faultstring")) ?? "respuesta rechazada"}`);
         return parsed;
       } catch (error) {
         lastError = error;
         const timedOut = error instanceof DOMException && error.name === "AbortError";
         if (timedOut && options.ambiguousOnTimeout) throw new AmbiguousSiatError();
+        if (timedOut) lastError = new Error("SIAT_TIMEOUT: el servicio no respondió dentro del tiempo configurado.");
         if (attempt < attempts) await new Promise((resolve) => setTimeout(resolve, 250 * 2 ** (attempt - 1)));
       } finally {
         clearTimeout(timer);

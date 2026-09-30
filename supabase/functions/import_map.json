@@ -1,0 +1,11 @@
+{
+  "imports": {
+    "@xmldom/xmldom": "npm:@xmldom/xmldom@0.9.12",
+    "decimal.js": "npm:decimal.js@10.6.0",
+    "fast-xml-parser": "npm:fast-xml-parser@5.11.1",
+    "libxml2-wasm": "npm:libxml2-wasm@0.7.2",
+    "pdf-lib": "npm:pdf-lib@1.17.1",
+    "qrcode": "npm:qrcode@1.5.4",
+    "xml-crypto": "npm:xml-crypto@6.2.0"
+  }
+}

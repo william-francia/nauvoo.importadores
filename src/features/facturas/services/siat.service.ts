@@ -182,7 +182,7 @@ export async function obtenerEstadoSiat(): Promise<EstadoSiatResumen> {
   const [health, config, cuis, cufd, sync, invoices, event, packages] = await Promise.all([
     obtenerSaludGatewaySiat(),
     supabase.from("siat_configuracion").select("ambiente,siat_habilitado").eq("id", true).maybeSingle(),
-    supabase.from("siat_cuis").select("estado,fecha_expiracion").eq("estado", "VIGENTE").order("fecha_expiracion", { ascending: false }).limit(1).maybeSingle(),
+    supabase.from("siat_cuis").select("estado,fecha_expiracion").eq("estado", "VIGENTE").gt("fecha_expiracion", new Date().toISOString()).order("fecha_expiracion", { ascending: false }).limit(1).maybeSingle(),
     supabase.from("siat_cufd").select("estado,fecha_expiracion").eq("estado", "VIGENTE").order("fecha_expiracion", { ascending: false }).limit(1).maybeSingle(),
     supabase.from("siat_sincronizaciones").select("fecha_fin").eq("estado", "COMPLETADA").order("fecha_fin", { ascending: false }).limit(1).maybeSingle(),
     supabase.from("facturas_siat").select("id", { count: "exact", head: true }).in("estado_fiscal", ["EN_COLA", "GENERANDO", "VALIDANDO_XSD", "ENVIANDO", "SIN_RESPUESTA", "OFFLINE", "PAQUETE_PENDIENTE"]),

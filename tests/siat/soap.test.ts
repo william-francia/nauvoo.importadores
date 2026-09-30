@@ -3,7 +3,7 @@ import { OfficialVigenteAdapter } from "../../supabase/functions/_shared/siat/of
 import { sanitizeErrorMessage, SoapClient } from "../../supabase/functions/_shared/siat/soap.ts";
 import { AmbiguousSiatError } from "../../supabase/functions/_shared/siat/types.ts";
 
-const context = { ambiente: "PRUEBAS" as const, versionNormativa: "SIAT_VIGENTE" as const, codigoSistema: "ABC", nit: "123", modalidad: "COMPUTARIZADA" as const, codigoSucursal: 0, codigoPuntoVenta: 0, cuis: "CUIS" };
+const context = { ambiente: "PRUEBAS" as const, versionNormativa: "SIAT_VIGENTE" as const, codigoSistema: "ABC", nit: "123", modalidad: "ELECTRONICA" as const, codigoSucursal: 0, codigoPuntoVenta: 0, cuis: "CUIS" };
 const envelope = (body: string) => `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body>${body}</soap:Body></soap:Envelope>`;
 
 afterEach(() => vi.unstubAllGlobals());
@@ -20,6 +20,8 @@ describe("SOAP SIAT", () => {
     const headers = fetchMock.mock.calls[0][1].headers as Record<string, string>;
     expect(headers.apikey).toBe("TokenApi secret-token");
     expect(String(fetchMock.mock.calls[0][1].body)).not.toContain("secret-token");
+    expect(String(fetchMock.mock.calls[0][1].body)).toContain("<codigoAmbiente>2</codigoAmbiente>");
+    expect(String(fetchMock.mock.calls[0][1].body)).toContain("<codigoModalidad>1</codigoModalidad>");
     const cufdBody = String(fetchMock.mock.calls[1][1].body);
     expect(cufdBody.indexOf("<cuis>")).toBeLessThan(cufdBody.indexOf("<nit>"));
     expect(cufdBody).toContain("<SolicitudCufd>");
@@ -30,6 +32,7 @@ describe("SOAP SIAT", () => {
     vi.stubGlobal("fetch", fetchMock); const adapter = new OfficialVigenteAdapter("token");
     expect((await adapter.verificarComunicacion()).transaccion).toBe(true);
     const body = String(fetchMock.mock.calls[0][1].body);
+    expect(fetchMock.mock.calls[0][0]).toBe("https://pilotosiatservicios.impuestos.gob.bo/v2/FacturacionCodigos");
     expect(body).toContain("<siat:verificarComunicacion></siat:verificarComunicacion>");
     expect(body).not.toContain("SolicitudVerificarComunicacion");
   });

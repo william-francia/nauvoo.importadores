@@ -21,7 +21,25 @@ supabase secrets set SIAT_SCHEDULER_SECRET=<SECRETO_SCHEDULER_MINIMO_32_CARACTER
 supabase secrets set SIAT_AGENT_SHARED_SECRET=<SECRETO_AGENTE_MINIMO_32_CARACTERES>
 ```
 
-Estos comandos son únicamente instrucciones: no se ejecutaron como parte de este paso. La salud del gateway informa solo indicadores booleanos de configuración y nunca confirma conectividad con el SIN. Solicitar CUIS/CUFD, sincronizar, verificar conectividad y habilitar SIAT siguen fuera de alcance.
+Estos comandos son únicamente instrucciones: no se ejecutaron como parte del paso 2. En ese paso, la salud del gateway informaba solo indicadores booleanos y CUIS/CUFD, sincronización, verificación y habilitación seguían fuera de alcance.
+
+## Paso 3: comunicación piloto y CUIS
+
+Para este paso son necesarios ahora: `SIAT_TOKEN_DELEGADO`, `SIAT_WORKER_SECRET` y `SIAT_ALLOWED_ORIGINS`. Los endpoints tienen respaldo seguro de piloto en el código, pero pueden declararse explícitamente. `SIAT_PRIVATE_KEY_PEM`, `SIAT_CERTIFICATE_PEM`, `SIAT_SCHEDULER_SECRET` y `SIAT_AGENT_SHARED_SECRET` no son necesarios para verificar comunicación ni solicitar CUIS; se requieren en pasos posteriores.
+
+```powershell
+supabase secrets set SIAT_TOKEN_DELEGADO=<TOKEN_DELEGADO_PILOTO>
+supabase secrets set SIAT_WORKER_SECRET=<SECRETO_WORKER_MINIMO_32_CARACTERES>
+supabase secrets set SIAT_ALLOWED_ORIGINS=<ORIGENES_PERMITIDOS_SEPARADOS_POR_COMA>
+supabase secrets set SIAT_CODIGOS_URL=https://pilotosiatservicios.impuestos.gob.bo/v2/FacturacionCodigos
+supabase secrets set SIAT_TIMEOUT_MS=20000
+supabase functions deploy siat-gateway --import-map supabase/functions/import_map.json
+supabase functions deploy siat-worker --import-map supabase/functions/import_map.json
+```
+
+Antes de solicitar CUIS, un administrador debe completar en **Facturas > Configuración SIAT** los datos no secretos reales: NIT, código de sistema, modalidad **Electrónica** (código 1), documento sector, sucursal tributaria y punto de venta correspondientes. El ambiente permanece en `PRUEBAS` (código 2) y `siat_habilitado` permanece en `false`.
+
+La operación administrativa **Verificar comunicación** llama al endpoint SOAP `FacturacionCodigos` de piloto y solo muestra `CONECTADO` después de una respuesta positiva real. **Solicitar CUIS** exige esa verificación previa, encola una tarea idempotente y despierta `siat-worker` de inmediato con `SIAT_WORKER_SECRET`. CUFD, sincronización, emisión, anulaciones y ventas fiscales siguen bloqueados.
 
 Esta entrega permanece bloqueada a `PRUEBAS`. Compilar el software no habilita producción ni sustituye la autorización del SIN.
 
