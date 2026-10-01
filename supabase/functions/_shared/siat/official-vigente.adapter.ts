@@ -47,7 +47,8 @@ export class OfficialVigenteAdapter implements SiatAdapter {
 
   constructor(token: string, endpoints: Partial<typeof OFFICIAL_TEST_ENDPOINTS> = {}, timeoutMs?: number) {
     if (!token) throw new Error("El Token Delegado SIAT no está configurado en el backend.");
-    const resolved = { ...OFFICIAL_TEST_ENDPOINTS, ...endpoints };
+    const configuredEndpoints = Object.fromEntries(Object.entries(endpoints).filter(([, value]) => typeof value === "string" && value.length > 0));
+    const resolved = { ...OFFICIAL_TEST_ENDPOINTS, ...configuredEndpoints } as typeof OFFICIAL_TEST_ENDPOINTS;
     this.codes = new SoapClient(resolved.codigos, token, timeoutMs);
     this.sync = new SoapClient(resolved.sincronizacion, token, timeoutMs);
     this.invoice = new SoapClient(resolved.compraVenta, token, timeoutMs);

@@ -70,8 +70,11 @@ export function normalizeSiatResponse(raw: unknown): SiatResponse {
 }
 
 export class SoapClient {
-  constructor(private readonly endpoint: string, private readonly token: string, private readonly timeoutMs = 20_000) {
-    if (!endpoint.startsWith("https://")) throw new Error("El endpoint SOAP debe utilizar HTTPS.");
+  private readonly endpoint: string;
+
+  constructor(endpoint: unknown, private readonly token: string, private readonly timeoutMs = 20_000) {
+    if (typeof endpoint !== "string" || !endpoint.startsWith("https://")) throw new Error("El endpoint SOAP debe utilizar HTTPS.");
+    this.endpoint = endpoint;
   }
 
   async call(operation: string, requestName: string | null, fields: Record<string, unknown>, options: { ambiguousOnTimeout?: boolean; retries?: number } = {}): Promise<unknown> {

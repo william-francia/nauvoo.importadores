@@ -37,6 +37,13 @@ describe("SOAP SIAT", () => {
     expect(body).not.toContain("SolicitudVerificarComunicacion");
   });
 
+  it("conserva el endpoint piloto cuando un override no está configurado", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(envelope("<verificarComunicacionResponse><return><transaccion>true</transaccion></return></verificarComunicacionResponse>"), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    await new OfficialVigenteAdapter("token", { codigos: undefined }).verificarComunicacion();
+    expect(fetchMock.mock.calls[0][0]).toBe("https://pilotosiatservicios.impuestos.gob.bo/v2/FacturacionCodigos");
+  });
+
   it("clasifica timeout posterior al envío como respuesta ambigua", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new DOMException("timeout", "AbortError")));
     const client = new SoapClient("https://pilotosiatservicios.impuestos.gob.bo/test", "token", 10);
