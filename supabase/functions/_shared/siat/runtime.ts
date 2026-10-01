@@ -34,7 +34,7 @@ const configuredTimeout = () => {
 };
 
 export const siatRuntimeConfiguration = (): SiatRuntimeConfiguration => ({
-  tokenDelegado: Deno.env.get("SIAT_TOKEN_DELEGADO") ?? "",
+  tokenDelegado: (Deno.env.get("SIAT_TOKEN_DELEGADO") ?? "").trim().replace(/^TokenApi\s+/i, ""),
   privateKeyPem: Deno.env.get("SIAT_PRIVATE_KEY_PEM") ?? "",
   certificatePem: Deno.env.get("SIAT_CERTIFICATE_PEM") ?? "",
   workerSecret: Deno.env.get("SIAT_WORKER_SECRET") ?? "",

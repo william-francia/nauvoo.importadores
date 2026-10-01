@@ -33,6 +33,8 @@ export function sanitizeErrorMessage(error: unknown): string {
     .slice(0, 500);
 }
 
+const httpErrorDetail = (body: string) => sanitizeErrorMessage(body.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim()).slice(0, 250);
+
 export function deepFind(value: unknown, target: string): unknown {
   if (!value || typeof value !== "object") return undefined;
   for (const [key, child] of Object.entries(value as Record<string, unknown>)) {
@@ -88,7 +90,7 @@ export class SoapClient {
           body: envelope,
         });
         const text = await response.text();
-        if (!response.ok) throw new Error(`SIAT_HTTP_${response.status}: el servicio SIN rechazó la solicitud.`);
+        if (!response.ok) throw new Error(`SIAT_HTTP_${response.status}: ${httpErrorDetail(text) || "el servicio SIN rechazó la solicitud."}`);
         const parsed = parser.parse(text);
         const fault = deepFind(parsed, "Fault");
         if (fault) throw new Error(`SIAT_SOAP_FAULT: ${asText(deepFind(fault, "faultstring")) ?? "respuesta rechazada"}`);

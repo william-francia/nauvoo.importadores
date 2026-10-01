@@ -52,6 +52,12 @@ describe("SOAP SIAT", () => {
     expect(message).not.toContain("clave");
   });
 
+  it("conserva el diagnóstico HTTP del SIN sin exponer secretos", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("<fault><message>Token inválido</message></fault>", { status: 400 })));
+    const client = new SoapClient("https://pilotosiatservicios.impuestos.gob.bo/test", "token");
+    await expect(client.call("verificarComunicacion", null, {})).rejects.toThrow("SIAT_HTTP_400: Token inválido");
+  });
+
   it("no procesa entidades XML externas", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(envelope('<!DOCTYPE x [<!ENTITY ext SYSTEM "file:///etc/passwd">]><x>&ext;</x>'), { status: 200 })));
     const client = new SoapClient("https://pilotosiatservicios.impuestos.gob.bo/test", "token");
