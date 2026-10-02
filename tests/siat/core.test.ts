@@ -1,6 +1,9 @@
-import { generateKeyPairSync } from "node:crypto";
+import { createHash } from "node:crypto";
+import { execFileSync } from "node:child_process";
 import { gunzipSync } from "node:zlib";
-import { readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { cufNumericBase, decimalToHex, generateCuf, modulo11 } from "../../supabase/functions/_shared/siat/cuf.ts";
 import { gzipBytes, sha256Hex } from "../../supabase/functions/_shared/siat/encoding.ts";
@@ -8,10 +11,32 @@ import { generateInvoiceXml } from "../../supabase/functions/_shared/siat/invoic
 import { formatMoney, invoiceTotal, lineSubtotal, maskCard } from "../../supabase/functions/_shared/siat/money.ts";
 import { officialQrUrl } from "../../supabase/functions/_shared/siat/qr.ts";
 import type { InvoiceSnapshot } from "../../supabase/functions/_shared/siat/types.ts";
-import { signInvoiceXml, verifyInvoiceSignature } from "../../supabase/functions/_shared/siat/xmldsig.ts";
-import { validateElectronicInvoiceXml, validateXmlAgainstXsd } from "../../supabase/functions/_shared/siat/xsd.ts";
+import { signInvoiceXml, validateInvoiceSignatureProfile, verifyInvoiceSignature } from "../../supabase/functions/_shared/siat/xmldsig.ts";
+import { validateElectronicInvoiceXml, validateUnsignedElectronicInvoiceXml, validateXmlAgainstXsd } from "../../supabase/functions/_shared/siat/xsd.ts";
 
 const artifacts = new URL("../../supabase/functions/_shared/siat/artifacts/SIAT_VIGENTE/", import.meta.url);
+
+function temporaryTestCertificate() {
+  const candidates = [process.env.OPENSSL_BIN, "openssl", "C:\\Program Files\\Git\\usr\\bin\\openssl.exe", "C:\\Program Files\\Git\\mingw64\\bin\\openssl.exe"].filter((value): value is string => Boolean(value));
+  const openssl = candidates.find((candidate) => {
+    try { execFileSync(candidate, ["version"], { stdio: "ignore" }); return true; } catch { return false; }
+  });
+  if (!openssl) throw new Error("OpenSSL es necesario para generar el certificado X.509 efímero de pruebas.");
+  const temporaryPrefix = join(tmpdir(), "siat-xmldsig-");
+  const directory = mkdtempSync(temporaryPrefix);
+  const privateKeyPath = join(directory, "private-key.pem");
+  const certificatePath = join(directory, "certificate.pem");
+  execFileSync(openssl, ["req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "1", "-subj", "/CN=SIAT Local Test", "-keyout", privateKeyPath, "-out", certificatePath], { stdio: "ignore", env: { ...process.env, MSYS2_ARG_CONV_EXCL: "*" } });
+  return {
+    privateKey: readFileSync(privateKeyPath, "utf8"),
+    certificate: readFileSync(certificatePath, "utf8"),
+    dispose: () => {
+      if (!directory.startsWith(temporaryPrefix)) throw new Error("Directorio temporal XMLDSig fuera del alcance permitido.");
+      rmSync(directory, { recursive: true, force: true });
+    },
+  };
+}
+
 const fixture = (modality: "COMPUTARIZADA" | "ELECTRONICA" = "COMPUTARIZADA"): InvoiceSnapshot => ({
   id: "00000000-0000-4000-8000-000000000001", correlationId: "00000000-0000-4000-8000-000000000002",
   nit: "123456789", razonSocial: "Nauvoo Importadores", municipio: "La Paz", telefono: "22110000",
@@ -21,8 +46,8 @@ const fixture = (modality: "COMPUTARIZADA" | "ELECTRONICA" = "COMPUTARIZADA"): I
   cliente: { nombreRazonSocial: "Cliente Prueba", codigoTipoDocumentoIdentidad: 1, numeroDocumento: "5115889", complemento: null, codigoCliente: "CLI-1" },
   pago: { codigoMetodoPago: 1, numeroTarjeta: null, codigoMoneda: 1, tipoCambio: "1" },
   totales: { montoTotal: "99", montoTotalSujetoIva: "99", montoTotalMoneda: "99", descuentoAdicional: "1" },
-  leyenda: "Ley N° 453: el proveedor debe brindar información clara.", usuario: "pruebas",
-  detalle: [{ actividadEconomica: "451010", codigoProductoSin: "49111", codigoProducto: "P-1", descripcion: "Producto de prueba", cantidad: "1", unidadMedidaSin: "1", precioUnitario: "100", descuento: "0", subtotal: "100", numeroSerie: null, numeroImei: null }],
+  leyenda: "Ley N° 453: Puedes acceder a la reclamación cuando tus derechos han sido vulnerados.", usuario: "pruebas",
+  detalle: [{ actividadEconomica: "4752100", codigoProductoSin: "1001903", codigoProducto: "FIXTURE-1", descripcion: "herramientas de mano tales como alicates, destornilladores.", cantidad: "1", unidadMedidaSin: "47", precioUnitario: "100", descuento: "0", subtotal: "100", numeroSerie: null, numeroImei: null }],
 });
 
 describe("dinero decimal", () => {
@@ -51,6 +76,17 @@ describe("CUF oficial", () => {
 });
 
 describe("documento fiscal", () => {
+  it("conserva los artefactos XSD oficiales registrados en el manifiesto", () => {
+    const manifest = JSON.parse(readFileSync(new URL("MANIFEST.json", artifacts), "utf8")) as { artefactos: Array<{ nombre: string; sha256: string }> };
+    for (const name of ["facturaElectronicaCompraVenta.xsd", "SignatureSchema.xsd"]) {
+      const expected = manifest.artefactos.find((item) => item.nombre === name)?.sha256;
+      const repositoryBytes = readFileSync(new URL(name, artifacts));
+      const officialBytes = name === "SignatureSchema.xsd" && repositoryBytes.at(-1) === 0x0a ? repositoryBytes.subarray(0, -1) : repositoryBytes;
+      const actual = createHash("sha256").update(officialBytes).digest("hex").toUpperCase();
+      expect(actual, name).toBe(expected);
+    }
+  });
+
   it("genera XML ordenado y lo valida contra el XSD oficial", () => {
     const xml = generateInvoiceXml(fixture());
     const xsd = readFileSync(new URL("facturaComputarizadaCompraVenta.xsd", artifacts), "utf8");
@@ -58,13 +94,28 @@ describe("documento fiscal", () => {
     expect(() => validateXmlAgainstXsd(xml.replace("<montoTotal>99.00</montoTotal>", "<montoTotal>-1</montoTotal>"), xsd)).toThrow(/XML inválido/);
   });
 
-  it("firma con RSA-SHA256, verifica XMLDSig y SignatureSchema", () => {
-    const { privateKey, publicKey } = generateKeyPairSync("rsa", { modulusLength: 2048, publicKeyEncoding: { type: "spki", format: "pem" }, privateKeyEncoding: { type: "pkcs8", format: "pem" } });
-    const signed = signInvoiceXml(generateInvoiceXml(fixture("ELECTRONICA")), privateKey, publicKey);
-    expect(verifyInvoiceSignature(signed, publicKey)).toBe(true);
+  it("valida el XML electrónico sin firma y todos sus campos obligatorios", () => {
+    const xsd = readFileSync(new URL("facturaElectronicaCompraVenta.xsd", artifacts), "utf8");
+    const xml = generateInvoiceXml(fixture("ELECTRONICA"));
+    expect(validateUnsignedElectronicInvoiceXml(xml, xsd)).toBe(true);
+    for (const field of ["nitEmisor", "razonSocialEmisor", "numeroFactura", "cuf", "cufd", "fechaEmision", "codigoTipoDocumentoIdentidad", "codigoMetodoPago", "montoTotal", "montoTotalSujetoIva", "codigoMoneda", "leyenda", "codigoDocumentoSector", "actividadEconomica", "codigoProductoSin", "unidadMedida", "subTotal"]) expect(xml).toContain(`<${field}`);
+  });
+
+  it("firma con X.509 efímero, verifica XMLDSig y detecta manipulación", () => {
+    const credentials = temporaryTestCertificate();
     const xsd = readFileSync(new URL("facturaElectronicaCompraVenta.xsd", artifacts), "utf8");
     const signature = readFileSync(new URL("SignatureSchema.xsd", artifacts), "utf8");
-    expect(validateElectronicInvoiceXml(signed, xsd, signature)).toBe(true);
+    try {
+      const unsigned = generateInvoiceXml(fixture("ELECTRONICA"));
+      const signed = signInvoiceXml(unsigned, credentials.privateKey, credentials.certificate);
+      expect(validateInvoiceSignatureProfile(signed)).toBe(true);
+      expect(verifyInvoiceSignature(signed, credentials.certificate)).toBe(true);
+      expect(validateElectronicInvoiceXml(signed, xsd, signature)).toBe(true);
+      const tampered = signed.replace("<precioUnitario>100.00</precioUnitario>", "<precioUnitario>101.00</precioUnitario>");
+      expect(() => verifyInvoiceSignature(tampered, credentials.certificate)).toThrow(/Firma XMLDSig inválida/);
+    } finally {
+      credentials.dispose();
+    }
   });
 
   it("comprime los bytes definitivos y calcula SHA-256", async () => {

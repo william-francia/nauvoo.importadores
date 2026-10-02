@@ -10,7 +10,7 @@ import { SiatRepository } from "./repository.ts";
 import { AmbiguousSiatError } from "./types.ts";
 import type { InvoiceSnapshot, SiatAdapter, SiatContext, SiatResponse } from "./types.ts";
 import { signInvoiceXml } from "./xmldsig.ts";
-import { validateElectronicInvoiceXml, validateXmlAgainstXsd } from "./xsd.ts";
+import { validateElectronicInvoiceXml, validateUnsignedElectronicInvoiceXml, validateXmlAgainstXsd } from "./xsd.ts";
 import { createTar } from "./tar.ts";
 
 const XSD_HASH = {
@@ -121,9 +121,9 @@ export class SiatEngine {
         codigoCliente: stringValue(customer.codigoCliente, "Código de cliente"),
       },
       pago: { codigoMetodoPago: numberValue(payment.codigoMetodoPago, "Método de pago"), numeroTarjeta: payment.numeroTarjeta ? String(payment.numeroTarjeta) : null, codigoMoneda: numberValue(payment.codigoMoneda, "Moneda"), tipoCambio: stringValue(payment.tipoCambio, "Tipo de cambio") },
-      totales: { montoTotal: stringValue(totals.montoTotal, "Monto total"), montoTotalSujetoIva: stringValue(totals.montoTotalSujetoIva, "Monto sujeto a IVA"), montoTotalMoneda: stringValue(totals.montoTotalMoneda, "Monto moneda"), descuentoAdicional: totals.descuentoAdicional ? String(totals.descuentoAdicional) : null },
+      totales: { montoTotal: stringValue(totals.montoTotal, "Monto total"), montoTotalSujetoIva: stringValue(totals.montoTotalSujetoIva, "Monto sujeto a IVA"), montoTotalMoneda: stringValue(totals.montoTotalMoneda, "Monto moneda"), montoGiftCard: totals.montoGiftCard == null ? null : String(totals.montoGiftCard), descuentoAdicional: totals.descuentoAdicional == null ? null : String(totals.descuentoAdicional), codigoExcepcion: totals.codigoExcepcion == null ? null : numberValue(totals.codigoExcepcion, "Código de excepción"), cafc: totals.cafc == null ? null : String(totals.cafc) },
       leyenda: stringValue(totals.leyenda, "Leyenda fiscal"), usuario: String(payment.usuario || "sistema").slice(0, 100),
-      detalle: detail.map((line) => ({ actividadEconomica: stringValue(line.actividadEconomica, "Actividad económica"), codigoProductoSin: stringValue(line.codigoProductoSin, "Producto SIN"), codigoProducto: stringValue(line.codigoProducto, "Código producto"), descripcion: stringValue(line.descripcion, "Descripción"), cantidad: stringValue(line.cantidad, "Cantidad"), unidadMedidaSin: stringValue(line.unidadMedidaSin, "Unidad de medida"), precioUnitario: stringValue(line.precioUnitario, "Precio"), descuento: line.descuento == null ? null : String(line.descuento), subtotal: stringValue(line.subtotal, "Subtotal") })),
+      detalle: detail.map((line) => ({ actividadEconomica: stringValue(line.actividadEconomica, "Actividad económica"), codigoProductoSin: stringValue(line.codigoProductoSin, "Producto SIN"), codigoProducto: stringValue(line.codigoProducto, "Código producto"), descripcion: stringValue(line.descripcion, "Descripción"), cantidad: stringValue(line.cantidad, "Cantidad"), unidadMedidaSin: stringValue(line.unidadMedidaSin, "Unidad de medida"), precioUnitario: stringValue(line.precioUnitario, "Precio"), descuento: line.descuento == null ? null : String(line.descuento), subtotal: stringValue(line.subtotal, "Subtotal"), numeroSerie: line.numeroSerie == null ? null : String(line.numeroSerie), numeroImei: line.numeroImei == null ? null : String(line.numeroImei) })),
     };
   }
 
@@ -147,10 +147,13 @@ export class SiatEngine {
     const snapshot = this.snapshot(invoice, config, branch, cuf);
     await this.repository.updateInvoice(invoiceId, { estado_fiscal: "GENERANDO", cuf });
     let xml = generateInvoiceXml(snapshot); const electronic = snapshot.modalidad === "ELECTRONICA";
-    if (electronic) xml = signInvoiceXml(xml, stringValue(this.secrets.privateKeyPem, "Clave privada"), stringValue(this.secrets.certificatePem, "Certificado"));
-    await this.repository.updateInvoice(invoiceId, { estado_fiscal: "VALIDANDO_XSD" });
     const xsdName = electronic ? "facturaElectronicaCompraVenta.xsd" : "facturaComputarizadaCompraVenta.xsd";
     const xsd = await this.readArtifact(xsdName);
+    if (electronic) {
+      validateUnsignedElectronicInvoiceXml(xml, xsd);
+      xml = signInvoiceXml(xml, stringValue(this.secrets.privateKeyPem, "Clave privada"), stringValue(this.secrets.certificatePem, "Certificado"));
+    }
+    await this.repository.updateInvoice(invoiceId, { estado_fiscal: "VALIDANDO_XSD" });
     if (electronic) validateElectronicInvoiceXml(xml, xsd, await this.readArtifact("SignatureSchema.xsd")); else validateXmlAgainstXsd(xml, xsd);
     const compressed = await gzipBytes(xml); const hash = await sha256Hex(compressed); const xmlPath = `${snapshot.fechaEmision.slice(0, 7)}/${invoiceId}/${cuf}.xml.gz`;
     await this.repository.store(xmlPath, compressed, "application/gzip");
