@@ -20,16 +20,20 @@ const XSD_HASH = {
 
 const catalogOperations = [
   ["ACTIVIDADES", "Actividades económicas", "sincronizarActividades"],
+  ["ACTIVIDADES_DOCUMENTO_SECTOR", "Actividades por documento sector", "sincronizarListaActividadesDocumentoSector"],
   ["PRODUCTOS_SERVICIOS", "Productos y servicios", "sincronizarListaProductosServicios"],
   ["UNIDADES_MEDIDA", "Unidades de medida", "sincronizarParametricaUnidadMedida"],
   ["METODOS_PAGO", "Métodos de pago", "sincronizarParametricaTipoMetodoPago"],
   ["TIPOS_DOCUMENTO", "Tipos de documento", "sincronizarParametricaTipoDocumentoIdentidad"],
   ["MOTIVOS_ANULACION", "Motivos de anulación", "sincronizarParametricaMotivoAnulacion"],
   ["LEYENDAS_FACTURA", "Leyendas de factura", "sincronizarListaLeyendasFactura"],
+  ["MENSAJES_SERVICIOS", "Mensajes de servicios", "sincronizarListaMensajesServicios"],
   ["EVENTOS_SIGNIFICATIVOS", "Eventos significativos", "sincronizarParametricaEventosSignificativos"],
   ["PAISES_ORIGEN", "Países de origen", "sincronizarParametricaPaisOrigen"],
+  ["MONEDAS", "Tipos de moneda", "sincronizarParametricaTipoMoneda"],
   ["TIPOS_EMISION", "Tipos de emisión", "sincronizarParametricaTipoEmision"],
   ["TIPOS_FACTURA", "Tipos de factura", "sincronizarParametricaTiposFactura"],
+  ["TIPOS_PUNTO_VENTA", "Tipos de punto de venta", "sincronizarParametricaTipoPuntoVenta"],
   ["DOCUMENTOS_SECTOR", "Documentos sector", "sincronizarParametricaTipoDocumentoSector"],
 ] as const;
 
@@ -43,6 +47,28 @@ const numberValue = (value: unknown, label: string) => {
   return parsed;
 };
 const objectValue = (value: unknown) => value && typeof value === "object" ? value as Record<string, unknown> : {};
+const catalogItem = (catalogCode: string, raw: unknown) => {
+  const item = objectValue(raw);
+  if (catalogCode === "ACTIVIDADES_DOCUMENTO_SECTOR") {
+    const actividad = String(item.codigoActividad ?? ""); const documento = String(item.codigoDocumentoSector ?? "");
+    const claveNatural = actividad && documento ? `${actividad}:${documento}` : "";
+    return { codigo: claveNatural, claveNatural, descripcion: String(item.tipoDocumentoSector ?? ""), metadatos: item };
+  }
+  if (catalogCode === "PRODUCTOS_SERVICIOS") {
+    const actividad = String(item.codigoActividad ?? ""); const producto = String(item.codigoProducto ?? "");
+    const nandina = Array.isArray(item.nandina) ? item.nandina.map(String).join("|") : String(item.nandina ?? "");
+    return { codigo: producto, claveNatural: actividad && producto ? `${actividad}:${producto}:${nandina}` : "", descripcion: String(item.descripcionProducto ?? ""), metadatos: item };
+  }
+  if (catalogCode === "LEYENDAS_FACTURA") {
+    const actividad = String(item.codigoActividad ?? ""); const descripcion = String(item.descripcionLeyenda ?? "");
+    return { codigo: actividad, claveNatural: actividad && descripcion ? `${actividad}:${descripcion}` : "", descripcion, metadatos: item };
+  }
+  const codigo = item.codigoClasificador ?? item.codigoCaeb ?? item.codigoActividad ?? item.codigoProducto ?? item.codigo;
+  const descripcion = item.descripcion ?? item.descripcionLeyenda ?? item.descripcionProducto ?? item.productoServicio ?? item.nombre;
+  const codigoTexto = String(codigo ?? ""); const descripcionTexto = String(descripcion ?? "");
+  const claveNatural = catalogCode === "UNIDADES_MEDIDA" ? `${codigoTexto}:${descripcionTexto}` : codigoTexto;
+  return { codigo: codigoTexto, claveNatural, descripcion: descripcionTexto, metadatos: { ...item, actividadEconomica: item.codigoActividad ?? item.codigoCaeb ?? null } };
+};
 const arrayValue = (value: unknown) => Array.isArray(value) ? value as Array<Record<string, unknown>> : [];
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error)).replace(/TokenApi\s+\S+/gi, "TokenApi [REDACTED]").slice(0, 500);
 
@@ -364,31 +390,54 @@ export class SiatEngine {
   }
 
   async requestCufd(job: Record<string, unknown>) {
-    const config = await this.repository.configuration(); const branch = await this.repository.branch(stringValue(config.sucursal_predeterminada_id, "Sucursal predeterminada")); const cuis = await this.repository.activeCuis(config); const point = config.punto_venta_predeterminado_id ? await this.repository.point(String(config.punto_venta_predeterminado_id)) : null;
+    const config = await this.repository.configuration();
+    if (config.ambiente !== "PRUEBAS" || config.modalidad !== "ELECTRONICA" || numberValue(config.documento_sector, "Documento sector") !== 1 || numberValue(config.tipo_factura, "Tipo factura") !== 1) throw new Error("La configuracion fiscal del piloto debe ser PRUEBAS, ELECTRONICA, documento sector 1 y tipo factura 1.");
+    const branch = await this.repository.branch(stringValue(config.sucursal_predeterminada_id, "Sucursal predeterminada"));
+    if (numberValue(branch.codigo, "Sucursal") !== 0) throw new Error("El piloto CUFD requiere la sucursal Casa Matriz con codigo 0.");
+    const point = config.punto_venta_predeterminado_id ? await this.repository.point(String(config.punto_venta_predeterminado_id)) : null;
+    if (point && numberValue(point.codigo, "Punto de venta") !== 0) throw new Error("El piloto CUFD requiere el punto de venta con codigo 0.");
+    const cuis = await this.repository.activeCuis(config);
     if (!cuis) throw new Error("Se requiere un CUIS vigente antes de solicitar CUFD.");
-    const context = this.context(config, { codigoSucursal: numberValue(branch.codigo, "Sucursal"), codigoPuntoVenta: point ? numberValue(point.codigo, "Punto de venta") : null, cuis: stringValue(cuis.codigo, "CUIS") }); const result = await this.adapter.solicitarCufd(context);
+    const existing = await this.repository.activeCufd(config, stringValue(cuis.id, "CUIS"));
+    if (existing) { await this.repository.completeJob(String(job.id)); return; }
+    const context = this.context(config, { codigoSucursal: numberValue(branch.codigo, "Sucursal"), codigoPuntoVenta: point ? numberValue(point.codigo, "Punto de venta") : null, cuis: stringValue(cuis.codigo, "CUIS") });
+    const result = await this.adapter.solicitarCufd(context);
     if (!result.transaccion || !result.codigo || !result.codigoControl || !result.fechaVigencia) throw new Error(result.mensajes.map((item) => item.descripcion).join("; ") || "El SIN no entregó CUFD.");
-    await this.repository.saveCufd(config, stringValue(cuis.id, "CUIS"), { codigo: result.codigo, codigoControl: result.codigoControl, direccion: result.direccion, fechaVigencia: result.fechaVigencia }); await this.repository.completeJob(String(job.id));
+    const fechaPrueba = new Date(Date.now() + Number(config.desfase_hora_sin_ms ?? 0));
+    const cufPrueba = generateCuf({ nit: stringValue(config.nit, "NIT"), fechaEmision: fechaPrueba, codigoSucursal: 0, modalidad: 1, tipoEmision: 1, tipoFactura: 1, documentoSector: 1, numeroFactura: 1, codigoPuntoVenta: 0, codigoControl: result.codigoControl });
+    if (!cufPrueba.endsWith(result.codigoControl.toUpperCase())) throw new Error("La validacion local del CUF no incorporo el codigo de control.");
+    await this.repository.auditEntity("siat_configuracion", "true", "VALIDAR_CUF_SIN_EMISION", null, null, { numeroFacturaPrueba: 1, fechaEmision: fechaPrueba.toISOString(), longitudCuf: cufPrueba.length, codigoControlIncorporado: true });
+    await this.repository.saveCufd(config, stringValue(cuis.id, "CUIS"), { codigo: result.codigo, codigoControl: result.codigoControl, direccion: result.direccion, fechaVigencia: result.fechaVigencia });
+    await this.repository.completeJob(String(job.id));
   }
 
   async synchronize(job: Record<string, unknown>) {
     const config = await this.repository.configuration(); const branch = await this.repository.branch(stringValue(config.sucursal_predeterminada_id, "Sucursal predeterminada")); const cuis = await this.repository.activeCuis(config); const point = config.punto_venta_predeterminado_id ? await this.repository.point(String(config.punto_venta_predeterminado_id)) : null;
     if (!cuis) throw new Error("Se requiere un CUIS vigente para sincronizar.");
     const context = this.context(config, { codigoSucursal: numberValue(branch.codigo, "Sucursal"), codigoPuntoVenta: point ? numberValue(point.codigo, "Punto de venta") : null, cuis: stringValue(cuis.codigo, "CUIS") });
-    const time = await this.adapter.sincronizarFechaHora(context); const offset = new Date(time.fechaHora).getTime() - Date.now();
-    const catalogs: Array<{ codigo: string; nombre: string; items: Array<{ codigo: string; descripcion: string; metadatos: Record<string, unknown> }> }> = [];
-    for (const [code, name, operation] of catalogOperations) {
-      const result = await this.adapter.sincronizarCatalogo(context, operation);
-      if (result.response.transaccion !== true) throw new Error(result.response.mensajes.map((item) => item.descripcion).join("; ") || `El SIN no confirmó el catálogo ${code}.`);
-      const items = result.items.map((raw) => {
-        const item = objectValue(raw); const codigo = item.codigoClasificador ?? item.codigoCaeb ?? item.codigoActividad ?? item.codigoProducto ?? item.codigo;
-        const descripcion = item.descripcion ?? item.descripcionLeyenda ?? item.descripcionProducto ?? item.productoServicio ?? item.nombre;
-        return { codigo: String(codigo ?? ""), descripcion: String(descripcion ?? ""), metadatos: { ...item, actividadEconomica: item.codigoActividad ?? item.codigoCaeb ?? null } };
-      });
-      catalogs.push({ codigo: code, nombre: name, items });
+    const time = await this.adapter.sincronizarFechaHora(context);
+    if (time.response.transaccion !== true) throw new Error(time.response.mensajes.map((item) => item.descripcion).join("; ") || "El SIN no confirmó la fecha y hora.");
+    const offset = new Date(time.fechaHora).getTime() - Date.now();
+    if (Number.isNaN(offset)) throw new Error("El SIN devolvió una fecha y hora inválida.");
+    const requestedCatalogs = Array.isArray(objectValue(job.payload).catalogos) ? objectValue(job.payload).catalogos.filter((value): value is string => typeof value === "string") : [];
+    const operations = requestedCatalogs.length ? catalogOperations.filter(([code]) => requestedCatalogs.includes(code)) : catalogOperations;
+    if (requestedCatalogs.length && operations.length !== requestedCatalogs.length) throw new Error("La tarea contiene catálogos SIAT no permitidos.");
+    const correlationId = crypto.randomUUID(); let completed = 0; const failures: string[] = [];
+    for (const [code, name, operation] of operations) {
+      try {
+        const result = await this.adapter.sincronizarCatalogo(context, operation);
+        if (result.response.transaccion !== true) throw new Error(result.response.mensajes.map((item) => item.descripcion).join("; ") || `El SIN no confirmó el catálogo ${code}.`);
+        const items = result.items.map((raw) => catalogItem(code, raw));
+        if (!items.length) throw new Error(`El SIN devolvió el catálogo ${code} vacío.`);
+        if (items.some((item) => !item.codigo || !item.descripcion)) throw new Error(`El SIN devolvió items incompletos para ${code}.`);
+        await this.repository.applyCatalog({ codigo: code, nombre: name, items }, correlationId); completed += 1;
+      } catch (error) {
+        const message = errorMessage(error); failures.push(`${code}: ${message}`);
+        await this.repository.registerCatalogError(code, name, correlationId, message);
+      }
     }
-    const { error } = await this.repository.db.rpc("siat_aplicar_sincronizacion_completa", { p_catalogos: catalogs, p_version_catalogo: new Date().toISOString(), p_desfase_hora_sin_ms: offset, p_correlation_id: crypto.randomUUID() });
-    if (error) throw new Error(error.message);
+    if (!completed) throw new Error(failures.join("; ") || "El SIN no entregó catálogos válidos.");
+    await this.repository.saveSynchronizationOffset(offset);
     await this.repository.completeJob(String(job.id));
   }
 

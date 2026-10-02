@@ -2,7 +2,7 @@ import { SiatEngine, errorMessage } from "../_shared/siat/engine.ts";
 import { SiatRepository } from "../_shared/siat/repository.ts";
 import { json, officialAdapter, secureEquals, serviceClient } from "../_shared/siat/runtime.ts";
 
-const permanentError = (message: string) => /XML inválido|snapshot|CUF|documento sector|totales|no está habilitado|PENDIENTE_DE_VERIFICACION_OFICIAL/i.test(message);
+const permanentError = (message: string) => /XML inválido|snapshot|CUF|documento sector|tipo factura|configuracion fiscal|sucursal|punto de venta|totales|no está habilitado|PENDIENTE_DE_VERIFICACION_OFICIAL/i.test(message);
 
 Deno.serve(async (request) => {
   if (request.method !== "POST") return json({ error: "Método no permitido." }, 405);

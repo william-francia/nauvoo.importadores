@@ -68,6 +68,7 @@ export interface GatewayHealthSiat {
   ultimaVerificacionServicio: string | null;
   ultimaSincronizacion: string | null;
   pendientes: number;
+  sincronizacion: { estado: "NO_SINCRONIZADO" | "SINCRONIZANDO" | "SINCRONIZADO" | "ERROR"; catalogosProcesados: number; itemsRecibidos: number };
 }
 
 export interface VentaOfflineSiat extends FacturaSiatResumen {

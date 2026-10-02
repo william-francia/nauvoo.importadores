@@ -11,6 +11,19 @@ const rateLimit = (key: string, limit = 30) => {
 const record = (value: unknown) => value && typeof value === "object" ? value as Record<string, unknown> : {};
 const isAdmin = (role: string) => role.toLowerCase() === "administrador";
 
+async function validatePilotCufdConfiguration(repository: SiatRepository, config: Record<string, unknown>) {
+  const required = [["nit", "NIT"], ["codigo_sistema", "Código de sistema"], ["sucursal_predeterminada_id", "Sucursal tributaria"]] as const;
+  const missing = required.filter(([key]) => !String(config[key] ?? "").trim()).map(([, label]) => label);
+  if (missing.length) throw new Error(`Falta configurar: ${missing.join(", ")}.`);
+  if (config.ambiente !== "PRUEBAS" || config.modalidad !== "ELECTRONICA" || Number(config.documento_sector) !== 1 || Number(config.tipo_factura) !== 1) throw new Error("El piloto CUFD requiere PRUEBAS, ELECTRONICA, documento sector 1 y tipo factura 1.");
+  const branch = await repository.branch(String(config.sucursal_predeterminada_id));
+  if (Number(branch.codigo) !== 0) throw new Error("El piloto CUFD requiere la sucursal Casa Matriz con código 0.");
+  if (config.punto_venta_predeterminado_id) {
+    const point = await repository.point(String(config.punto_venta_predeterminado_id));
+    if (Number(point.codigo) !== 0) throw new Error("El piloto CUFD requiere punto de venta con código 0.");
+  }
+}
+
 async function dispatchWorker() {
   const workerSecret = Deno.env.get("SIAT_WORKER_SECRET") ?? "";
   const baseUrl = Deno.env.get("SUPABASE_URL") ?? "";
@@ -31,12 +44,18 @@ Deno.serve(async (request) => {
     const body = record(await request.json()); const action = String(body.action ?? ""); const repository = new SiatRepository(db);
     if (action === "health") {
       const config = await repository.configuration();
-      const [cuis, cufd, pending] = await Promise.all([
+      const [cuis, cufd, pending, syncPending, latestSync, catalogos, catalogsWithError, items] = await Promise.all([
         db.from("siat_cuis").select("id,fecha_expiracion").eq("estado", "VIGENTE").gt("fecha_expiracion", new Date().toISOString()).order("fecha_expiracion", { ascending: false }).limit(1).maybeSingle(),
-        db.from("siat_cufd").select("id,fecha_expiracion").eq("estado", "VIGENTE").order("fecha_expiracion", { ascending: false }).limit(1).maybeSingle(),
+        db.from("siat_cufd").select("id,fecha_expiracion").eq("estado", "VIGENTE").gt("fecha_expiracion", new Date().toISOString()).order("fecha_expiracion", { ascending: false }).limit(1).maybeSingle(),
         db.from("siat_outbox").select("id", { count: "exact", head: true }).in("estado", ["PENDIENTE", "REINTENTAR", "PROCESANDO"]),
+        db.from("siat_outbox").select("id", { count: "exact", head: true }).eq("tipo_tarea", "SINCRONIZAR_CATALOGOS").in("estado", ["PENDIENTE", "REINTENTAR", "PROCESANDO"]),
+        db.from("siat_sincronizaciones").select("estado").order("fecha_inicio", { ascending: false }).limit(1).maybeSingle(),
+        db.from("siat_catalogos").select("id", { count: "exact", head: true }).eq("version_normativa", "SIAT_VIGENTE").eq("estado", "VIGENTE"),
+        db.from("siat_catalogos").select("id", { count: "exact", head: true }).eq("version_normativa", "SIAT_VIGENTE").eq("estado", "CON_ERROR"),
+        db.from("siat_catalogo_items").select("id", { count: "exact", head: true }).eq("activo", true),
       ]);
-      return json({ ambiente: config.ambiente, version: config.version_normativa, habilitado: config.siat_habilitado, credenciales: siatCredentialStatus(), conectividad: "NO_CONFIGURADO", cuis: cuis.data, cufd: cufd.data, ultimaVerificacionServicio: config.ultima_verificacion_servicio, ultimaSincronizacion: config.ultima_sincronizacion_exitosa, pendientes: pending.count ?? 0 }, 200, origin);
+      const syncStatus = (syncPending.count ?? 0) > 0 ? "SINCRONIZANDO" : (catalogsWithError.count ?? 0) > 0 || latestSync.data?.estado === "CON_ERROR" ? "ERROR" : (catalogos.count ?? 0) > 0 ? "SINCRONIZADO" : "NO_SINCRONIZADO";
+      return json({ ambiente: config.ambiente, version: config.version_normativa, habilitado: config.siat_habilitado, credenciales: siatCredentialStatus(), conectividad: "NO_CONFIGURADO", cuis: cuis.data, cufd: cufd.data, ultimaVerificacionServicio: config.ultima_verificacion_servicio, ultimaSincronizacion: config.ultima_sincronizacion_exitosa, pendientes: pending.count ?? 0, sincronizacion: { estado: syncStatus, catalogosProcesados: catalogos.count ?? 0, itemsRecibidos: items.count ?? 0 } }, 200, origin);
     }
     if (action === "verify-service") {
       if (!isAdmin(String(user.profile.rol))) throw new Error("Operación reservada a administración.");
@@ -57,7 +76,32 @@ Deno.serve(async (request) => {
       const worker = await dispatchWorker();
       return json({ estado: worker.processed > 0 ? "PROCESADA" : "EN_COLA", worker }, 202, origin);
     }
-    if (["request-cufd", "sync", "prepare-invoice", "cancel", "reverse"].includes(action)) {
+    if (action === "sync") {
+      if (!isAdmin(String(user.profile.rol))) throw new Error("Operación reservada a administración.");
+      const config = await repository.configuration();
+      if (!config.ultima_verificacion_servicio) throw new Error("Primero verifica la comunicación real con SIAT Piloto.");
+      if (!await repository.activeCuis(config)) throw new Error("Se requiere un CUIS vigente para sincronizar catálogos.");
+      const { data: failedCatalogs, error: failedCatalogsError } = await db.from("siat_catalogos").select("codigo").eq("estado", "CON_ERROR").eq("version_normativa", "SIAT_VIGENTE");
+      if (failedCatalogsError) throw failedCatalogsError;
+      const catalogos = (failedCatalogs ?? []).map((catalog) => String(catalog.codigo)).sort();
+      const scope = catalogos.length ? catalogos.join(",") : "COMPLETA";
+      await repository.enqueue(null, "SINCRONIZAR_CATALOGOS", `sincronizar_catalogos:${scope}:${new Date().toISOString().slice(0, 10)}`, { actor: user.authId, origen: "ADMINISTRACION", catalogos });
+      const worker = await dispatchWorker();
+      return json({ estado: worker.failures.length ? "ERROR" : worker.processed > 0 ? "SINCRONIZADO" : "SINCRONIZANDO", worker }, 202, origin);
+    }
+    if (action === "request-cufd") {
+      if (!isAdmin(String(user.profile.rol))) throw new Error("Operación reservada a administración.");
+      const config = await repository.configuration();
+      if (!config.ultima_verificacion_servicio) throw new Error("Primero verifica la comunicación real con SIAT Piloto.");
+      await validatePilotCufdConfiguration(repository, config);
+      const cuis = await repository.activeCuis(config);
+      if (!cuis) throw new Error("Se requiere un CUIS vigente antes de solicitar CUFD.");
+      if (await repository.activeCufd(config, String(cuis.id))) return json({ estado: "VIGENTE", worker: { processed: 0, failures: [] } }, 200, origin);
+      await repository.enqueue(null, "RENOVAR_CUFD", `renovar_cufd:${String(cuis.id)}:${new Date().toISOString().slice(0, 10)}`, { actor: user.authId, origen: "ADMINISTRACION" });
+      const worker = await dispatchWorker();
+      return json({ estado: worker.processed > 0 ? "PROCESADA" : "EN_COLA", worker }, 202, origin);
+    }
+    if (["prepare-invoice", "cancel", "reverse"].includes(action)) {
       return json({ error: "Esta operación fiscal permanece bloqueada hasta un paso posterior." }, 409, origin);
     }
     if (action === "prepare-invoice") {

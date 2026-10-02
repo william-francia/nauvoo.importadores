@@ -27,6 +27,16 @@ const syncFields = (context: SiatContext) => ({
   codigoAmbiente: context.ambiente === "PRUEBAS" ? 2 : 1, codigoPuntoVenta: context.codigoPuntoVenta ?? undefined,
   codigoSistema: context.codigoSistema, codigoSucursal: context.codigoSucursal, cuis: context.cuis, nit: context.nit,
 });
+const synchronizationOperations = new Set([
+  "sincronizarActividades", "sincronizarFechaHora", "sincronizarListaActividadesDocumentoSector",
+  "sincronizarListaLeyendasFactura", "sincronizarListaMensajesServicios", "sincronizarListaProductosServicios",
+  "sincronizarParametricaEventosSignificativos", "sincronizarParametricaMotivoAnulacion",
+  "sincronizarParametricaPaisOrigen", "sincronizarParametricaTipoDocumentoIdentidad",
+  "sincronizarParametricaTipoDocumentoSector", "sincronizarParametricaTipoEmision",
+  "sincronizarParametricaTipoHabitacion", "sincronizarParametricaTipoMetodoPago",
+  "sincronizarParametricaTipoMoneda", "sincronizarParametricaTipoPuntoVenta",
+  "sincronizarParametricaTiposFactura", "sincronizarParametricaUnidadMedida",
+]);
 const receptionFields = (context: SiatContext, codigoEmision = 1) => ({
   codigoAmbiente: context.ambiente === "PRUEBAS" ? 2 : 1, codigoDocumentoSector: context.documentoSector,
   codigoEmision, codigoModalidad: context.modalidad === "ELECTRONICA" ? 1 : 2,
@@ -77,9 +87,9 @@ export class OfficialVigenteAdapter implements SiatAdapter {
   }
 
   async sincronizarCatalogo(context: SiatContext, operation: string) {
-    if (!/^sincronizar[A-Z][A-Za-z]+$/.test(operation)) throw new Error("Operación de catálogo SIAT no permitida.");
+    if (!synchronizationOperations.has(operation) || operation === "sincronizarFechaHora") throw new Error("Operación de catálogo SIAT no permitida.");
     const raw = await this.sync.call(operation, "Sincronizacion", syncFields(context), { retries: 1 });
-    const list = deepFind(raw, "listaCodigos") ?? deepFind(raw, "listaActividades") ?? deepFind(raw, "listaLeyendas") ?? deepFind(raw, "listaProductos") ?? [];
+    const list = deepFind(raw, "listaCodigos") ?? deepFind(raw, "listaActividades") ?? deepFind(raw, "listaActividadesDocumentoSector") ?? deepFind(raw, "listaLeyendas") ?? deepFind(raw, "listaProductos") ?? [];
     return { items: Array.isArray(list) ? list : [list], response: normalizeSiatResponse(raw) };
   }
 

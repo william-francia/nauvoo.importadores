@@ -11,8 +11,8 @@ async function invoke<T>(action: string, values: Record<string, unknown> = {}): 
 export const obtenerSaludGatewaySiat = () => invoke<GatewayHealthSiat>("health");
 export const verificarServicioSiat = () => invoke<{ transaccion: boolean | null; codigoEstado: number | null; mensajes: Array<{ descripcion: string }> }>("verify-service");
 export const solicitarCuisSiat = () => invoke<{ estado: "PROCESADA" | "EN_COLA"; worker: { processed: number; failures: string[] } }>("request-cuis");
-export const solicitarCufdSiat = () => invoke<{ estado: string }>("request-cufd");
-export const sincronizarSiat = () => invoke<{ estado: string }>("sync");
+export const solicitarCufdSiat = () => invoke<{ estado: "PROCESADA" | "EN_COLA" | "VIGENTE"; worker: { processed: number; failures: string[] } }>("request-cufd");
+export const sincronizarSiat = () => invoke<{ estado: "SINCRONIZADO" | "SINCRONIZANDO" | "ERROR"; worker: { processed: number; failures: string[] } }>("sync");
 export const prepararFacturaSiat = (ventaId: string) => invoke<{ facturaId: string | null; estado: string }>("prepare-invoice", { ventaId });
 export const solicitarAnulacionSiat = (facturaId: string, motivo: number) => invoke<{ estado: string }>("cancel", { facturaId, motivo });
 export const solicitarReversionSiat = (facturaId: string) => invoke<{ estado: string }>("reverse", { facturaId });

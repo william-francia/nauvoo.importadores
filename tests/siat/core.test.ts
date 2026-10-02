@@ -42,6 +42,12 @@ describe("CUF oficial", () => {
     expect(decimalToHex(`${base}${modulo11(base)}`)).toBe("8727F63A15F8976591FDDE5B387C5D015A29E06A1");
     expect(generateCuf({ ...input, codigoControl: "A19E23EF34124CD" })).toBe("8727F63A15F8976591FDDE5B387C5D015A29E06A1A19E23EF34124CD");
   });
+
+  it("completa los campos fiscales del piloto sin usar un CUFD real", () => {
+    const base = cufNumericBase({ nit: "1234567", fechaEmision: "2026-10-02T12:34:56.789-04:00", codigoSucursal: 0, modalidad: 1, tipoEmision: 1, tipoFactura: 1, documentoSector: 1, numeroFactura: 1, codigoPuntoVenta: 0 });
+    expect(base).toBe("00000012345672026100212345678900001110100000000010000");
+    expect(generateCuf({ nit: "1234567", fechaEmision: "2026-10-02T12:34:56.789-04:00", codigoSucursal: 0, modalidad: 1, tipoEmision: 1, tipoFactura: 1, documentoSector: 1, numeroFactura: 1, codigoPuntoVenta: 0, codigoControl: "CONTROLPRUEBA" })).toMatch(/CONTROLPRUEBA$/);
+  });
 });
 
 describe("documento fiscal", () => {
