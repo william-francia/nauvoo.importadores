@@ -29,6 +29,12 @@ export class SiatRepository {
     return data as Record<string, unknown>;
   }
 
+  async cuis(id: string) {
+    const { data, error } = await this.db.from("siat_cuis").select("*").eq("id", id).single();
+    if (error || !data) fail(error, "CUIS de la factura no encontrado.");
+    return data as Record<string, unknown>;
+  }
+
   async cufd(id: string) {
     const { data, error } = await this.db.from("siat_cufd").select("*").eq("id", id).single();
     if (error || !data) fail(error, "CUFD de la factura no encontrado.");

@@ -44,10 +44,38 @@ describe("SOAP SIAT", () => {
     expect(fetchMock.mock.calls[0][0]).toBe("https://pilotosiatservicios.impuestos.gob.bo/v2/FacturacionCodigos");
   });
 
+  it("prepara recepcionFactura con contrato piloto y archivo GZIP simulado", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(envelope("<recepcionFacturaResponse><return><codigoEstado>908</codigoEstado><codigoRecepcion>REC-908</codigoRecepcion><transaccion>true</transaccion></return></recepcionFacturaResponse>"), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const adapter = new OfficialVigenteAdapter("token-local");
+    const result = await adapter.recepcionarFactura({
+      context: { ...context, documentoSector: 1, tipoFactura: 1 }, cufd: "CUFD-REAL-NO-USADO", documentoSector: 1, tipoFactura: 1,
+      archivo: new Uint8Array([0x1f, 0x8b, 0x08]), hashArchivo: "A".repeat(64), fechaEnvio: "2026-10-22T12:00:00.000Z",
+    });
+    const body = String(fetchMock.mock.calls[0][1].body);
+    expect(result).toMatchObject({ codigoEstado: 908, codigoRecepcion: "REC-908", transaccion: true });
+    expect(fetchMock.mock.calls[0][0]).toBe("https://pilotosiatservicios.impuestos.gob.bo/v2/ServicioFacturacionCompraVenta");
+    expect((fetchMock.mock.calls[0][1].headers as Record<string, string>).apikey).toBe("TokenApi token-local");
+    for (const field of ["codigoAmbiente", "codigoSistema", "nit", "codigoSucursal", "codigoPuntoVenta", "codigoDocumentoSector", "codigoEmision", "codigoModalidad", "tipoFacturaDocumento", "cuis", "cufd", "archivo", "fechaEnvio", "hashArchivo"]) expect(body).toContain(`<${field}>`);
+    expect(body).toContain("<codigoAmbiente>2</codigoAmbiente>");
+    expect(body).toContain("<codigoEmision>1</codigoEmision>");
+    expect(body).toContain("<codigoModalidad>1</codigoModalidad>");
+    expect(body).toContain("<codigoDocumentoSector>1</codigoDocumentoSector>");
+    expect(body).toContain("<tipoFacturaDocumento>1</tipoFacturaDocumento>");
+    expect(body).toContain(`<hashArchivo>${"A".repeat(64)}</hashArchivo>`);
+    expect(body).not.toContain("token-local");
+  });
+
   it("clasifica timeout posterior al envío como respuesta ambigua", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new DOMException("timeout", "AbortError")));
     const client = new SoapClient("https://pilotosiatservicios.impuestos.gob.bo/test", "token", 10);
     await expect(client.call("recepcionFactura", "ServicioRecepcionFactura", { archivo: "AA==" }, { ambiguousOnTimeout: true })).rejects.toBeInstanceOf(AmbiguousSiatError);
+  });
+
+  it("no confunde SOAP Fault con recepción válida", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(envelope("<soap:Fault><faultcode>Server</faultcode><faultstring>Solicitud inválida</faultstring></soap:Fault>"), { status: 200 })));
+    const client = new SoapClient("https://pilotosiatservicios.impuestos.gob.bo/test", "token");
+    await expect(client.call("recepcionFactura", "ServicioRecepcionFactura", { archivo: "AA==" })).rejects.toThrow("SIAT_SOAP_FAULT: Solicitud inválida");
   });
 
   it("redacta tokens y material PEM de los errores antes de propagarlos", () => {

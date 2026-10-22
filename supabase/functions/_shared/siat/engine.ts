@@ -9,7 +9,7 @@ import { officialQrUrl } from "./qr.ts";
 import { SiatRepository } from "./repository.ts";
 import { AmbiguousSiatError } from "./types.ts";
 import type { InvoiceSnapshot, SiatAdapter, SiatContext, SiatResponse } from "./types.ts";
-import { signInvoiceXml } from "./xmldsig.ts";
+import { signInvoiceXml, verifyInvoiceSignature } from "./xmldsig.ts";
 import { validateSignatureCredentials } from "./signature-credentials.ts";
 import { sanitizeErrorMessage } from "./soap.ts";
 import { validateElectronicInvoiceXml, validateUnsignedElectronicInvoiceXml, validateXmlAgainstXsd } from "./xsd.ts";
@@ -74,6 +74,52 @@ const catalogItem = (catalogCode: string, raw: unknown) => {
 const arrayValue = (value: unknown) => Array.isArray(value) ? value as Array<Record<string, unknown>> : [];
 const errorMessage = (error: unknown) => sanitizeErrorMessage(error);
 
+export type InvoiceReceptionOutcome = {
+  state: "VALIDADA" | "OBSERVADA" | "SIN_RESPUESTA";
+  accepted: boolean;
+  observed: boolean;
+  inconclusive: boolean;
+};
+
+export function classifyInvoiceReception(response: Pick<SiatResponse, "codigoEstado" | "codigoRecepcion" | "transaccion">): InvoiceReceptionOutcome {
+  const accepted = response.codigoEstado === 908 && response.transaccion === true && Boolean(response.codigoRecepcion);
+  const observed = response.codigoEstado === 904;
+  return {
+    state: accepted ? "VALIDADA" : observed ? "OBSERVADA" : "SIN_RESPUESTA",
+    accepted,
+    observed,
+    inconclusive: !accepted && !observed,
+  };
+}
+
+export function assertActiveInvoiceFiscalCodes(
+  invoice: Record<string, unknown>,
+  cuis: Record<string, unknown>,
+  cufd: Record<string, unknown>,
+  now = Date.now(),
+): void {
+  const invoicePoint = invoice.punto_venta_id ?? null;
+  const cuisExpiry = cuis.fecha_expiracion == null ? null : Date.parse(String(cuis.fecha_expiracion));
+  if (cuis.estado !== "VIGENTE" || cuisExpiry !== null && (!Number.isFinite(cuisExpiry) || cuisExpiry <= now)) {
+    throw new Error("CUIS_NO_VIGENTE");
+  }
+  if (cuis.id !== invoice.cuis_id || cuis.codigo !== invoice.cuis || cuis.sucursal_id !== invoice.sucursal_id
+    || (cuis.punto_venta_id ?? null) !== invoicePoint || cuis.ambiente !== invoice.ambiente) {
+    throw new Error("CUIS_NO_CORRESPONDE");
+  }
+
+  const cufdStart = Date.parse(String(cufd.fecha_inicio ?? ""));
+  const cufdExpiry = Date.parse(String(cufd.fecha_expiracion ?? ""));
+  if (cufd.estado !== "VIGENTE" || !Number.isFinite(cufdStart) || !Number.isFinite(cufdExpiry) || cufdStart > now || cufdExpiry <= now) {
+    throw new Error("CUFD_NO_VIGENTE");
+  }
+  if (cufd.id !== invoice.cufd_id || cufd.codigo !== invoice.cufd || cufd.cuis_id !== cuis.id
+    || cufd.sucursal_id !== invoice.sucursal_id || (cufd.punto_venta_id ?? null) !== invoicePoint
+    || cufd.ambiente !== invoice.ambiente) {
+    throw new Error("CUFD_NO_CORRESPONDE");
+  }
+}
+
 export class SiatEngine {
   constructor(
     private readonly repository: SiatRepository,
@@ -102,7 +148,7 @@ export class SiatEngine {
     });
   }
 
-  private snapshot(invoice: Record<string, unknown>, config: Record<string, unknown>, branch: Record<string, unknown>, cuf: string): InvoiceSnapshot {
+  private snapshot(invoice: Record<string, unknown>, config: Record<string, unknown>, branch: Record<string, unknown>, cufd: Record<string, unknown>, cuf: string): InvoiceSnapshot {
     const customer = objectValue(invoice.cliente_snapshot); const payment = objectValue(invoice.pago_snapshot); const totals = objectValue(invoice.totales_snapshot);
     const detail = arrayValue(invoice.detalle_snapshot);
     const computed = invoiceTotal(detail.map((line) => ({ quantity: stringValue(line.cantidad, "Cantidad"), price: stringValue(line.precioUnitario, "Precio"), discount: String(line.descuento ?? 0) })), String(totals.descuentoAdicional ?? 0));
@@ -112,7 +158,7 @@ export class SiatEngine {
       nit: stringValue(config.nit, "NIT"), razonSocial: stringValue(config.razon_social, "Razón social"),
       municipio: stringValue(branch.municipio ?? config.municipio, "Municipio"), telefono: config.telefono ? String(config.telefono) : null,
       numeroFactura: stringValue(invoice.numero_factura, "Número de factura"), cuf, cufd: stringValue(invoice.cufd, "CUFD"),
-      codigoSucursal: numberValue(invoice.codigo_sucursal, "Sucursal"), direccion: stringValue(branch.direccion ?? config.domicilio, "Dirección"),
+      codigoSucursal: numberValue(invoice.codigo_sucursal, "Sucursal"), direccion: stringValue(cufd.direccion ?? branch.direccion ?? config.domicilio, "Dirección"),
       codigoPuntoVenta: invoice.punto_venta_id ? Number(invoice.codigo_punto_venta) : null, fechaEmision: stringValue(invoice.fecha_emision, "Fecha de emisión"),
       modalidad: invoice.modalidad === "ELECTRONICA" ? "ELECTRONICA" : "COMPUTARIZADA",
       documentoSector: numberValue(invoice.documento_sector, "Documento sector"), tipoFactura: numberValue(invoice.tipo_factura, "Tipo factura"),
@@ -141,12 +187,19 @@ export class SiatEngine {
     const invoiceId = stringValue(job.factura_id, "Factura"); const jobId = stringValue(job.id, "Outbox");
     const invoice = await this.repository.invoice(invoiceId);
     if (["VALIDADA", "ANULADA", "REVERTIDA"].includes(String(invoice.estado_fiscal))) { await this.repository.completeJob(jobId); return; }
+    const config = await this.repository.configuration();
+    if (config.siat_habilitado !== true) throw new Error("SIAT_EMISION_NO_HABILITADA");
     if (["ENVIANDO", "SIN_RESPUESTA", "CONCILIANDO"].includes(String(invoice.estado_fiscal))) {
       await this.repository.enqueue(invoiceId, "CONCILIAR_FACTURA", `conciliar:${invoiceId}`, { facturaId: invoiceId }); await this.repository.completeJob(jobId); return;
     }
-    const config = await this.repository.configuration(); const branch = await this.repository.branch(stringValue(invoice.sucursal_id, "Sucursal")); const cufd = await this.repository.cufd(stringValue(invoice.cufd_id, "CUFD"));
+    const [branch, cuis, cufd] = await Promise.all([
+      this.repository.branch(stringValue(invoice.sucursal_id, "Sucursal")),
+      this.repository.cuis(stringValue(invoice.cuis_id, "CUIS")),
+      this.repository.cufd(stringValue(invoice.cufd_id, "CUFD")),
+    ]);
+    assertActiveInvoiceFiscalCodes(invoice, cuis, cufd);
     const cuf = generateCuf({ nit: stringValue(config.nit, "NIT"), fechaEmision: stringValue(invoice.fecha_emision, "Fecha"), codigoSucursal: numberValue(invoice.codigo_sucursal, "Sucursal"), modalidad: invoice.modalidad === "ELECTRONICA" ? 1 : 2, tipoEmision: 1, tipoFactura: numberValue(invoice.tipo_factura, "Tipo factura"), documentoSector: numberValue(invoice.documento_sector, "Documento sector"), numeroFactura: stringValue(invoice.numero_factura, "Número factura"), codigoPuntoVenta: Number(invoice.codigo_punto_venta ?? 0), codigoControl: stringValue(cufd.codigo_control, "Código control CUFD") });
-    const snapshot = this.snapshot(invoice, config, branch, cuf);
+    const snapshot = this.snapshot(invoice, config, branch, cufd, cuf);
     await this.repository.updateInvoice(invoiceId, { estado_fiscal: "GENERANDO", cuf });
     let xml = generateInvoiceXml(snapshot); const electronic = snapshot.modalidad === "ELECTRONICA";
     const xsdName = electronic ? "facturaElectronicaCompraVenta.xsd" : "facturaComputarizadaCompraVenta.xsd";
@@ -155,6 +208,7 @@ export class SiatEngine {
       validateUnsignedElectronicInvoiceXml(xml, xsd);
       validateSignatureCredentials(this.secrets.privateKeyPem, this.secrets.certificatePem);
       xml = signInvoiceXml(xml, stringValue(this.secrets.privateKeyPem, "Clave privada"), stringValue(this.secrets.certificatePem, "Certificado"));
+      if (!verifyInvoiceSignature(xml, stringValue(this.secrets.certificatePem, "Certificado"))) throw new Error("FIRMA_VERIFICACION_FALLIDA");
     }
     await this.repository.updateInvoice(invoiceId, { estado_fiscal: "VALIDANDO_XSD" });
     if (electronic) validateElectronicInvoiceXml(xml, xsd, await this.readArtifact("SignatureSchema.xsd")); else validateXmlAgainstXsd(xml, xsd);
@@ -179,9 +233,8 @@ export class SiatEngine {
   }
 
   private async handleReception(invoiceId: string, jobId: string, attemptId: string, snapshot: InvoiceSnapshot, response: SiatResponse) {
-    const accepted = response.transaccion === true && Boolean(response.codigoRecepcion);
-    const inconclusive = response.transaccion === true && !response.codigoRecepcion;
-    const state = accepted ? "VALIDADA" : inconclusive ? "SIN_RESPUESTA" : response.codigoRecepcion ? "OBSERVADA" : "RECHAZADA";
+    const outcome = classifyInvoiceReception(response);
+    const { accepted, inconclusive, state } = outcome;
     const responseHash = await sha256Hex(new TextEncoder().encode(JSON.stringify(response.rawSanitizado)));
     const values: Record<string, unknown> = { estado_fiscal: state, codigo_recepcion: response.codigoRecepcion, codigo_estado: response.codigoEstado, codigo_descripcion: response.codigoDescripcion, transaccion: response.transaccion, mensajes_siat: response.mensajes, fecha_respuesta: new Date().toISOString(), ultimo_error_sanitizado: accepted ? null : response.mensajes.map((item) => item.descripcion).join("; ").slice(0, 500) };
     if (accepted) {
@@ -200,12 +253,18 @@ export class SiatEngine {
     await this.repository.updateInvoice(invoiceId, { estado_fiscal: "CONCILIANDO" });
     const response = await this.adapter.verificarFactura(this.invoiceContext(config, invoice), String(invoice.cuf));
     const description = `${response.codigoDescripcion ?? ""} ${response.mensajes.map((item) => item.descripcion).join(" ")}`.toUpperCase();
-    const state = description.includes("VALIDAD") ? "VALIDADA" : description.includes("RECHAZ") ? "RECHAZADA" : description.includes("OBSERV") ? "OBSERVADA" : null;
+    const state = response.codigoEstado === 908 && response.transaccion === true ? "VALIDADA"
+      : response.codigoEstado === 904 ? "OBSERVADA"
+      : response.transaccion === false && description.includes("RECHAZ") ? "RECHAZADA"
+      : null;
     if (!state) throw new Error("La consulta al SIN no devolvió un estado fiscal concluyente; se reintentará solo la verificación.");
     const values: Record<string, unknown> = { estado_fiscal: state, codigo_recepcion: response.codigoRecepcion ?? invoice.codigo_recepcion, codigo_estado: response.codigoEstado, codigo_descripcion: response.codigoDescripcion, mensajes_siat: response.mensajes, transaccion: response.transaccion, fecha_respuesta: new Date().toISOString(), ultimo_error_sanitizado: null };
     if (state === "VALIDADA" && !invoice.pdf_storage_path) {
-      const branch = await this.repository.branch(stringValue(invoice.sucursal_id, "Sucursal"));
-      Object.assign(values, await this.persistRepresentation(invoiceId, this.snapshot(invoice, config, branch, String(invoice.cuf))));
+      const [branch, cufd] = await Promise.all([
+        this.repository.branch(stringValue(invoice.sucursal_id, "Sucursal")),
+        this.repository.cufd(stringValue(invoice.cufd_id, "CUFD")),
+      ]);
+      Object.assign(values, await this.persistRepresentation(invoiceId, this.snapshot(invoice, config, branch, cufd, String(invoice.cuf))));
     }
     await this.repository.updateInvoice(invoiceId, values);
     await this.repository.audit(invoiceId, "CONCILIACION", "CONCILIANDO", state, { codigoEstado: response.codigoEstado }); await this.repository.completeJob(String(job.id));
