@@ -3,13 +3,17 @@ import type { GatewayHealthSiat } from "../types/siat.types";
 
 async function invoke<T>(action: string, values: Record<string, unknown> = {}): Promise<T> {
   const { data, error } = await supabase.functions.invoke("siat-gateway", { body: { action, ...values } });
-  if (error) throw new Error(error.message || "No fue posible comunicarse con el gateway SIAT.");
+  if (error) {
+    const details = error.context instanceof Response ? await error.context.json().catch(() => null) as { code?: string; error?: string } | null : null;
+    throw new Error(details?.code || details?.error || error.message || "No fue posible comunicarse con el gateway SIAT.");
+  }
   if (data?.error) throw new Error(String(data.error));
   return data as T;
 }
 
 export const obtenerSaludGatewaySiat = () => invoke<GatewayHealthSiat>("health");
 export const verificarServicioSiat = () => invoke<{ transaccion: boolean | null; codigoEstado: number | null; mensajes: Array<{ descripcion: string }> }>("verify-service");
+export const probarFirmaDigitalSiat = () => invoke<{ ok: true; firma: true; xsd: true; nit: string; nitCoincidenciaTextual: boolean; eku: string }>("test-signature");
 export const solicitarCuisSiat = () => invoke<{ estado: "PROCESADA" | "EN_COLA"; worker: { processed: number; failures: string[] } }>("request-cuis");
 export const solicitarCufdSiat = () => invoke<{ estado: "PROCESADA" | "EN_COLA" | "VIGENTE"; worker: { processed: number; failures: string[] } }>("request-cufd");
 export const sincronizarSiat = () => invoke<{ estado: "SINCRONIZADO" | "SINCRONIZANDO" | "ERROR"; worker: { processed: number; failures: string[] } }>("sync");

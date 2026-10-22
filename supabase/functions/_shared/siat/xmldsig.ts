@@ -1,5 +1,6 @@
 import { SignedXml } from "xml-crypto";
 import { DOMParser } from "@xmldom/xmldom";
+import { X509Certificate } from "node:crypto";
 
 const C14N = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
 const C14N_WITH_COMMENTS = `${C14N}#WithComments`;
@@ -74,6 +75,14 @@ export function signInvoiceXml(xml: string, privateKeyPem: string, certificatePe
 export function verifyInvoiceSignature(xml: string, certificatePem: string): true {
   if (!certificatePem.includes("-----BEGIN CERTIFICATE-----")) throw new Error("Se requiere un certificado X.509 para verificar XMLDSig.");
   validateInvoiceSignatureProfile(xml);
+  const embedded = String(single(new DOMParser().parseFromString(xml, "text/xml"), "X509Certificate").textContent ?? "").replace(/\s/g, "");
+  try {
+    const configured = new X509Certificate(certificatePem);
+    if (embedded !== configured.raw.toString("base64")) throw new Error("FIRMA_KEYINFO_NO_CORRESPONDE");
+  } catch (error) {
+    if (error instanceof Error && error.message === "FIRMA_KEYINFO_NO_CORRESPONDE") throw error;
+    throw new Error("FIRMA_PEM_INVALIDO", { cause: error });
+  }
   const verifier = new SignedXml({ publicCert: certificatePem });
   const document = new DOMParser().parseFromString(xml, "text/xml") as unknown as Parameters<typeof verifier.findSignatures>[0];
   const signatures = verifier.findSignatures(document);

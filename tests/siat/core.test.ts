@@ -4,7 +4,7 @@ import { gunzipSync } from "node:zlib";
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { cufNumericBase, decimalToHex, generateCuf, modulo11 } from "../../supabase/functions/_shared/siat/cuf.ts";
 import { gzipBytes, sha256Hex } from "../../supabase/functions/_shared/siat/encoding.ts";
 import { generateInvoiceXml } from "../../supabase/functions/_shared/siat/invoice-xml.ts";
@@ -13,10 +13,13 @@ import { officialQrUrl } from "../../supabase/functions/_shared/siat/qr.ts";
 import type { InvoiceSnapshot } from "../../supabase/functions/_shared/siat/types.ts";
 import { signInvoiceXml, validateInvoiceSignatureProfile, verifyInvoiceSignature } from "../../supabase/functions/_shared/siat/xmldsig.ts";
 import { validateElectronicInvoiceXml, validateUnsignedElectronicInvoiceXml, validateXmlAgainstXsd } from "../../supabase/functions/_shared/siat/xsd.ts";
+import { validateSignatureCredentials } from "../../supabase/functions/_shared/siat/signature-credentials.ts";
+import { assertSignatureTestAdmin, testSignatureIsolated } from "../../supabase/functions/_shared/siat/signature-test.ts";
+import { errorMessage } from "../../supabase/functions/_shared/siat/engine.ts";
 
 const artifacts = new URL("../../supabase/functions/_shared/siat/artifacts/SIAT_VIGENTE/", import.meta.url);
 
-function temporaryTestCertificate() {
+function temporaryTestCertificate(addExtensions: string[] = []) {
   const candidates = [process.env.OPENSSL_BIN, "openssl", "C:\\Program Files\\Git\\usr\\bin\\openssl.exe", "C:\\Program Files\\Git\\mingw64\\bin\\openssl.exe"].filter((value): value is string => Boolean(value));
   const openssl = candidates.find((candidate) => {
     try { execFileSync(candidate, ["version"], { stdio: "ignore" }); return true; } catch { return false; }
@@ -26,7 +29,7 @@ function temporaryTestCertificate() {
   const directory = mkdtempSync(temporaryPrefix);
   const privateKeyPath = join(directory, "private-key.pem");
   const certificatePath = join(directory, "certificate.pem");
-  execFileSync(openssl, ["req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "1", "-subj", "/CN=SIAT Local Test", "-keyout", privateKeyPath, "-out", certificatePath], { stdio: "ignore", env: { ...process.env, MSYS2_ARG_CONV_EXCL: "*" } });
+  execFileSync(openssl, ["req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "1", "-subj", "/CN=SIAT Local Test", "-keyout", privateKeyPath, "-out", certificatePath, ...addExtensions.flatMap((item) => ["-addext", item])], { stdio: "ignore", env: { ...process.env, MSYS2_ARG_CONV_EXCL: "*" } });
   return {
     privateKey: readFileSync(privateKeyPath, "utf8"),
     certificate: readFileSync(certificatePath, "utf8"),
@@ -76,6 +79,54 @@ describe("CUF oficial", () => {
 });
 
 describe("documento fiscal", () => {
+  it("valida PEM, vigencia, par RSA y exige revisión manual del NIT", () => {
+    const first = temporaryTestCertificate(); const second = temporaryTestCertificate();
+    try {
+      expect(validateSignatureCredentials(first.privateKey, first.certificate).nit).toBe("NIT_VERIFICACION_MANUAL");
+      expect(validateSignatureCredentials(first.privateKey.replaceAll("\n", "\r\n"), first.certificate.replaceAll("\n", "\r\n")).nit).toBe("NIT_VERIFICACION_MANUAL");
+      expect(() => validateSignatureCredentials(undefined, undefined)).toThrow("FIRMA_DIGITAL_NO_CONFIGURADA");
+      expect(() => validateSignatureCredentials("invalid", first.certificate)).toThrow("FIRMA_PEM_INVALIDO");
+      expect(() => validateSignatureCredentials(first.privateKey, "invalid")).toThrow("FIRMA_PEM_INVALIDO");
+      expect(() => validateSignatureCredentials(first.privateKey, second.certificate)).toThrow("FIRMA_CLAVE_NO_CORRESPONDE");
+      expect(() => validateSignatureCredentials(first.privateKey, first.certificate, new Date("2000-01-01"))).toThrow("FIRMA_CERTIFICADO_NO_VIGENTE");
+      expect(() => validateSignatureCredentials(first.privateKey, first.certificate, new Date("2100-01-01"))).toThrow("FIRMA_CERTIFICADO_NO_VIGENTE");
+    } finally { first.dispose(); second.dispose(); }
+  });
+
+  it("aplica KeyUsage y señala EKU para revisión manual", () => {
+    const invalidUse = temporaryTestCertificate(["keyUsage=critical,keyEncipherment"]);
+    const extendedUse = temporaryTestCertificate(["keyUsage=critical,digitalSignature", "extendedKeyUsage=serverAuth"]);
+    try {
+      expect(() => validateSignatureCredentials(invalidUse.privateKey, invalidUse.certificate)).toThrow("FIRMA_USO_NO_PERMITIDO");
+      expect(validateSignatureCredentials(extendedUse.privateKey, extendedUse.certificate).eku).toBe("EKU_VERIFICACION_MANUAL");
+    } finally { invalidUse.dispose(); extendedUse.dispose(); }
+  });
+
+  it("rechaza KeyInfo ajeno y limita la prueba aislada a administradores sin red fiscal", async () => {
+    const first = temporaryTestCertificate(); const second = temporaryTestCertificate();
+    try {
+      expect(() => assertSignatureTestAdmin("vendedor")).toThrow("FIRMA_ACCESO_DENEGADO");
+      expect(() => assertSignatureTestAdmin("administrador")).not.toThrow();
+      const readArtifact = vi.fn(async (name: string) => readFileSync(new URL(name, artifacts), "utf8"));
+      const fetchSpy = vi.spyOn(globalThis, "fetch");
+      try {
+        const result = await testSignatureIsolated(first.privateKey, first.certificate, readArtifact);
+        expect(result).toMatchObject({ ok: true, firma: true, xsd: true, nit: "NIT_VERIFICACION_MANUAL" });
+        expect(readArtifact).toHaveBeenCalledTimes(2);
+        expect(fetchSpy).not.toHaveBeenCalled();
+      } finally { fetchSpy.mockRestore(); }
+      const signed = signInvoiceXml(generateInvoiceXml(fixture("ELECTRONICA")), first.privateKey, first.certificate);
+      const otherBase64 = second.certificate.replace(/-----BEGIN CERTIFICATE-----|-----END CERTIFICATE-----|\s/g, "");
+      const altered = signed.replace(/(<X509Certificate>)[\s\S]*?(<\/X509Certificate>)/, `$1${otherBase64}$2`);
+      expect(() => verifyInvoiceSignature(altered, first.certificate)).toThrow("FIRMA_KEYINFO_NO_CORRESPONDE");
+    } finally { first.dispose(); second.dispose(); }
+  });
+
+  it("el worker oculta material PEM en errores", () => {
+    const message = errorMessage(new Error("falló -----BEGIN PRIVATE KEY-----\nsecreto\n-----END PRIVATE KEY-----"));
+    expect(message).toContain("[REDACTED]");
+    expect(message).not.toContain("secreto");
+  });
   it("conserva los artefactos XSD oficiales registrados en el manifiesto", () => {
     const manifest = JSON.parse(readFileSync(new URL("MANIFEST.json", artifacts), "utf8")) as { artefactos: Array<{ nombre: string; sha256: string }> };
     for (const name of ["facturaElectronicaCompraVenta.xsd", "SignatureSchema.xsd"]) {

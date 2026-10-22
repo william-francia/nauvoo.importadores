@@ -10,6 +10,8 @@ import { SiatRepository } from "./repository.ts";
 import { AmbiguousSiatError } from "./types.ts";
 import type { InvoiceSnapshot, SiatAdapter, SiatContext, SiatResponse } from "./types.ts";
 import { signInvoiceXml } from "./xmldsig.ts";
+import { validateSignatureCredentials } from "./signature-credentials.ts";
+import { sanitizeErrorMessage } from "./soap.ts";
 import { validateElectronicInvoiceXml, validateUnsignedElectronicInvoiceXml, validateXmlAgainstXsd } from "./xsd.ts";
 import { createTar } from "./tar.ts";
 
@@ -70,7 +72,7 @@ const catalogItem = (catalogCode: string, raw: unknown) => {
   return { codigo: codigoTexto, claveNatural, descripcion: descripcionTexto, metadatos: { ...item, actividadEconomica: item.codigoActividad ?? item.codigoCaeb ?? null } };
 };
 const arrayValue = (value: unknown) => Array.isArray(value) ? value as Array<Record<string, unknown>> : [];
-const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error)).replace(/TokenApi\s+\S+/gi, "TokenApi [REDACTED]").slice(0, 500);
+const errorMessage = (error: unknown) => sanitizeErrorMessage(error);
 
 export class SiatEngine {
   constructor(
@@ -151,6 +153,7 @@ export class SiatEngine {
     const xsd = await this.readArtifact(xsdName);
     if (electronic) {
       validateUnsignedElectronicInvoiceXml(xml, xsd);
+      validateSignatureCredentials(this.secrets.privateKeyPem, this.secrets.certificatePem);
       xml = signInvoiceXml(xml, stringValue(this.secrets.privateKeyPem, "Clave privada"), stringValue(this.secrets.certificatePem, "Certificado"));
     }
     await this.repository.updateInvoice(invoiceId, { estado_fiscal: "VALIDANDO_XSD" });

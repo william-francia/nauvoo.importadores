@@ -1,6 +1,7 @@
 import { SiatRepository } from "../_shared/siat/repository.ts";
 import { authenticatedUser, corsHeaders, json, officialAdapter, serviceClient, siatCredentialStatus } from "../_shared/siat/runtime.ts";
 import { sanitizeErrorMessage } from "../_shared/siat/soap.ts";
+import { assertSignatureTestAdmin, testSignatureIsolated } from "../_shared/siat/signature-test.ts";
 
 const requests = new Map<string, { count: number; reset: number }>();
 const rateLimit = (key: string, limit = 30) => {
@@ -42,6 +43,17 @@ Deno.serve(async (request) => {
     const db = serviceClient(); const user = await authenticatedUser(request, db);
     if (rateLimit(user.authId)) return json({ error: "Demasiadas solicitudes. Intente nuevamente en un minuto." }, 429, origin);
     const body = record(await request.json()); const action = String(body.action ?? ""); const repository = new SiatRepository(db);
+    if (action === "test-signature") {
+      assertSignatureTestAdmin(String(user.profile.rol));
+      try {
+        const result = await testSignatureIsolated(Deno.env.get("SIAT_PRIVATE_KEY_PEM"), Deno.env.get("SIAT_CERTIFICATE_PEM"),
+          (name) => Deno.readTextFile(new URL(`../_shared/siat/artifacts/SIAT_VIGENTE/${name}`, import.meta.url)));
+        return json(result, 200, origin);
+      } catch (error) {
+        const code = error instanceof Error && /^(FIRMA_|CERTIFICADO_)[A-Z_]+$/.test(error.message) ? error.message : "FIRMA_PRUEBA_FALLIDA";
+        return json({ ok: false, code }, 400, origin);
+      }
+    }
     if (action === "health") {
       const config = await repository.configuration();
       const [cuis, cufd, pending, syncPending, latestSync, catalogos, catalogsWithError, items] = await Promise.all([
