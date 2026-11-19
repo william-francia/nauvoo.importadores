@@ -30,6 +30,7 @@ interface ActionItem {
 }
 
 const ACTIONS: ActionItem[] = [
+  { action: "VER", label: "Ver factura", icon: "▤" },
   {
     action: "SIN",
     label: "Datos del S.I.N.",
@@ -45,7 +46,7 @@ const ACTIONS: ActionItem[] = [
 
   {
     action: "PDF_MEDIO_OFICIO",
-    label: "PDF Medio Oficio",
+    label: "PDF carta",
     icon: "PDF",
   },
 
@@ -149,6 +150,8 @@ export default function FacturaActionsMenu({
             <button
               type="button"
               key={item.action}
+              disabled={item.action === "REENVIAR_CORREO"}
+              title={item.action === "REENVIAR_CORREO" ? "Correo no configurado" : undefined}
               className={
                 item.danger
                   ? "gestion-actions__item gestion-actions__item--danger"

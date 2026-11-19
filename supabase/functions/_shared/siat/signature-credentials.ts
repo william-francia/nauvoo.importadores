@@ -1,4 +1,5 @@
-import { createPrivateKey, createPublicKey, X509Certificate } from "node:crypto";
+import { createPrivateKey, createPublicKey, timingSafeEqual, X509Certificate } from "node:crypto";
+import { Buffer } from "node:buffer";
 
 export type SignatureCredentialStatus = { nit: "NIT_VERIFICACION_MANUAL"; nitCoincidenciaTextual: boolean; eku: "NO_DECLARADO" | "EKU_VERIFICACION_MANUAL" };
 
@@ -27,8 +28,17 @@ function oid(bytes: Uint8Array, node: Tlv): string {
   for (const byte of values.subarray(1)) { current = current * 128 + (byte & 127); if (!(byte & 128)) { result.push(current); current = 0; } }
   return result.join(".");
 }
-function extensions(cert: X509Certificate): Map<string, Uint8Array> {
-  const bytes = cert.raw; const root = tlv(bytes, 0); const tbs = children(bytes, root)[0];
+// Read DER from the PEM itself: X509Certificate.raw is unavailable in older Edge runtimes.
+export function certificateDerFromPem(pem: string): Buffer {
+  const body = /^-----BEGIN CERTIFICATE-----\r?\n([A-Za-z0-9+/=\s]+)\r?\n-----END CERTIFICATE-----\s*$/.exec(pem)?.[1]?.replace(/\s/g, "");
+  if (!body) throw new Error("FIRMA_CERTIFICADO_FORMATO_INVALIDO");
+  const bytes = Buffer.from(body, "base64");
+  if (bytes.toString("base64") !== body) throw new Error("FIRMA_CERTIFICADO_FORMATO_INVALIDO");
+  return bytes;
+}
+
+function extensions(bytes: Uint8Array): Map<string, Uint8Array> {
+  const root = tlv(bytes, 0); const tbs = children(bytes, root)[0];
   if (!tbs || root.tag !== 0x30 || tbs.tag !== 0x30) throw new Error("CERTIFICADO_PEM_INVALIDO");
   const context = children(bytes, tbs).find((item) => item.tag === 0xa3);
   const result = new Map<string, Uint8Array>();
@@ -45,16 +55,25 @@ function extensions(cert: X509Certificate): Map<string, Uint8Array> {
 
 export function validateSignatureCredentials(privateKeyPem?: string, certificatePem?: string, now = new Date()): SignatureCredentialStatus {
   if (!privateKeyPem?.trim() || !certificatePem?.trim()) throw new Error("FIRMA_DIGITAL_NO_CONFIGURADA");
-  if (!/^-----BEGIN PRIVATE KEY-----\r?\n[\s\S]+\r?\n-----END PRIVATE KEY-----\s*$/.test(privateKeyPem) ||
-      !/^-----BEGIN CERTIFICATE-----\r?\n[\s\S]+\r?\n-----END CERTIFICATE-----\s*$/.test(certificatePem)) throw new Error("FIRMA_PEM_INVALIDO");
+  if (privateKeyPem.includes("\\n") && !privateKeyPem.includes("\n")) throw new Error("FIRMA_CLAVE_SALTOS_LITERALES");
+  if (certificatePem.includes("\\n") && !certificatePem.includes("\n")) throw new Error("FIRMA_CERTIFICADO_SALTOS_LITERALES");
+  if (!/^-----BEGIN PRIVATE KEY-----\r?\n[\s\S]+\r?\n-----END PRIVATE KEY-----\s*$/.test(privateKeyPem)) throw new Error("FIRMA_CLAVE_FORMATO_INVALIDO");
+  if (!/^-----BEGIN CERTIFICATE-----\r?\n[\s\S]+\r?\n-----END CERTIFICATE-----\s*$/.test(certificatePem)) throw new Error("FIRMA_CERTIFICADO_FORMATO_INVALIDO");
+  let key: ReturnType<typeof createPrivateKey>;
+  let cert: X509Certificate;
+  try { key = createPrivateKey({ key: privateKeyPem, format: "pem" }); }
+  catch (error) { throw new Error("FIRMA_CLAVE_IMPORTACION_FALLIDA", { cause: error }); }
+  try { cert = new X509Certificate(certificatePem); }
+  catch (error) { throw new Error("FIRMA_CERTIFICADO_IMPORTACION_FALLIDA", { cause: error }); }
   try {
-    const key = createPrivateKey({ key: privateKeyPem, format: "pem" });
-    const cert = new X509Certificate(certificatePem);
     if (key.asymmetricKeyType !== "rsa" || cert.publicKey.asymmetricKeyType !== "rsa") throw new Error("FIRMA_CLAVE_INCOMPATIBLE");
     const instant = now.getTime();
     if (!Number.isFinite(instant) || instant < Date.parse(cert.validFrom) || instant > Date.parse(cert.validTo)) throw new Error("FIRMA_CERTIFICADO_NO_VIGENTE");
-    if (!createPublicKey(key).equals(cert.publicKey)) throw new Error("FIRMA_CLAVE_NO_CORRESPONDE");
-    const values = extensions(cert);
+    // KeyObject.equals is not implemented in some Deno/Edge runtimes.
+    const derivedPublicKey = createPublicKey(key).export({ type: "spki", format: "der" });
+    const certificatePublicKey = cert.publicKey.export({ type: "spki", format: "der" });
+    if (derivedPublicKey.length !== certificatePublicKey.length || !timingSafeEqual(derivedPublicKey, certificatePublicKey)) throw new Error("FIRMA_CLAVE_NO_CORRESPONDE");
+    const values = extensions(certificateDerFromPem(certificatePem));
     const usage = values.get("2.5.29.15");
     if (usage) {
       const bitString = tlv(usage, 0);
@@ -66,6 +85,6 @@ export function validateSignatureCredentials(privateKeyPem?: string, certificate
     return { nit: "NIT_VERIFICACION_MANUAL", nitCoincidenciaTextual, eku: values.has("2.5.29.37") ? "EKU_VERIFICACION_MANUAL" : "NO_DECLARADO" };
   } catch (error) {
     if (error instanceof Error && /^FIRMA_|^CERTIFICADO_/.test(error.message)) throw error;
-    throw new Error("FIRMA_PEM_INVALIDO", { cause: error });
+    throw new Error("FIRMA_VALIDACION_RUNTIME_FALLIDA", { cause: error });
   }
 }

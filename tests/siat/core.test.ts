@@ -1,4 +1,4 @@
-import { createHash } from "node:crypto";
+import { createHash, KeyObject, X509Certificate } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { gunzipSync } from "node:zlib";
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
@@ -79,14 +79,41 @@ describe("CUF oficial", () => {
 });
 
 describe("documento fiscal", () => {
+  it("valida y verifica sin KeyObject.equals, X509Certificate.raw ni Buffer global de Node", () => {
+    const credentials = temporaryTestCertificate();
+    const equals = vi.spyOn(KeyObject.prototype, "equals").mockImplementation(() => { throw new Error("Not implemented"); });
+    const raw = vi.spyOn(X509Certificate.prototype, "raw", "get").mockImplementation(() => { throw new Error("Not implemented"); });
+    const bufferDescriptor = Object.getOwnPropertyDescriptor(globalThis, "Buffer");
+    let verified: boolean;
+    try {
+      Reflect.deleteProperty(globalThis, "Buffer");
+      validateSignatureCredentials(credentials.privateKey, credentials.certificate);
+      // Node packages need their global; Deno supplies it separately in npm scope.
+      if (bufferDescriptor) Object.defineProperty(globalThis, "Buffer", bufferDescriptor);
+      const signed = signInvoiceXml(generateInvoiceXml(fixture("ELECTRONICA")), credentials.privateKey, credentials.certificate);
+      verified = verifyInvoiceSignature(signed, credentials.certificate);
+    } finally {
+      if (bufferDescriptor) Object.defineProperty(globalThis, "Buffer", bufferDescriptor);
+      equals.mockRestore(); raw.mockRestore(); credentials.dispose();
+    }
+    expect(verified).toBe(true);
+  });
+
   it("valida PEM, vigencia, par RSA y exige revisión manual del NIT", () => {
     const first = temporaryTestCertificate(); const second = temporaryTestCertificate();
     try {
       expect(validateSignatureCredentials(first.privateKey, first.certificate).nit).toBe("NIT_VERIFICACION_MANUAL");
       expect(validateSignatureCredentials(first.privateKey.replaceAll("\n", "\r\n"), first.certificate.replaceAll("\n", "\r\n")).nit).toBe("NIT_VERIFICACION_MANUAL");
       expect(() => validateSignatureCredentials(undefined, undefined)).toThrow("FIRMA_DIGITAL_NO_CONFIGURADA");
-      expect(() => validateSignatureCredentials("invalid", first.certificate)).toThrow("FIRMA_PEM_INVALIDO");
-      expect(() => validateSignatureCredentials(first.privateKey, "invalid")).toThrow("FIRMA_PEM_INVALIDO");
+      expect(() => validateSignatureCredentials("invalid", first.certificate)).toThrow("FIRMA_CLAVE_FORMATO_INVALIDO");
+      expect(() => validateSignatureCredentials(first.privateKey, "invalid")).toThrow("FIRMA_CERTIFICADO_FORMATO_INVALIDO");
+      expect(() => validateSignatureCredentials(first.privateKey.replaceAll("\n", "\\n"), first.certificate)).toThrow("FIRMA_CLAVE_SALTOS_LITERALES");
+      expect(() => validateSignatureCredentials(first.privateKey, first.certificate.replaceAll("\n", "\\n"))).toThrow("FIRMA_CERTIFICADO_SALTOS_LITERALES");
+      expect(() => validateSignatureCredentials(`"${first.privateKey}"`, first.certificate)).toThrow("FIRMA_CLAVE_FORMATO_INVALIDO");
+      expect(() => validateSignatureCredentials(first.privateKey, `\uFEFF${first.certificate}`)).toThrow("FIRMA_CERTIFICADO_FORMATO_INVALIDO");
+      expect(() => validateSignatureCredentials(first.privateKey.replace(/([A-Za-z0-9+/])/, "!"), first.certificate)).toThrow("FIRMA_CLAVE_FORMATO_INVALIDO");
+      expect(() => validateSignatureCredentials(first.privateKey.replace(/(-----BEGIN PRIVATE KEY-----\n)[^\n]+/, "$1!!!"), first.certificate)).toThrow("FIRMA_CLAVE_IMPORTACION_FALLIDA");
+      expect(() => validateSignatureCredentials(first.privateKey, first.certificate.replace(/(-----BEGIN CERTIFICATE-----\n)[^\n]+/, "$1!!!"))).toThrow("FIRMA_CERTIFICADO_IMPORTACION_FALLIDA");
       expect(() => validateSignatureCredentials(first.privateKey, second.certificate)).toThrow("FIRMA_CLAVE_NO_CORRESPONDE");
       expect(() => validateSignatureCredentials(first.privateKey, first.certificate, new Date("2000-01-01"))).toThrow("FIRMA_CERTIFICADO_NO_VIGENTE");
       expect(() => validateSignatureCredentials(first.privateKey, first.certificate, new Date("2100-01-01"))).toThrow("FIRMA_CERTIFICADO_NO_VIGENTE");

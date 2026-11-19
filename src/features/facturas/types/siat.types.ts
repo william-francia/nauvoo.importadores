@@ -52,8 +52,13 @@ export interface FacturaSiatDetalle extends FacturaSiatResumen {
   cufdUtilizado: string | null;
   cantidadIntentos: number;
   motivoAnulacion: string | null;
+  motivoAnulacionCodigo: number | null;
   pdfDisponible: boolean;
   xmlDisponible: boolean;
+  xmlHash: string | null;
+  xmlFirmado: boolean;
+  codigoEstado: number | null;
+  transaccion: boolean | null;
   auditoria: AuditoriaSiat[];
 }
 

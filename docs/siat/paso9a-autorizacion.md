@@ -1,0 +1,9 @@
+# Paso 9A: habilitación de reversión
+
+Estado de NUVOO: **pendiente de evidencia oficial**. Una factura `908` o una prueba local no demuestran habilitación para reversión. El código `3011` significa que el sistema no superó las pruebas de autorización para esta operación. [SIN: reversión](https://siatinfo.impuestos.gob.bo/index.php/facturacion-en-linea/emision-y-envio-de-facturas/reversion-anulacion-documentos-fiscales).
+
+Para verificar sin realizar una operación fiscal, el responsable autorizado puede ingresar al portal SIAT, abrir **Gestión de Autorización de Sistemas (PILOTO) → Seguimiento de Sistemas**, localizar el código de sistema de NUVOO y revisar la etapa de anulación/reversión y su resultado oficial. Conservar la referencia y fecha de la evidencia sin guardar credenciales. Si la pantalla no muestra autorización inequívoca, pedir confirmación al SIN. [SIN: proceso de autorización](https://siatinfo.impuestos.gob.bo/index.php/facturacion-en-linea/autorizacion-de-sistemas/proceso-de-autorizacion).
+
+El SIN describe pruebas de anulación y reversión en sus fases de autorización y pruebas piloto; deben completarse las que correspondan al sistema. [SIN: fase de pruebas](https://siatinfo.impuestos.gob.bo/index.php/facturacion-en-linea/autorizacion-de-sistemas/pruebas-para-la-autorizacion-del-sistema-de-facturacion/fase-i-pruebas), [SIN: pruebas piloto](https://siatinfo.impuestos.gob.bo/index.php/facturacion-en-linea/autorizacion-de-sistemas/pruebas-para-la-autorizacion-del-sistema-de-facturacion/fase-iii-pruebas-piloto).
+
+La reversión real continúa bloqueada. La revisión administrativa de una respuesta incierta registra únicamente la huella y la declaración del administrador; no modifica el estado fiscal ni reenvía. La consulta oficial, cuando se autorice, debe conservar su respuesta y tratarse por separado del resultado de la operación.

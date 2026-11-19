@@ -6,6 +6,8 @@ Garantiza cola tras reinicio, numeración y stock serializados, idempotencia, XM
 
 Configure las variables sin prefijo `VITE_` de `.env.example`. `SIAT_AGENT_DEFAULT_EVENT_CODE` debe ser un código oficial sincronizado y aplicable; el agente no inventa uno.
 
+Antes de autorizar el aprovisionamiento fiscal configure `SIAT_AGENT_RESERVA_CANTIDAD` con la cantidad expresamente decidida para el punto de venta. No existe una reserva predeterminada; reaprovicionar devuelve el bloque ya asignado. La reserva y la emisión continúan sujetas a los controles y autorizaciones fiscales.
+
 ```text
 npm run typecheck:agent
 npm run agent:start

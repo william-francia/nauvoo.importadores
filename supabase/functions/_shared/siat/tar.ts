@@ -30,7 +30,8 @@ export function createTar(entries: TarEntry[]): Uint8Array {
     writeOctal(header, 108, 8, 0);
     writeOctal(header, 116, 8, 0);
     writeOctal(header, 124, 12, entry.content.byteLength);
-    writeOctal(header, 136, 12, Math.floor(Date.now() / 1000));
+    // El mismo conjunto de XML debe producir el mismo archivo tras una caída.
+    writeOctal(header, 136, 12, 0);
     header.fill(0x20, 148, 156);
     header[156] = "0".charCodeAt(0);
     writeText(header, 257, 6, "ustar\0");

@@ -6,6 +6,7 @@ import { guardarConfiguracionSiat, guardarMapeosMetodosPago, guardarPuntoVentaSi
 import type { SiatConfiguracion } from "../types/siat.types";
 import { obtenerSaludGatewaySiat, probarFirmaDigitalSiat, solicitarCufdSiat, solicitarCuisSiat, sincronizarSiat, verificarServicioSiat } from "../services/siat.gateway.service";
 import { SiatError, SiatLoading } from "./SiatShared";
+import PilotPreviewSiat from "./PilotPreviewSiat";
 
 function ConfigForm({ initial }: { initial: SiatConfiguracion }) {
   const [form, setForm] = useState(initial);
@@ -62,5 +63,5 @@ function Branches() {
 
 export default function ConfiguracionSiatModal({ onClose }: { onClose: () => void }) {
   const config = useQuery({ queryKey: ["siat-configuracion"], queryFn: obtenerConfiguracionSiat });
-  return <div className="siat-modal-backdrop" role="presentation" onMouseDown={onClose}><section className="siat-modal siat-modal--large" role="dialog" aria-modal="true" aria-labelledby="siat-config-title" onMouseDown={(event) => event.stopPropagation()}><header><div><small>Administración</small><h2 id="siat-config-title">Configuración SIAT</h2></div><button type="button" onClick={onClose} aria-label="Cerrar"><X /></button></header><div className="siat-config-content">{config.isLoading && <SiatLoading />}{config.error && <SiatError message={config.error.message} />}{config.data && <ConfigForm key={JSON.stringify(config.data)} initial={config.data} />}<Operations /><PaymentMappings /><Branches /></div></section></div>;
+  return <div className="siat-modal-backdrop" role="presentation" onMouseDown={onClose}><section className="siat-modal siat-modal--large" role="dialog" aria-modal="true" aria-labelledby="siat-config-title" onMouseDown={(event) => event.stopPropagation()}><header><div><small>Administración</small><h2 id="siat-config-title">Configuración SIAT</h2></div><button type="button" onClick={onClose} aria-label="Cerrar"><X /></button></header><div className="siat-config-content">{config.isLoading && <SiatLoading />}{config.error && <SiatError message={config.error.message} />}{config.data && <ConfigForm key={JSON.stringify(config.data)} initial={config.data} />}<Operations /><PilotPreviewSiat /><PaymentMappings /><Branches /></div></section></div>;
 }

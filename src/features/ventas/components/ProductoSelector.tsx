@@ -13,6 +13,7 @@ import type {
 } from "../types/ventas.types";
 
 interface Props {
+  soloFiscal?: boolean;
   onAgregar: (
     producto: ProductoVenta
   ) => void;
@@ -32,6 +33,7 @@ function moneda(valor: number) {
 export default function ProductoSelector({
   onAgregar,
   buscar = buscarProductosVenta,
+  soloFiscal = false,
 }: Props) {
   const [texto, setTexto] =
     useState("");
@@ -216,10 +218,10 @@ export default function ProductoSelector({
                           BOB
                         </strong>
 
-                        <span>
+                        {!soloFiscal && <span>
                           Stock:{" "}
                           {stockTotal}
-                        </span>
+                        </span>}
                       </div>
 
                       <div className="producto-resultado__tiendas">

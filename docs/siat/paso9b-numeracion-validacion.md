@@ -1,0 +1,26 @@
+# Paso 9B: numeración y validación pendiente
+
+La migración `20261113010000_siat_numeracion_compartida.sql` está preparada localmente; requiere autorización expresa antes de publicarse. Bloquea la emisión online del punto mientras exista una reserva digital abierta; la liberación requiere retirar primero el bloque en el agente y conciliarlo en el servidor. Si no se recibieron pruebas concluyentes, la pausa se conserva. La cantidad se configura expresamente mediante `SIAT_AGENT_RESERVA_CANTIDAD`; no existe un tamaño predeterminado de 1.000.
+
+La reserva digital y la transcripción manual con CAFC mantienen controles separados. CAFC queda bloqueado en el agente, local-ingest, gateway y la inserción de facturas piloto; se conservan las restricciones históricas. La numeración digital no hereda el máximo CAFC: evita individualmente las colisiones con números manuales existentes que impide la restricción histórica. Habilitar CAFC en el futuro requiere resolver y autorizar su propia compatibilidad; no hace falta hacerlo para probar el flujo digital.
+
+Para un evento digital sin documentos, el agente no registra eventos ni crea paquetes vacíos. Si no llegó a registrarse remotamente, el administrador puede cerrar la reserva sin uso; el agente vuelve a estado degradado hasta comprobar la comunicación, sin afirmar que está en línea. Si el evento ya consta como validado por el SIN, con recepción y transacción positiva, la nueva comprobación exige ausencia de facturas, vínculos CAFC, paquetes, tareas pendientes e intentos inciertos. Después permite cerrar la reserva sin reutilizarla; el estado remoto del evento permanece intacto y se audita el cierre. La importación tardía de documentos o paquetes al evento conciliado se bloquea en PostgreSQL. Los eventos no confirmados, CAFC o con evidencia incompleta permanecen pendientes de revisión administrativa; no se interpreta una ausencia de respuesta como aceptación.
+
+Las pruebas locales comprueban la migración, la RPC de recuperación, concurrencia y cierre en PostgreSQL sintético. El circuito del agente y del motor usa transporte SIN y persistencia remota simulados. El gateway CAFC se probó con Node y PostgreSQL sintético. Ninguna de estas pruebas demuestra el circuito completo en Edge real o ante el SIN.
+
+## Publicación futura, sujeta a autorización
+
+1. Confirmar proyecto `vzpufrxjmdjjkikvpeev`, ambiente PILOTO, cola inactiva, ausencia de bloques históricos y compatibilidad de los índices y la extensión `btree_gist`. Verificar los bloqueos CAFC antes de permitir esa ruta.
+2. Aplicar únicamente `20261113010000_siat_numeracion_compartida.sql`. Verificar restricciones, bloqueo CAFC y permisos en la misma intervención; ante cualquier error detenerse.
+3. Publicar `siat-local-ingest` y `siat-gateway`; este último incorpora la protección de la factura piloto 3. El código principal publicado de `siat-worker` coincidía con el local en la lectura realizada y no requiere publicarse por este cambio. Verificar las versiones efectivas antes de intervenir.
+4. Actualizar el agente local y el frontend. Mantener operaciones fiscales deshabilitadas. El cierre administrativo requiere identificar al agente en `SIAT_CONTINGENCIA_AGENTE_CODIGO`; no modificar secretos sin autorización específica.
+
+## Prueba positiva Edge sin operación fiscal
+
+La autorización debe incluir una sola inserción de nonce sintético y su limpieza tras vencer, así como revocar la sonda al terminar. El canal solo acepta PILOTO con emisión general y contingencia deshabilitadas, exige la firma HMAC del agente existente y usa el registro de nonce habitual. Su RPC comprueba la persistencia de ese nonce; está limitada a `service_role` y no escribe en facturas, ventas, inventario, secuencias ni cola. No llama al SIN. El circuito equivalente con manejador y PostgreSQL sintético pasó localmente; todavía no se ejecutó en Edge real.
+
+Tras publicar y confirmar el estado de los controles, ejecutar una sola vez desde PowerShell: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/siat-9b-prueba-controlada.ps1 -Mode send`. El script recupera la credencial existente desde el almacén local del agente sin imprimirla. Guardar el identificador `9bprobe_...` que muestra, incluso si falla o se pierde la respuesta; no repetir automáticamente.
+
+Esperar a que venza el nonce (al menos 11 minutos desde el envío) y ejecutar `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/siat-9b-prueba-controlada.ps1 -Mode cleanup -ProbeId <identificador>`. El borrado está limitado al agente y nonce exactos y al tiempo vencido; una segunda lectura confirma su ausencia. Si no puede verificarse, detenerse sin borrar otro registro.
+
+Finalmente, deshabilitar la RPC exclusivamente de la sonda mediante `REVOKE EXECUTE ON FUNCTION public.siat_9b_verificar_nonce_prueba(uuid,text) FROM service_role` y verificar con `has_function_privilege` que el resultado es falso. La sonda positiva demuestra HMAC → Edge → RPC → PostgreSQL y persistencia del nonce; **no demuestra** reserva, emisión offline, paquetes ni integración fiscal completa. La prueba fiscal posterior necesita producto homologado, CUIS/CUFD vigentes, una contingencia auténtica y autorización específica.

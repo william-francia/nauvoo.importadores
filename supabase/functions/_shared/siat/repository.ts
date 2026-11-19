@@ -1,4 +1,6 @@
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
+import { pilotCertificateEvidenceMatches, pilotIdentityAllowed } from "./pilot-approval.ts";
+import { assertCurrentFiscalCodes } from "./fiscal-operation.ts";
 
 const fail = (error: { message?: string } | null, fallback: string): never => { throw new Error(error?.message || fallback); };
 
@@ -11,16 +13,43 @@ export class SiatRepository {
     return data as Record<string, unknown>;
   }
 
-  async claim(workerId: string) {
-    const { data, error } = await this.db.rpc("siat_reclamar_outbox", { p_worker_id: workerId, p_lock_segundos: 120 });
+  async claim(workerId: string, allowCancellation = false) {
+    const { data, error } = await this.db.rpc("siat_reclamar_outbox_9a", { p_worker_id: workerId, p_lock_segundos: 120, p_habilitar_anulacion: allowCancellation });
     if (error) fail(error, "No se pudo reclamar el outbox.");
     return (data?.[0] ?? null) as Record<string, unknown> | null;
   }
 
+  async claimContingency(workerId: string, agentCode: string) {
+    const { data, error } = await this.db.rpc("siat_reclamar_outbox_9b", { p_worker: workerId, p_agente: agentCode });
+    if (error) fail(error, "No se pudo reclamar contingencia.");
+    return (data?.[0] ?? null) as Record<string, unknown> | null;
+  }
+  async markRecoveryCufdStarted(id: string) {
+    const { data, error } = await this.db.rpc("siat_9b_marcar_cufd", { p_job: id });
+    if (error) fail(error, "No se pudo asegurar solicitud CUFD.");
+    return data === true;
+  }
   async invoice(id: string) {
     const { data, error } = await this.db.from("facturas_siat").select("*").eq("id", id).single();
     if (error || !data) fail(error, "Factura SIAT no encontrada.");
     return data as Record<string, unknown>;
+  }
+
+  async pilotEmissionAllowed(invoice: Record<string, unknown>, job: Record<string, unknown>, certificateHash: string): Promise<boolean> {
+    if (invoice.origen_fiscal !== "PILOTO" || invoice.ambiente !== "PRUEBAS" || invoice.venta_id !== null || !invoice.piloto_autorizacion_id) return false;
+    const payload = job.payload && typeof job.payload === "object" ? job.payload as Record<string, unknown> : {};
+    if (payload.origenFiscal !== "PILOTO" || payload.autorizacionId !== invoice.piloto_autorizacion_id) return false;
+    const [gate, authorization] = await Promise.all([
+      this.db.from("siat_piloto_control").select("emision_habilitada,autorizacion_habilitada_id,eku_fiscal_aprobado,eku_tipo_evidencia,eku_alcance,eku_declaracion_at,eku_aprobado_por,nit_cliente_verificado,nit_cliente_id,nit_cliente_documento,nit_ambiente,nit_codigo_respuesta,nit_verificado_at,eku_cert_sha256,eku_aprobado_at").eq("id", true).single(),
+      this.db.from("siat_piloto_autorizaciones").select("estado,cliente_id").eq("id", String(invoice.piloto_autorizacion_id)).single(),
+    ]);
+    if (gate.error || authorization.error) throw new Error("PILOTO_CONTROL_NO_DISPONIBLE");
+    if (gate.data?.emision_habilitada !== true || gate.data?.autorizacion_habilitada_id !== invoice.piloto_autorizacion_id
+      || authorization.data?.estado !== "CONSUMIDA"
+      || !pilotCertificateEvidenceMatches(gate.data, certificateHash)) return false;
+    const client = await this.db.from("clientes").select("id,codigo_cliente,nombre_razon_social,tipo_documento,numero_documento,complemento,activo").eq("id", authorization.data.cliente_id).single();
+    if (client.error || !client.data || invoice.numero_documento !== client.data.numero_documento || invoice.tipo_documento !== client.data.tipo_documento) return false;
+    return pilotIdentityAllowed(gate.data, client.data, invoice.ambiente);
   }
 
   async branch(id: string) {
@@ -59,15 +88,23 @@ export class SiatRepository {
     return data as Record<string, unknown>;
   }
 
-  async activeFiscalCodes(sucursalId: string, puntoVentaId: string | null, ambiente: string) {
-    let cuisQuery = this.db.from("siat_cuis").select("*").eq("sucursal_id", sucursalId).eq("ambiente", ambiente).eq("estado", "VIGENTE");
+  async activeCuisForScope(sucursalId: string, puntoVentaId: string | null, ambiente: string) {
+    const now = new Date().toISOString();
+    let cuisQuery = this.db.from("siat_cuis").select("*").eq("sucursal_id", sucursalId).eq("ambiente", ambiente).eq("estado", "VIGENTE").gt("fecha_expiracion", now);
     cuisQuery = puntoVentaId ? cuisQuery.eq("punto_venta_id", puntoVentaId) : cuisQuery.is("punto_venta_id", null);
     const { data: cuis, error: cuisError } = await cuisQuery.order("fecha_expiracion", { ascending: false }).limit(1).maybeSingle();
     if (cuisError || !cuis) fail(cuisError, "CUIS vigente no encontrado para recuperación.");
-    let cufdQuery = this.db.from("siat_cufd").select("*").eq("sucursal_id", sucursalId).eq("cuis_id", cuis.id).eq("ambiente", ambiente).eq("estado", "VIGENTE").gt("fecha_expiracion", new Date().toISOString());
+    return cuis as Record<string, unknown>;
+  }
+
+  async activeFiscalCodes(sucursalId: string, puntoVentaId: string | null, ambiente: string) {
+    const now = new Date().toISOString();
+    const cuis = await this.activeCuisForScope(sucursalId, puntoVentaId, ambiente);
+    let cufdQuery = this.db.from("siat_cufd").select("*").eq("sucursal_id", sucursalId).eq("cuis_id", cuis.id).eq("ambiente", ambiente).eq("estado", "VIGENTE").lte("fecha_inicio", now).gt("fecha_expiracion", now);
     cufdQuery = puntoVentaId ? cufdQuery.eq("punto_venta_id", puntoVentaId) : cufdQuery.is("punto_venta_id", null);
     const { data: cufd, error: cufdError } = await cufdQuery.order("fecha_expiracion", { ascending: false }).limit(1).maybeSingle();
     if (cufdError || !cufd) fail(cufdError, "CUFD nuevo vigente no encontrado para recuperación.");
+    assertCurrentFiscalCodes({ sucursal_id: sucursalId, punto_venta_id: puntoVentaId, ambiente }, cuis, cufd);
     return { cuis: cuis as Record<string, unknown>, cufd: cufd as Record<string, unknown> };
   }
 
@@ -82,7 +119,7 @@ export class SiatRepository {
   }
 
   async offlineInvoices(eventId: string) {
-    const { data, error } = await this.db.from("facturas_siat").select("*").eq("evento_id", eventId).eq("tipo_emision", "OFFLINE").eq("estado_fiscal", "OFFLINE").order("fecha_emision");
+    const { data, error } = await this.db.from("facturas_siat").select("*").eq("evento_id", eventId).eq("tipo_emision", "OFFLINE").eq("estado_fiscal", "OFFLINE").order("fecha_emision").order("id");
     if (error) fail(error, "No se pudieron consultar las facturas offline.");
     return (data ?? []) as Array<Record<string, unknown>>;
   }
@@ -108,20 +145,27 @@ export class SiatRepository {
 
   async finishPackage(id: string, state: "VALIDADA" | "OBSERVADA", messages: unknown[]) {
     const links = await this.packageInvoices(id);
-    for (const link of links) await this.updateInvoice(String(link.factura.id), { estado_fiscal: state, mensajes_siat: messages, fecha_validacion: state === "VALIDADA" ? new Date().toISOString() : null });
+    for (const link of links) {
+      if (link.factura.estado_fiscal === state) continue;
+      if (!await this.updateInvoiceIfState(String(link.factura.id), "EMPAQUETADA", { estado_fiscal: state, mensajes_siat: messages, fecha_validacion: state === "VALIDADA" ? new Date().toISOString() : null })) throw new Error("FACTURA_PAQUETE_CAMBIO_CONCURRENTE");
+    }
   }
 
   async refreshEventFromPackages(eventId: string) {
-    const { data, error } = await this.db.from("siat_paquetes").select("estado").eq("evento_id", eventId);
-    if (error) fail(error, "No se pudo consolidar el evento.");
-    const states = (data ?? []).map((item) => String(item.estado));
-    if (!states.length || states.some((state) => !["VALIDADO", "OBSERVADO", "RECHAZADO", "CON_ERROR"].includes(state))) return;
-    const finalState = states.every((state) => state === "VALIDADO") ? "VALIDADO" : "OBSERVADO";
+    // Conteos exactos evitan tratar como completo un resultado paginado por Supabase.
+    const [packages, active, notValid, invoices, invoicesNotValid] = await Promise.all([
+      this.db.from("siat_paquetes").select("id", { count: "exact", head: true }).eq("evento_id", eventId),
+      this.db.from("siat_paquetes").select("id", { count: "exact", head: true }).eq("evento_id", eventId).in("estado", ["PENDIENTE", "GENERANDO", "EN_COLA", "ENVIADO", "RECEPCIONADO", "VALIDANDO", "SIN_RESPUESTA", "CONCILIANDO"]),
+      this.db.from("siat_paquetes").select("id", { count: "exact", head: true }).eq("evento_id", eventId).not("estado", "in", "(VALIDADO,OBSERVADO)"),
+      this.db.from("facturas_siat").select("id", { count: "exact", head: true }).eq("evento_id", eventId).eq("tipo_emision", "OFFLINE"),
+      this.db.from("facturas_siat").select("id", { count: "exact", head: true }).eq("evento_id", eventId).eq("tipo_emision", "OFFLINE").neq("estado_fiscal", "VALIDADA"),
+    ]);
+    const failure = [packages, active, notValid, invoices, invoicesNotValid].find((result) => result.error || result.count == null);
+    if (failure) fail(failure.error, "No se pudo consolidar el evento.");
+    if (!packages.count || active.count) return;
+    const finalState = notValid.count === 0 && Boolean(invoices.count) && invoicesNotValid.count === 0 ? "VALIDADO" : "OBSERVADO";
     await this.updateEvent(eventId, { estado: finalState });
-    const event = await this.event(eventId);
-    if (event.agente_local_id) {
-      await this.db.from("siat_estado_operativo").update({ estado: finalState === "VALIDADO" ? "ONLINE" : "DEGRADADO", evento_id: null, changed_at: new Date().toISOString(), evidencia: { paquetes: states } }).eq("agente_id", event.agente_local_id);
-    }
+    // El agente solo podrá volver a ONLINE tras verificar el circuito remoto completo.
   }
 
   async point(id: string) {
@@ -135,9 +179,27 @@ export class SiatRepository {
     if (error) fail(error, "No se pudo actualizar la factura SIAT.");
   }
 
+  async updateInvoiceIfState(id: string, expectedState: string, values: Record<string, unknown>): Promise<boolean> {
+    const { data, error } = await this.db.from("facturas_siat").update({ ...values, updated_at: new Date().toISOString() })
+      .eq("id", id).eq("estado_fiscal", expectedState).select("id").maybeSingle();
+    if (error) fail(error, "No se pudo actualizar la factura SIAT de forma condicionada.");
+    return Boolean(data);
+  }
+
   async completeJob(id: string) {
     const { error } = await this.db.from("siat_outbox").update({ estado: "COMPLETADA", processed_at: new Date().toISOString(), locked_by: null, locked_until: null, ultimo_error: null }).eq("id", id).eq("estado", "PROCESANDO");
     if (error) fail(error, "No se pudo completar el outbox.");
+  }
+
+  // Se persiste antes de la llamada: tras caída o concurrencia nunca se vuelve a transmitir.
+  async markFiscalMutationStarted(job: Record<string, unknown>): Promise<boolean> {
+    const payload = job.payload && typeof job.payload === "object" ? job.payload as Record<string, unknown> : {};
+    const { data, error } = await this.db.from("siat_outbox")
+      .update({ payload: { ...payload, transmisionFiscalIniciadaAt: new Date().toISOString() } })
+      .eq("id", String(job.id)).eq("estado", "PROCESANDO")
+      .is("payload->transmisionFiscalIniciadaAt", null).select("id").maybeSingle();
+    if (error) fail(error, "No se pudo asegurar la transmisión fiscal única.");
+    return Boolean(data);
   }
 
   async retryJob(id: string, attempts: number, errorMessage: string, permanent = false) {
@@ -148,6 +210,61 @@ export class SiatRepository {
       locked_by: null, locked_until: null, ultimo_error: errorMessage.slice(0, 500),
     }).eq("id", id);
     if (error) fail(error, "No se pudo reprogramar el outbox.");
+  }
+
+  async stopJob(id: string, message: string) {
+    const { error } = await this.db.from("siat_outbox").update({ estado: "FALLIDA", locked_by: null, locked_until: null, ultimo_error: message.slice(0, 500) }).eq("id", id).eq("estado", "PROCESANDO");
+    if (error) fail(error, "No se pudo detener el outbox SIAT.");
+  }
+
+  async claimHeldReconciliation(invoiceId: string, outboxId: string) {
+    const { data: job, error } = await this.db.from("siat_outbox").select("*").eq("id", outboxId).eq("factura_id", invoiceId).eq("estado", "CANCELADA").single();
+    if (error || !job || job.payload?.reenvioAutomaticoBloqueado !== true || job.locked_by || job.locked_until) throw new Error("CONCILIACION_REQUIERE_ENVIO_RETENIDO");
+    // Compare-and-set: ni doble clic, concurrencia ni timeout pueden repetir la consulta.
+    const { data: claimed, error: claimError } = await this.db.from("siat_outbox").update({ payload: { ...job.payload, conciliacionUnicaIniciadaAt: new Date().toISOString() } })
+      .eq("id", outboxId).eq("factura_id", invoiceId).eq("estado", "CANCELADA")
+      .eq("payload->>reenvioAutomaticoBloqueado", "true").is("locked_by", null).is("locked_until", null)
+      .is("payload->conciliacionUnicaIniciadaAt", null).select("*").maybeSingle();
+    if (claimError) fail(claimError, "No se pudo reservar la consulta única.");
+    if (!claimed) throw new Error("CONCILIACION_UNICA_YA_SOLICITADA");
+    return claimed as Record<string, unknown>;
+  }
+
+  async currentCufdForInvoice(invoice: Record<string, unknown>) {
+    const cuis = await this.cuis(String(invoice.cuis_id ?? ""));
+    const now = new Date().toISOString();
+    if (invoice.ambiente !== "PRUEBAS" || cuis.estado !== "VIGENTE" || cuis.ambiente !== invoice.ambiente
+      || cuis.sucursal_id !== invoice.sucursal_id || (cuis.punto_venta_id ?? null) !== (invoice.punto_venta_id ?? null)
+      || cuis.codigo !== invoice.cuis || !Number.isFinite(Date.parse(String(cuis.fecha_expiracion ?? "")))
+      || Date.parse(String(cuis.fecha_expiracion)) <= Date.parse(now)) {
+      throw new Error("CONCILIACION_CUIS_NO_VIGENTE_O_NO_CORRESPONDE");
+    }
+    let query = this.db.from("siat_cufd").select("id,codigo,cuis_id,sucursal_id,punto_venta_id,ambiente,estado,fecha_inicio,fecha_expiracion")
+      .eq("cuis_id", cuis.id).eq("sucursal_id", invoice.sucursal_id).eq("ambiente", invoice.ambiente)
+      .eq("estado", "VIGENTE").lte("fecha_inicio", now).gt("fecha_expiracion", now);
+    query = invoice.punto_venta_id ? query.eq("punto_venta_id", invoice.punto_venta_id) : query.is("punto_venta_id", null);
+    const { data, error } = await query.order("fecha_expiracion", { ascending: false }).limit(1).maybeSingle();
+    if (error) fail(error, "No se pudo consultar CUFD vigente para conciliación.");
+    if (!data || !String(data.codigo ?? "").trim()) throw new Error("CONCILIACION_CUFD_VIGENTE_NO_DISPONIBLE");
+    return data as Record<string, unknown>;
+  }
+
+  async claimHeldReconciliationWithCurrentCufd(invoiceId: string, outboxId: string, cufdId: string) {
+    const { data: job, error } = await this.db.from("siat_outbox").select("*")
+      .eq("id", outboxId).eq("factura_id", invoiceId).eq("estado", "CANCELADA").single();
+    if (error || !job || job.payload?.reenvioAutomaticoBloqueado !== true
+      || !job.payload?.conciliacionUnicaIniciadaAt || job.locked_by || job.locked_until) {
+      throw new Error("CONCILIACION_REQUIERE_ENVIO_RETENIDO_Y_CONSULTA_PREVIA");
+    }
+    const { data: claimed, error: claimError } = await this.db.from("siat_outbox")
+      .update({ payload: { ...job.payload, conciliacionCufdVigenteIniciadaAt: new Date().toISOString(), conciliacionCufdVigenteId: cufdId } })
+      .eq("id", outboxId).eq("factura_id", invoiceId).eq("estado", "CANCELADA")
+      .eq("payload->>reenvioAutomaticoBloqueado", "true")
+      .is("locked_by", null).is("locked_until", null)
+      .is("payload->conciliacionCufdVigenteIniciadaAt", null).select("*").maybeSingle();
+    if (claimError) fail(claimError, "No se pudo reservar la conciliación con CUFD vigente.");
+    if (!claimed) throw new Error("CONCILIACION_CUFD_VIGENTE_YA_SOLICITADA");
+    return claimed as Record<string, unknown>;
   }
 
   async enqueue(facturaId: string | null, type: string, idempotencyKey: string, payload: Record<string, unknown>) {
@@ -163,7 +280,7 @@ export class SiatRepository {
   async registerCatalogError(codigo: string, nombre: string, correlationId: string, message: string) {
     const { data: catalog, error: catalogError } = await this.db.from("siat_catalogos").upsert({ codigo, nombre, version_normativa: "SIAT_VIGENTE", estado: "CON_ERROR", ultimo_error: message.slice(0, 500) }, { onConflict: "codigo,version_normativa" }).select("id").single();
     if (catalogError || !catalog) fail(catalogError, `No se pudo registrar el error del catálogo ${codigo}.`);
-    const { error } = await this.db.from("siat_sincronizaciones").insert({ catalogo_id: catalog.id, operacion: `SINCRONIZAR_${codigo}`, estado: "CON_ERROR", fecha_fin: new Date().toISOString(), ultimo_error: message.slice(0, 500), correlation_id: correlationId });
+    const { error } = await this.db.from("siat_sincronizaciones").insert({ catalogo_id: catalog!.id, operacion: `SINCRONIZAR_${codigo}`, estado: "CON_ERROR", fecha_fin: new Date().toISOString(), ultimo_error: message.slice(0, 500), correlation_id: correlationId });
     if (error) fail(error, `No se pudo registrar la sincronización fallida de ${codigo}.`);
   }
 

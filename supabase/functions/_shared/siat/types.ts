@@ -33,6 +33,8 @@ export interface SiatResponse {
   rawSanitizado: Record<string, unknown>;
 }
 
+export type FiscalResponseCapture = (response: { status: number | null; body: Uint8Array | null; reason?: "TIMEOUT" | "SIN_RESPUESTA" | "BLOQUEADO_SENSIBLE" }) => Promise<void>;
+
 export interface CuisResult extends SiatResponse {
   codigo: string | null;
   fechaVigencia: string | null;
@@ -93,6 +95,7 @@ export interface InvoiceSnapshot {
     descripcion: string;
     cantidad: string;
     unidadMedidaSin: string;
+    unidadDescripcion?: string;
     precioUnitario: string;
     descuento: string | null;
     subtotal: string;
@@ -128,14 +131,15 @@ export interface PackageReceptionInput extends InvoiceReceptionInput {
 
 export interface SiatAdapter {
   verificarComunicacion(): Promise<SiatResponse>;
+  verificarNit(context: SiatContext, nitParaVerificacion: string): Promise<SiatResponse>;
   solicitarCuis(context: SiatContext): Promise<CuisResult>;
   solicitarCufd(context: SiatContext): Promise<CufdResult>;
   sincronizarFechaHora(context: SiatContext): Promise<{ fechaHora: string; response: SiatResponse }>;
   sincronizarCatalogo(context: SiatContext, operation: string): Promise<{ items: unknown[]; response: SiatResponse }>;
   recepcionarFactura(input: InvoiceReceptionInput): Promise<SiatResponse>;
-  verificarFactura(context: SiatContext, cuf: string): Promise<SiatResponse>;
-  anularFactura(context: SiatContext, cuf: string, motivo: number): Promise<SiatResponse>;
-  revertirAnulacion(context: SiatContext, cuf: string): Promise<SiatResponse>;
+  verificarFactura(context: SiatContext, cuf: string, options?: { retries?: number }): Promise<SiatResponse>;
+  anularFactura(context: SiatContext, cuf: string, motivo: number, capture?: FiscalResponseCapture): Promise<SiatResponse>;
+  revertirAnulacion(context: SiatContext, cuf: string, capture?: FiscalResponseCapture): Promise<SiatResponse>;
   registrarEvento(input: SignificantEventInput): Promise<SiatResponse>;
   consultarEventos(context: SiatContext, fechaEvento: string): Promise<{ eventos: Array<Record<string, unknown>>; response: SiatResponse }>;
   recepcionarPaquete(input: PackageReceptionInput): Promise<SiatResponse>;

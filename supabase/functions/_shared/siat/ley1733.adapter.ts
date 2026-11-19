@@ -4,6 +4,7 @@ import type { SiatAdapter } from "./types.ts";
 export class Ley1733PilotAdapter implements SiatAdapter {
   private unavailable(): never { throw new PendingOfficialVerificationError("PENDIENTE_DE_VERIFICACION_OFICIAL: SIAT_LEY_1733_PILOTO no está habilitado para producción."); }
   verificarComunicacion = async () => this.unavailable();
+  verificarNit = async () => this.unavailable();
   solicitarCuis = async () => this.unavailable();
   solicitarCufd = async () => this.unavailable();
   sincronizarFechaHora = async () => this.unavailable();

@@ -28,7 +28,7 @@ function readDraft(key: string): VentaDraftSnapshot | null {
   }
 }
 
-export function useVentaDraft() {
+export function useVentaDraft(options?: { scope?: string; allowNoStock?: boolean }) {
   const [lineas, setLineas] = useState<LineaVenta[]>([]);
   const [cliente, setCliente] = useState<ClienteVenta | null>(null);
   const [observacion, setObservacion] = useState("");
@@ -42,7 +42,7 @@ export function useVentaDraft() {
 
     void supabase.auth.getSession().then(({ data }) => {
       if (!activo) return;
-      const key = `${DRAFT_PREFIX}${data.session?.user.id ?? "anonimo"}`;
+      const key = `${DRAFT_PREFIX}${options?.scope ? `${options.scope}:` : ""}${data.session?.user.id ?? "anonimo"}`;
       const draft = readDraft(key);
       if (draft) {
         setLineas(draft.lineas);
@@ -57,7 +57,7 @@ export function useVentaDraft() {
     return () => {
       activo = false;
     };
-  }, []);
+  }, [options?.scope]);
 
   useEffect(() => {
     if (!draftLoaded || !draftKey) return;
@@ -93,12 +93,12 @@ export function useVentaDraft() {
 
   function agregarProducto(producto: ProductoVenta) {
     const stock = almacenPredeterminado(producto);
-    if (!stock) throw new Error("El producto no tiene stock disponible.");
-    setLineas(current => [...current, { id: crypto.randomUUID(), producto, almacen_id: stock.almacen.id, cantidad: 1, precio_unitario: producto.precio_pieza, descuento: 0, informacion_extra: "" }]);
+    if (!stock && !options?.allowNoStock) throw new Error("El producto no tiene stock disponible.");
+    setLineas(current => [...current, { id: crypto.randomUUID(), producto, almacen_id: stock?.almacen.id ?? "", cantidad: 1, precio_unitario: producto.precio_pieza, descuento: 0, informacion_extra: "" }]);
   }
   const update = (id: string, changes: Partial<LineaVenta>) => setLineas(current => current.map(l => l.id === id ? { ...l, ...changes } : l));
   return { lineas, cliente, observacion, descuentoAdicional, totales, setCliente, setObservacion, setDescuentoAdicional, agregarProducto,
-    actualizarCantidad: (id: string, cantidad: number) => update(id, { cantidad: Math.max(1, cantidad) }),
+    actualizarCantidad: (id: string, cantidad: number) => update(id, { cantidad: Math.max(options?.allowNoStock ? 0.001 : 1, cantidad) }),
     actualizarAlmacen: (id: string, almacen_id: string) => update(id, { almacen_id }),
     actualizarPrecio: (id: string, precio_unitario: number) => update(id, { precio_unitario: Math.max(0, precio_unitario) }),
     actualizarDescuento: (id: string, descuento: number) => update(id, { descuento: Math.max(0, descuento) }),

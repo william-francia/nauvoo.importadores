@@ -1,6 +1,6 @@
 import { deepFind, normalizeSiatResponse, SoapClient } from "./soap.ts";
 import { toBase64 } from "./encoding.ts";
-import type { CufdResult, CuisResult, InvoiceReceptionInput, PackageReceptionInput, SiatAdapter, SiatContext, SiatResponse, SignificantEventInput } from "./types.ts";
+import type { CufdResult, CuisResult, FiscalResponseCapture, InvoiceReceptionInput, PackageReceptionInput, SiatAdapter, SiatContext, SiatResponse, SignificantEventInput } from "./types.ts";
 
 export const OFFICIAL_TEST_ENDPOINTS = {
   codigos: "https://pilotosiatservicios.impuestos.gob.bo/v2/FacturacionCodigos",
@@ -55,7 +55,7 @@ export class OfficialVigenteAdapter implements SiatAdapter {
   private readonly invoice: SoapClient;
   private readonly operations: SoapClient;
 
-  constructor(token: string, endpoints: Partial<typeof OFFICIAL_TEST_ENDPOINTS> = {}, timeoutMs?: number) {
+  constructor(token: string, endpoints: Partial<Record<keyof typeof OFFICIAL_TEST_ENDPOINTS, string>> = {}, timeoutMs?: number) {
     if (!token) throw new Error("El Token Delegado SIAT no está configurado en el backend.");
     const configuredEndpoints = Object.fromEntries(Object.entries(endpoints).filter(([, value]) => typeof value === "string" && value.length > 0));
     const resolved = { ...OFFICIAL_TEST_ENDPOINTS, ...configuredEndpoints } as typeof OFFICIAL_TEST_ENDPOINTS;
@@ -67,6 +67,20 @@ export class OfficialVigenteAdapter implements SiatAdapter {
 
   async verificarComunicacion(): Promise<SiatResponse> {
     return normalizeSiatResponse(await this.codes.call("verificarComunicacion", null, {}, { retries: 1 }));
+  }
+
+  async verificarNit(context: SiatContext, nitParaVerificacion: string): Promise<SiatResponse> {
+    if (!/^\d+$/.test(nitParaVerificacion) || !context.cuis) throw new Error("PILOTO_NIT_O_CUIS_INVALIDO");
+    const raw = await this.codes.call("verificarNit", "VerificarNit", {
+      codigoAmbiente: context.ambiente === "PRUEBAS" ? 2 : 1,
+      codigoModalidad: context.modalidad === "ELECTRONICA" ? 1 : 2,
+      codigoSistema: context.codigoSistema,
+      codigoSucursal: context.codigoSucursal,
+      cuis: context.cuis,
+      nit: context.nit,
+      nitParaVerificacion,
+    });
+    return normalizeSiatResponse(raw);
   }
 
   async solicitarCuis(context: SiatContext): Promise<CuisResult> {
@@ -101,24 +115,24 @@ export class OfficialVigenteAdapter implements SiatAdapter {
     return normalizeSiatResponse(raw);
   }
 
-  async verificarFactura(context: SiatContext, cuf: string): Promise<SiatResponse> {
+  async verificarFactura(context: SiatContext, cuf: string, options: { retries?: number } = {}): Promise<SiatResponse> {
     const raw = await this.invoice.call("verificacionEstadoFactura", "ServicioVerificacionEstadoFactura", {
       ...receptionFields(context), cuf,
-    }, { retries: 1 });
+    }, { retries: options.retries ?? 1 });
     return normalizeSiatResponse(raw);
   }
 
-  async anularFactura(context: SiatContext, cuf: string, motivo: number): Promise<SiatResponse> {
+  async anularFactura(context: SiatContext, cuf: string, motivo: number, capture?: FiscalResponseCapture): Promise<SiatResponse> {
     const raw = await this.invoice.call("anulacionFactura", "ServicioAnulacionFactura", {
       ...receptionFields(context), codigoMotivo: motivo, cuf,
-    }, { ambiguousOnTimeout: true });
+    }, { ambiguousOnTimeout: true, capture });
     return normalizeSiatResponse(raw);
   }
 
-  async revertirAnulacion(context: SiatContext, cuf: string): Promise<SiatResponse> {
+  async revertirAnulacion(context: SiatContext, cuf: string, capture?: FiscalResponseCapture): Promise<SiatResponse> {
     const raw = await this.invoice.call("reversionAnulacionFactura", "ServicioReversionAnulacionFactura", {
       ...receptionFields(context), cuf,
-    }, { ambiguousOnTimeout: true });
+    }, { ambiguousOnTimeout: true, capture });
     return normalizeSiatResponse(raw);
   }
 

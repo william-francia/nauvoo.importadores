@@ -24,8 +24,9 @@ import {
 import "../../features/ventas/styles/gestionVentas.css";
 
 import GestionVentasTable from "../../features/ventas/components/gestion/GestionVentasTable";
-import ResendEmailModal from "../../features/ventas/components/gestion/ResendEmailModal";
 import SinDetailsModal from "../../features/ventas/components/gestion/SinDetailsModal";
+import { obtenerFacturaSiat } from "../facturas/services/siat.service";
+import { ejecutarAccionDocumentoFiscal, type AccionDocumentoFiscal } from "../facturas/services/documentos-fiscales.service";
 
 import { useGestionVentas } from "../../features/ventas/hooks/useGestionVentas";
 import { listarVentasGestion } from "./services/ventas.api";
@@ -80,14 +81,6 @@ export default function GestionVentasPage() {
     );
 
   const [
-    ventaCorreo,
-    setVentaCorreo,
-  ] =
-    useState<GestionVenta | null>(
-      null
-    );
-
-  const [
     notification,
     setNotification,
   ] =
@@ -108,37 +101,28 @@ export default function GestionVentasPage() {
     action: FacturaAction,
     venta: GestionVenta
   ) {
+    const documentActions: Partial<Record<FacturaAction, AccionDocumentoFiscal>> = { VER: "VER", PDF_ROLLO: "PDF_ROLLO", PDF_MEDIO_OFICIO: "PDF_CARTA", XML: "XML", URL_SIN: "CONSULTA" };
+    const documentAction = documentActions[action];
+    if (documentAction) {
+      if (permissions.data?.role?.toLowerCase() !== "administrador" || !venta.facturaId || venta.estado !== "VALIDADA") {
+        mostrarPendiente("Solo administración puede abrir documentos fiscales de una factura validada.");
+        return;
+      }
+      const target = documentAction === "VER" || documentAction === "CONSULTA" ? window.open("", "_blank") : undefined;
+      if (target === null) { mostrarPendiente("El navegador bloqueó la nueva ventana."); return; }
+      if (target) target.opener = null;
+      void obtenerFacturaSiat(venta.facturaId)
+        .then((invoice) => ejecutarAccionDocumentoFiscal(invoice, documentAction, 80, target))
+        .catch((error: unknown) => { target?.close(); mostrarPendiente(error instanceof Error ? error.message : "No se pudo abrir el documento fiscal."); });
+      return;
+    }
     switch (action) {
       case "SIN":
         setVentaSin(venta);
         return;
 
       case "REENVIAR_CORREO":
-        setVentaCorreo(venta);
-        return;
-
-      case "PDF_ROLLO":
-        mostrarPendiente(
-          `PDF en rollo de la factura #${venta.numeroFactura}. La interfaz está preparada; se conectará al módulo de facturación.`
-        );
-        return;
-
-      case "PDF_MEDIO_OFICIO":
-        mostrarPendiente(
-          `PDF medio oficio de la factura #${venta.numeroFactura}. Se conectará cuando implementemos facturación.`
-        );
-        return;
-
-      case "XML":
-        mostrarPendiente(
-          `XML de la factura #${venta.numeroFactura}. Esta acción quedará conectada al documento fiscal.`
-        );
-        return;
-
-      case "URL_SIN":
-        mostrarPendiente(
-          `Consulta de URL del S.I.N. para la factura #${venta.numeroFactura}. Pendiente de integración.`
-        );
+        mostrarPendiente("El envío de correo no está configurado.");
         return;
 
       case "ANULAR":
@@ -151,31 +135,6 @@ export default function GestionVentasPage() {
 
         return;
     }
-  }
-
-  function handleEnviarCorreos(
-    venta: GestionVenta,
-    correos: string[]
-  ) {
-    /*
-     * Visual por ahora.
-     *
-     * Posteriormente:
-     *
-     * await reenviarFactura({
-     *   ventaId: venta.id,
-     *   correos,
-     * });
-     */
-
-    setVentaCorreo(null);
-
-    setNotification({
-      type: "success",
-
-      message:
-        `Reenvío preparado para la factura #${venta.numeroFactura} a ${correos.length} correo${correos.length === 1 ? "" : "s"}. La conexión real se realizará con facturación.`,
-    });
   }
 
   return (
@@ -405,15 +364,6 @@ export default function GestionVentasPage() {
         }
       />
 
-      <ResendEmailModal
-        venta={ventaCorreo}
-        onCerrar={() =>
-          setVentaCorreo(null)
-        }
-        onEnviar={
-          handleEnviarCorreos
-        }
-      />
     </div>
   );
 }

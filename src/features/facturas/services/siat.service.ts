@@ -96,7 +96,7 @@ export async function listarFacturasSiat(): Promise<FacturaSiatResumen[]> {
 
 export async function obtenerFacturaSiat(id: string): Promise<FacturaSiatDetalle> {
   const [{ data, error }, auditResult] = await Promise.all([
-    supabase.from("facturas_siat").select(`${FACTURA_SELECT},detalle_snapshot,totales_snapshot,cufd,xml_documento,xml_storage_path,pdf_storage_path,cantidad_intentos,motivo_anulacion`).eq("id", id).single(),
+    supabase.from("facturas_siat").select(`${FACTURA_SELECT},detalle_snapshot,totales_snapshot,cufd,xml_storage_path,pdf_storage_path,xml_hash,xml_firmado,codigo_estado,transaccion,cantidad_intentos,motivo_anulacion,motivo_anulacion_codigo`).eq("id", id).single(),
     supabase.from("siat_auditoria").select("id,accion,resultado,created_at,actor_auth_user_id,contexto").eq("entidad", "facturas_siat").eq("entidad_id", id).order("created_at", { ascending: false }).limit(100),
   ]);
   if (error) throw siatError(error, "No se pudo cargar el detalle fiscal.");
@@ -115,8 +115,13 @@ export async function obtenerFacturaSiat(id: string): Promise<FacturaSiatDetalle
     cufdUtilizado: row.cufd ? text(row.cufd) : null,
     cantidadIntentos: number(row.cantidad_intentos),
     motivoAnulacion: row.motivo_anulacion ? text(row.motivo_anulacion) : null,
+    motivoAnulacionCodigo: row.motivo_anulacion_codigo == null ? null : number(row.motivo_anulacion_codigo),
     pdfDisponible: Boolean(row.pdf_storage_path),
-    xmlDisponible: Boolean(row.xml_storage_path || row.xml_documento),
+    xmlDisponible: Boolean(row.xml_storage_path),
+    xmlHash: row.xml_hash ? text(row.xml_hash) : null,
+    xmlFirmado: row.xml_firmado === true,
+    codigoEstado: row.codigo_estado == null ? null : number(row.codigo_estado),
+    transaccion: typeof row.transaccion === "boolean" ? row.transaccion : null,
     auditoria,
   };
 }
@@ -266,6 +271,8 @@ async function catalogOptions(code: string): Promise<CatalogoOpcionSiat[]> {
   if (error) throw siatError(error, "No se pudo cargar el catálogo SIAT.");
   return (data ?? []).map((item) => ({ codigo: text(item.codigo), descripcion: text(item.descripcion) }));
 }
+
+export const listarUnidadesFacturaSiat = () => catalogOptions(CATALOGOS_HOMOLOGACION.unidadesMedida);
 
 export async function listarCatalogosHomologacion(): Promise<CatalogosHomologacion> {
   const [actividades, productosServicios, unidadesMedida] = await Promise.all([

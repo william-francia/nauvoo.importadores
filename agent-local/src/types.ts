@@ -4,6 +4,7 @@ export type OperationalState =
   | "ENVIANDO_PAQUETES" | "VALIDANDO_PAQUETES";
 
 export interface BootstrapBundle {
+  agentId?: string;
   config: Record<string, unknown>;
   branch: Record<string, unknown>;
   point: Record<string, unknown> | null;
@@ -38,6 +39,7 @@ export interface OfflineSaleInput {
 
 export interface LocalInvoice {
   id: string; idempotencyKey: string; correlationId: string; cajaId: string;
+  requestHash?: string;
   eventId: string; numeroFactura: number; cuf: string; fechaEmision: string;
   cliente: Record<string, unknown>; total: string; estado: string;
   paqueteId: string | null; xmlPath: string; pdfPath: string; xmlHash: string;

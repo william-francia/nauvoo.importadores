@@ -28,6 +28,7 @@ export interface SinFacturaDetalle {
 
 export interface GestionVenta {
   id: string;
+  facturaId?: string | null;
 
   numeroFactura: string;
 
@@ -61,6 +62,7 @@ export interface GestionVentasFilters {
 }
 
 export type FacturaAction =
+  | "VER"
   | "SIN"
   | "ANULAR"
   | "PDF_MEDIO_OFICIO"

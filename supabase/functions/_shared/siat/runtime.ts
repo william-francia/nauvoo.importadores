@@ -15,7 +15,7 @@ export function serviceClient() {
   return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 }
 
-type SiatEndpoints = Partial<typeof OFFICIAL_TEST_ENDPOINTS>;
+type SiatEndpoints = Partial<Record<keyof typeof OFFICIAL_TEST_ENDPOINTS, string>>;
 
 interface SiatRuntimeConfiguration {
   tokenDelegado: string;

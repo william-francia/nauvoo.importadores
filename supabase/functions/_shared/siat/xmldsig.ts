@@ -1,6 +1,8 @@
 import { SignedXml } from "xml-crypto";
 import { DOMParser } from "@xmldom/xmldom";
 import { X509Certificate } from "node:crypto";
+import { Buffer } from "node:buffer";
+import { certificateDerFromPem } from "./signature-credentials.ts";
 
 const C14N = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
 const C14N_WITH_COMMENTS = `${C14N}#WithComments`;
@@ -8,6 +10,11 @@ const RSA_SHA256 = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
 const SHA256 = "http://www.w3.org/2001/04/xmlenc#sha256";
 const DSIG_NAMESPACE = "http://www.w3.org/2000/09/xmldsig#";
 const ENVELOPED_SIGNATURE = `${DSIG_NAMESPACE}enveloped-signature`;
+
+// xml-crypto usa Buffer global en su implementación Node; algunos runtimes Edge no lo exponen.
+const ensureNodeBuffer = () => {
+  if (typeof globalThis.Buffer === "undefined") Object.defineProperty(globalThis, "Buffer", { value: Buffer, writable: true, configurable: true });
+};
 
 type XmlDocument = ReturnType<DOMParser["parseFromString"]>;
 
@@ -47,6 +54,7 @@ export function validateInvoiceSignatureProfile(xml: string): true {
 }
 
 export function signInvoiceXml(xml: string, privateKeyPem: string, certificatePem: string): string {
+  ensureNodeBuffer();
   if (!/-----BEGIN (?:RSA )?PRIVATE KEY-----/.test(privateKeyPem) || !certificatePem.includes("-----BEGIN CERTIFICATE-----")) throw new Error("Certificado X.509 o clave privada de firma no configurados.");
   const signer = new SignedXml({
     privateKey: privateKeyPem,
@@ -73,15 +81,16 @@ export function signInvoiceXml(xml: string, privateKeyPem: string, certificatePe
 }
 
 export function verifyInvoiceSignature(xml: string, certificatePem: string): true {
+  ensureNodeBuffer();
   if (!certificatePem.includes("-----BEGIN CERTIFICATE-----")) throw new Error("Se requiere un certificado X.509 para verificar XMLDSig.");
   validateInvoiceSignatureProfile(xml);
   const embedded = String(single(new DOMParser().parseFromString(xml, "text/xml"), "X509Certificate").textContent ?? "").replace(/\s/g, "");
   try {
-    const configured = new X509Certificate(certificatePem);
-    if (embedded !== configured.raw.toString("base64")) throw new Error("FIRMA_KEYINFO_NO_CORRESPONDE");
+    new X509Certificate(certificatePem);
+    if (embedded !== certificateDerFromPem(certificatePem).toString("base64")) throw new Error("FIRMA_KEYINFO_NO_CORRESPONDE");
   } catch (error) {
     if (error instanceof Error && error.message === "FIRMA_KEYINFO_NO_CORRESPONDE") throw error;
-    throw new Error("FIRMA_PEM_INVALIDO", { cause: error });
+    throw new Error("FIRMA_KEYINFO_CERTIFICADO_INVALIDO", { cause: error });
   }
   const verifier = new SignedXml({ publicCert: certificatePem });
   const document = new DOMParser().parseFromString(xml, "text/xml") as unknown as Parameters<typeof verifier.findSignatures>[0];

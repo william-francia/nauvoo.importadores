@@ -8,6 +8,7 @@ import type {
 } from "../types/ventas.types";
 
 interface Props {
+  soloFiscal?: boolean;
   lineas: LineaVenta[];
 
   onCantidad: (
@@ -50,6 +51,7 @@ function formatMoney(value: number) {
 
 export default function VentaItemsTable({
   lineas,
+  soloFiscal = false,
   onCantidad,
   onAlmacen,
   onPrecio,
@@ -112,7 +114,7 @@ export default function VentaItemsTable({
 
             <th>Cantidad</th>
 
-            <th>Tienda</th>
+            <th>{soloFiscal ? "Inventario" : "Tienda"}</th>
 
             <th>Precio</th>
 
@@ -192,8 +194,8 @@ export default function VentaItemsTable({
 
                       <input
                         type="number"
-                        min="1"
-                        step="1"
+                        min={soloFiscal ? "0.001" : "1"}
+                        step={soloFiscal ? "0.001" : "1"}
                         value={
                           linea.cantidad
                         }
@@ -222,15 +224,15 @@ export default function VentaItemsTable({
                       </button>
                     </div>
 
-                    <small className="stock-info">
+                    {!soloFiscal && <small className="stock-info">
                       Disponible:{" "}
                       {stockActual?.cantidad ??
                         0}
-                    </small>
+                    </small>}
                   </td>
 
                   <td>
-                    <select
+                    {soloFiscal ? <span>No modifica stock</span> : <select
                       className="venta-table-select"
                       value={
                         linea.almacen_id
@@ -270,7 +272,7 @@ export default function VentaItemsTable({
                           </option>
                         )
                       )}
-                    </select>
+                    </select>}
                   </td>
 
                   <td>

@@ -1,6 +1,6 @@
 import { XMLParser } from "fast-xml-parser";
 import { AmbiguousSiatError } from "./types.ts";
-import type { SiatMessage, SiatResponse } from "./types.ts";
+import type { FiscalResponseCapture, SiatMessage, SiatResponse } from "./types.ts";
 
 const parser = new XMLParser({
   ignoreAttributes: false,
@@ -50,7 +50,7 @@ const asNumber = (value: unknown): number | null => value == null || value === "
 const asText = (value: unknown): string | null => value == null || value === "" ? null : String(value);
 
 export function normalizeSiatResponse(raw: unknown): SiatResponse {
-  const messagesRaw = deepFind(raw, "mensajesList") ?? deepFind(raw, "mensajes") ?? [];
+  const messagesRaw = deepFind(raw, "mensajesList") ?? deepFind(raw, "mensajes") ?? deepFind(raw, "codigosRespuesta") ?? deepFind(raw, "codigosRespuestas") ?? [];
   const values = Array.isArray(messagesRaw) ? messagesRaw : [messagesRaw];
   const mensajes: SiatMessage[] = values.filter(Boolean).map((item) => ({
     codigo: asNumber(deepFind(item, "codigo")) ?? undefined,
@@ -77,7 +77,8 @@ export class SoapClient {
     this.endpoint = endpoint;
   }
 
-  async call(operation: string, requestName: string | null, fields: Record<string, unknown>, options: { ambiguousOnTimeout?: boolean; retries?: number } = {}): Promise<unknown> {
+  async call(operation: string, requestName: string | null, fields: Record<string, unknown>, options: { ambiguousOnTimeout?: boolean; retries?: number; capture?: FiscalResponseCapture } = {}): Promise<unknown> {
+    if (options.capture && (!['anulacionFactura', 'reversionAnulacionFactura'].includes(operation) || (options.retries ?? 0) !== 0)) throw new Error("CAPTURA_SOAP_OPERACION_INVALIDA");
     const body = Object.entries(fields).filter(([, value]) => value !== undefined).map(([key, value]) => `<${key}>${escapeXml(value)}</${key}>`).join("");
     const requestBody = requestName ? `<Solicitud${requestName}>${body}</Solicitud${requestName}>` : body;
     const envelope = `<?xml version="1.0" encoding="UTF-8"?><soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:siat="https://siat.impuestos.gob.bo/"><soapenv:Header/><soapenv:Body><siat:${operation}>${requestBody}</siat:${operation}></soapenv:Body></soapenv:Envelope>`;
@@ -86,13 +87,25 @@ export class SoapClient {
     for (let attempt = 1; attempt <= attempts; attempt += 1) {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), this.timeoutMs);
+      let received = false;
       try {
         const response = await fetch(this.endpoint, {
           method: "POST", signal: controller.signal,
           headers: { "content-type": "text/xml; charset=utf-8", apikey: `TokenApi ${this.token}`, SOAPAction: "" },
           body: envelope,
         });
-        const text = await response.text();
+        const bytes = new Uint8Array(await response.arrayBuffer());
+        received = true;
+        if (options.capture) {
+          let textForCheck: string;
+          try { textForCheck = new TextDecoder("utf-8", { fatal: true }).decode(bytes); }
+          catch { await options.capture({ status: response.status, body: null, reason: "BLOQUEADO_SENSIBLE" }); throw new Error("SOAP_CUERPO_NO_VERIFICABLE"); }
+          const sensitive = /-----BEGIN|\bMII[A-Za-z0-9+/]{50,}={0,2}\b|<(?:[\w.-]+:)?[\w.-]*(?:token|api[_-]?key|authorization|password|secret|clave|cert|private[_-]?key|cuis|cufd)[\w.-]*(?:\s|\/?>)|["']?(?:tokenapi|api[_-]?key|authorization|password|secret)["']?\s*[:=]/i.test(textForCheck)
+            || [this.token, fields.cuis, fields.cufd].some((value) => typeof value === "string" && value.length >= 6 && textForCheck.includes(value));
+          if (sensitive || bytes.length > 2_000_000) { await options.capture({ status: response.status, body: null, reason: "BLOQUEADO_SENSIBLE" }); throw new Error("SOAP_CONTENIDO_SENSIBLE_NO_ALMACENADO"); }
+          await options.capture({ status: response.status, body: bytes });
+        }
+        const text = new TextDecoder().decode(bytes);
         if (!response.ok) throw new Error(`SIAT_HTTP_${response.status}: ${httpErrorDetail(text) || "el servicio SIN rechazó la solicitud."}`);
         const parsed = parser.parse(text);
         const fault = deepFind(parsed, "Fault");
@@ -101,6 +114,7 @@ export class SoapClient {
       } catch (error) {
         lastError = error;
         const timedOut = error instanceof DOMException && error.name === "AbortError";
+        if (options.capture && !received) await options.capture({ status: null, body: null, reason: timedOut ? "TIMEOUT" : "SIN_RESPUESTA" });
         if (timedOut && options.ambiguousOnTimeout) throw new AmbiguousSiatError();
         if (timedOut) lastError = new Error("SIAT_TIMEOUT: el servicio no respondió dentro del tiempo configurado.");
         if (attempt < attempts) await new Promise((resolve) => setTimeout(resolve, 250 * 2 ** (attempt - 1)));

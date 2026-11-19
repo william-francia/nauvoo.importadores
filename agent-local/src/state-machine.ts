@@ -24,5 +24,9 @@ export class OperationalMachine {
     return this.state;
   }
   confirmContingency() { if (this.state !== "INICIANDO_CONTINGENCIA") throw new Error("La contingencia no puede iniciarse desde el estado actual."); return this.move("OFFLINE"); }
+  closeEmptyRecovery() {
+    if (!["OFFLINE", "RECUPERANDO", "REGISTRANDO_EVENTO"].includes(this.state)) return this.state;
+    this.failures = 0; this.state = "DEGRADADO"; return this.state;
+  }
   move(next: OperationalState) { if (!allowed[this.state].includes(next)) throw new Error(`Transición operativa inválida: ${this.state} -> ${next}.`); this.state = next; return next; }
 }

@@ -171,6 +171,7 @@ interface HistorialVentaRow {
 }
 
 interface FacturaGestionRow {
+  id: string;
   venta_id: string;
   numero_factura: number | string | null;
   fecha_emision: string | null;
@@ -257,7 +258,7 @@ export async function listarVentasGestion(): Promise<GestionVenta[]> {
   if (ids.length) {
     const { data: facturas, error: facturaError } = await supabase
       .from("facturas_siat")
-      .select("venta_id, numero_factura, fecha_emision, estado_fiscal")
+      .select("id, venta_id, numero_factura, fecha_emision, estado_fiscal")
       .in("venta_id", ids);
 
     if (!facturaError) {
@@ -275,6 +276,7 @@ export async function listarVentasGestion(): Promise<GestionVenta[]> {
 
     return {
       id: venta.id,
+      facturaId: factura?.id ?? null,
       numeroFactura: factura?.numero_factura == null ? venta.codigo_venta : String(factura.numero_factura),
       fechaEmision: factura?.fecha_emision ?? venta.fecha_venta,
       razonSocial: cliente?.nombre_razon_social || "Consumidor final",

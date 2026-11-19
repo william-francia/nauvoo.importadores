@@ -5,10 +5,13 @@ const AGENT_URL = (import.meta.env.VITE_SIAT_AGENT_URL as string | undefined)?.r
 
 export interface LocalAgentStatus {
   state: "ONLINE" | "DEGRADADO" | "INICIANDO_CONTINGENCIA" | "OFFLINE" | "RECUPERANDO" | "REGISTRANDO_EVENTO" | "EMPAQUETANDO" | "ENVIANDO_PAQUETES" | "VALIDANDO_PAQUETES";
-  evidence: { internetOnline?: boolean; backendOnline?: boolean; siatOnline?: boolean; checkedAt?: string; detail?: string };
+  evidence: { internetOnline?: boolean | null; backendOnline?: boolean | null; siatOnline?: boolean | null; checkedAt?: string | null; detail?: string };
   event: Record<string, unknown> | null;
   pending: number;
   bootstrapAt: string | null;
+  emisionOfflineHabilitada?: boolean;
+  reserva?: { estado: "ABIERTA" | "CIERRE_PENDIENTE" | "SIN_RESERVA"; desde: number | null; hasta: number | null };
+  capacidades?: { aprovisionar: boolean; recuperar: boolean; registrarEvento: boolean; cerrarReservaSinEvento?: boolean };
 }
 
 export interface LocalInvoiceSummary {
@@ -39,12 +42,19 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 export const obtenerEstadoAgenteLocal = () => request<LocalAgentStatus>("/v1/status");
 export const reportarEstadoNavegadorLocal = (online: boolean) => request<{ ok: boolean }>("/v1/browser-heartbeat", { method: "POST", body: JSON.stringify({ online }) });
 export const buscarProductosAgenteLocal = (query: string) => request<ProductoVenta[]>(`/v1/products?q=${encodeURIComponent(query)}`);
+export const buscarProductosCafcAgenteLocal = (query: string) => request<ProductoVenta[]>(`/v1/cafc/products?q=${encodeURIComponent(query)}`);
 export const buscarClientesAgenteLocal = (query: string) => request<ClienteVenta[]>(`/v1/clients?q=${encodeURIComponent(query)}`);
 export const listarFacturasAgenteLocal = () => request<LocalInvoiceSummary[]>("/v1/invoices");
 export const listarCafcAgenteLocal = () => request<LocalCafcRange[]>("/v1/cafc");
 export const aprovisionarAgenteLocal = () => request<{ generatedAt: string; products: number; clients: number }>("/v1/bootstrap", { method: "POST", body: "{}" });
 export const recuperarAgenteLocal = () => request<{ status: string; pendientes?: number }>("/v1/recover", { method: "POST", body: "{}" });
-export const registrarEventoLocal = (input: { tipoEventoCodigo: string; descripcion: string; evidencia: string }) => request<Record<string, unknown>>("/v1/events/manual", { method: "POST", body: JSON.stringify(input) });
+export const cerrarReservaSinEventoLocal = () => request<{ estado: string }>("/v1/reservation/release-unused", { method: "POST", body: "{}" });
+export const registrarEventoLocal = (input: { tipoEventoCodigo: string; descripcion: string; evidencia: string; cafcId?: string | null }) => request<Record<string, unknown>>("/v1/events/manual", { method: "POST", body: JSON.stringify(input) });
+
+export const prepararTranscripcionCafcAgente = (input: { formulario: Record<string, unknown>; originalBase64: string; originalSha256: string; originalRevisado: true; idempotencyKey: string; ventaId: string | null }) => request<{
+  facturaId: string; eventoId: string; cafcId: string; agenteId: string; correlationId: string; idempotencyKey: string; ventaId: string | null;
+  xmlGzipBase64: string; xmlSha256: string; originalBase64: string; originalSha256: string; fingerprint: string; originalRevisado: true;
+}>("/v1/cafc/prepare", { method: "POST", body: JSON.stringify(input) });
 
 export async function registrarVentaAgenteLocal(input: {
   idempotencyKey: string; cajaId: string; clienteId: string; metodoPago: MetodoPago;
