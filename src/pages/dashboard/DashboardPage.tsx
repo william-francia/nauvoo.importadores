@@ -371,6 +371,7 @@ export default function DashboardPage() {
             </Suspense>
           )}
 
+
           {!ventasActiva && !productosActiva && !clientesActiva && !facturasActiva && activeItem === "ventas" && (
             <PlaceholderPage
               title="Ventas"
