@@ -1,10 +1,7 @@
-export type EstadoFactura =
-  | "VALIDADA"
-  | "PENDIENTE"
-  | "ANULADA"
-  | "RECHAZADA";
+import type { AmbienteSiat, EstadoFiscal, FacturaSiatResumen } from "../../facturas/types/siat.types";
+export type EstadoFactura = EstadoFiscal | "PENDIENTE";
 
-export type MonedaVenta = "BOB" | "USD";
+export type MonedaVenta = string;
 
 export interface SinFacturaDetalle {
   cuf: string;
@@ -24,11 +21,18 @@ export interface SinFacturaDetalle {
   codigoRecepcion: string | null;
 
   log: string | null;
+  transaccion?: boolean | null;
+  ambiente?: AmbienteSiat;
 }
 
 export interface GestionVenta {
   id: string;
   facturaId?: string | null;
+  ventaId?: string | null;
+  origen?: "VENTA" | "FACTURA_SIN_VENTA";
+  estadoComercial?: string | null;
+  ambiente?: AmbienteSiat | null;
+  factura?: FacturaSiatResumen;
 
   numeroFactura: string;
 
@@ -52,6 +56,8 @@ export interface GestionVenta {
 }
 
 export interface GestionVentasFilters {
+  ambiente: "TODOS" | "SIN_FACTURA" | AmbienteSiat;
+  estadoFiscal: string;
   numeroFactura: string;
 
   razonSocial: string;
@@ -65,6 +71,7 @@ export type FacturaAction =
   | "VER"
   | "SIN"
   | "ANULAR"
+  | "REVERTIR"
   | "PDF_MEDIO_OFICIO"
   | "PDF_ROLLO"
   | "XML"

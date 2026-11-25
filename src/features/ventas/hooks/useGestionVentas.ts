@@ -9,6 +9,8 @@ import type {
 } from "../types/gestionVentas.types";
 
 const FILTROS_INICIALES: GestionVentasFilters = {
+  ambiente: "TODOS",
+  estadoFiscal: "TODOS",
   numeroFactura: "",
   razonSocial: "",
   numeroDocumento: "",
@@ -77,6 +79,8 @@ export function useGestionVentas(
       );
 
     return ventas.filter((venta) => {
+      if (filters.ambiente !== "TODOS" && (venta.ambiente ?? "SIN_FACTURA") !== filters.ambiente) return false;
+      if (filters.estadoFiscal !== "TODOS" && (venta.factura?.estadoFiscal ?? "SIN_FACTURA") !== filters.estadoFiscal) return false;
       if (
         numeroFactura &&
         !normalizarTexto(

@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { PDFDocument } from "pdf-lib";
+import { cancelledWatermark } from "../../supabase/functions/_shared/siat/pdf-watermark.ts";
 import { gzipBytes, sha256Hex } from "../../supabase/functions/_shared/siat/encoding.ts";
 import { generateInvoiceXml } from "../../supabase/functions/_shared/siat/invoice-xml.ts";
 import type { InvoiceSnapshot } from "../../supabase/functions/_shared/siat/types.ts";
@@ -61,5 +62,21 @@ describe("entrega de documentos fiscales", () => {
     await expect(prepararDocumentoFiscal({ ...invoice, xmlHash: "A".repeat(64) }, "XML")).rejects.toThrow("hash");
     await expect(prepararDocumentoFiscal({ ...invoice, cuf: "OTRO" }, "PDF_CARTA")).rejects.toThrow("no coincide");
     await expect(prepararDocumentoFiscal({ ...invoice, estadoFiscal: "SIN_RESPUESTA" }, "XML")).rejects.toThrow("validada");
+  });
+  it("marca ANULADO en carta y rollos sin modificar el XML original", async () => {
+    const { invoice, original } = await fixture();
+    const cancelled = { ...invoice, estadoFiscal: "ANULADA" as const };
+    for (const [action, width] of [["PDF_CARTA", 80], ["PDF_ROLLO", 80], ["PDF_ROLLO", 58]] as const) {
+      const pdf = await prepararDocumentoFiscal(cancelled, action, width);
+      const parsed = await PDFDocument.load(pdf.bytes!);
+      expect(parsed.getPage(0).node.Contents()?.toString()).toBeTruthy();
+      expect(Buffer.from(pdf.bytes!).includes(Buffer.from("ANULADO"))).toBe(false); // PDF comprime el contenido.
+      const base = await prepararDocumentoFiscal(invoice, action, width);
+      expect(pdf.bytes).not.toEqual(base.bytes);
+    }
+    const xml = await prepararDocumentoFiscal(cancelled, "XML");
+    expect(xml.bytes).toEqual(original);
+    const base = await prepararDocumentoFiscal(invoice, "PDF_CARTA");
+    expect(await cancelledWatermark(base.bytes!, false)).toEqual(base.bytes);
   });
 });

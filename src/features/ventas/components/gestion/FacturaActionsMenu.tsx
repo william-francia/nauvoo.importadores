@@ -43,6 +43,7 @@ const ACTIONS: ActionItem[] = [
     icon: "⊘",
     danger: true,
   },
+  { action: "REVERTIR", label: "Revertir anulación", icon: "↶" },
 
   {
     action: "PDF_MEDIO_OFICIO",
@@ -146,12 +147,11 @@ export default function FacturaActionsMenu({
             {venta.numeroFactura}
           </div>
 
-          {ACTIONS.filter((item) => item.action !== "ANULAR" || canIssueInvoice).map((item) => (
+          {ACTIONS.filter((item) => (item.action !== "ANULAR" && item.action !== "REVERTIR") || (canIssueInvoice && (item.action === "ANULAR" ? venta.estado === "VALIDADA" || venta.estado === "REVERTIDA" : venta.estado === "ANULADA"))).map((item) => (
             <button
               type="button"
               key={item.action}
-              disabled={item.action === "REENVIAR_CORREO"}
-              title={item.action === "REENVIAR_CORREO" ? "Correo no configurado" : undefined}
+              title={!venta.facturaId && item.action !== "ANULAR" ? "Venta sin factura electrónica asociada" : undefined}
               className={
                 item.danger
                   ? "gestion-actions__item gestion-actions__item--danger"

@@ -1,4 +1,5 @@
 import FacturaActionsMenu from "./FacturaActionsMenu";
+import { ESTADOS_FISCALES } from "../../../facturas/types/siat.types";
 
 import type {
   FacturaAction,
@@ -61,6 +62,7 @@ function fecha(
       second: "2-digit",
 
       hour12: false,
+      timeZone: "America/La_Paz",
     }
   ).format(date);
 }
@@ -103,7 +105,7 @@ export default function GestionVentasTable({
 
             <th>Usuario</th>
 
-            <th>Estado</th>
+            <th>Estado comercial</th><th>Estado fiscal</th><th>Ambiente</th>
           </tr>
 
           <tr className="gestion-filter-row">
@@ -174,6 +176,17 @@ export default function GestionVentasTable({
             </th>
 
             <th />
+            <th>
+              <select aria-label="Estado fiscal" value={filters.estadoFiscal} onChange={(event) => onFilterChange("estadoFiscal", event.target.value)}>
+                <option value="TODOS">Todos</option><option value="SIN_FACTURA">Sin factura</option>
+                {ESTADOS_FISCALES.map(estado => <option key={estado} value={estado}>{estado.replaceAll("_", " ")}</option>)}
+              </select>
+            </th>
+            <th>
+              <select aria-label="Ambiente" value={filters.ambiente} onChange={(event) => onFilterChange("ambiente", event.target.value as GestionVentasFilters["ambiente"])}>
+                <option value="TODOS">Todos</option><option value="PRUEBAS">PILOTO</option><option value="PRODUCCION">PRODUCCIÓN</option><option value="SIN_FACTURA">Sin factura</option>
+              </select>
+            </th>
           </tr>
         </thead>
 
@@ -181,7 +194,7 @@ export default function GestionVentasTable({
           {ventas.length === 0 ? (
             <tr>
               <td
-                colSpan={8}
+                colSpan={10}
                 className="gestion-table-empty"
               >
                 <div>
@@ -218,6 +231,7 @@ export default function GestionVentasTable({
                       venta.numeroFactura
                     }
                   </strong>
+                  <small className="gestion-row-context">{venta.origen === "FACTURA_SIN_VENTA" ? "Documento sin venta comercial" : venta.factura ? `Venta ${venta.factura.codigoVenta}` : "Venta sin factura fiscal"}</small>
                 </td>
 
                 <td>
@@ -255,13 +269,15 @@ export default function GestionVentasTable({
                   {venta.usuario}
                 </td>
 
+                <td>{venta.estadoComercial ?? "No aplica"}</td>
                 <td>
                   <span
                     className={`gestion-status gestion-status--${venta.estado.toLowerCase()}`}
                   >
-                    {venta.estado}
+                    {venta.factura ? venta.estado === "REVERTIDA" ? "VALIDADA (revertida)" : venta.estado.replaceAll("_", " ") : "Sin factura"}
                   </span>
                 </td>
+                <td><strong>{venta.ambiente === "PRUEBAS" ? "PILOTO" : venta.ambiente === "PRODUCCION" ? "PRODUCCIÓN" : "—"}</strong></td>
               </tr>
             ))
           )}

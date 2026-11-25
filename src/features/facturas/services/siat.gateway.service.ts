@@ -71,3 +71,6 @@ export async function obtenerXmlFiscalComprimido(facturaId: string): Promise<Uin
   if (!response.ok) throw new Error("No se pudo recuperar el XML fiscal privado.");
   return new Uint8Array(await response.arrayBuffer());
 }
+
+export const obtenerCapacidadCorreoFactura = () => invoke<{ disponible: boolean; motivo: string | null }>("invoice-email-capabilities");
+export const reenviarCorreoFactura = (input: { facturaId: string; destinatario: string; idempotencia: string; confirmacion: true }) => invoke<{ estado: string; entregaConfirmada: false; reutilizado: boolean }>("invoice-email-send", input);

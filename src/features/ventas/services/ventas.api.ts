@@ -5,7 +5,7 @@ import type {
   ProductoVenta,
   RegistrarVentaInput,
 } from "../types/ventas.types";
-import type { EstadoFactura, GestionVenta } from "../types/gestionVentas.types";
+import type { GestionVenta } from "../types/gestionVentas.types";
 
 interface AlmacenRow {
   id: string;
@@ -170,13 +170,6 @@ interface HistorialVentaRow {
   fecha_facturacion: string | null;
 }
 
-interface FacturaGestionRow {
-  id: string;
-  venta_id: string;
-  numero_factura: number | string | null;
-  fecha_emision: string | null;
-  estado_fiscal: string | null;
-}
 
 interface ClienteGestionRow {
   id: string;
@@ -192,36 +185,30 @@ interface UsuarioGestionRow {
   correo: string | null;
 }
 
-function estadoGestion(estadoVenta: string | null, estadoFiscal?: string | null): EstadoFactura {
-  const estado = (estadoFiscal ?? estadoVenta ?? "").toUpperCase();
-  if (estado === "VALIDADA" || estado === "VALIDADO") return "VALIDADA";
-  if (estado.includes("ANULADA")) return "ANULADA";
-  if (estado.includes("RECHAZADA") || estado.includes("OBSERVADA")) return "RECHAZADA";
-  return "PENDIENTE";
-}
 
 export async function listarVentasGestion(): Promise<GestionVenta[]> {
-  const { data, error } = await supabase
-    .from("ventas")
-    .select("id, codigo_venta, fecha_venta, total, estado, cliente_id, usuario_id")
-    .order("fecha_venta", { ascending: false })
-    .limit(500);
-
-  if (error) throw new Error(error.message || "No se pudo cargar el historial de ventas.");
-
-  let ventas = (data ?? []) as unknown as VentaGestionRow[];
+  const ventas: VentaGestionRow[] = [];
+  for (let offset = 0; ; offset += 500) {
+    const { data, error } = await supabase.from("ventas")
+      .select("id, codigo_venta, fecha_venta, total, estado, cliente_id, usuario_id")
+      .order("fecha_venta", { ascending: false }).order("id").range(offset, offset + 499);
+    if (error) throw new Error(error.message || "No se pudo cargar el historial de ventas.");
+    ventas.push(...(data ?? []) as unknown as VentaGestionRow[]);
+    if (!data || data.length < 500) break;
+  }
 
   // El trigger de ventas mantiene este resumen para el historial. Se usa como
   // respaldo para instalaciones que ya tenían ventas registradas previamente.
   if (ventas.length === 0) {
-    const { data: historial, error: historialError } = await supabase
+    for (let offset = 0; ; offset += 500) {
+      const { data: historial, error: historialError } = await supabase
       .from("historial_ventas")
       .select("venta_id, codigo_venta, fecha_venta, total, estado, cliente_id, usuario_id, numero_factura, fecha_facturacion")
-      .order("fecha_venta", { ascending: false })
-      .limit(500);
+      .order("fecha_venta", { ascending: false }).order("venta_id")
+      .range(offset, offset + 499);
 
-    if (!historialError) {
-      ventas = ((historial ?? []) as HistorialVentaRow[]).map((venta) => ({
+      if (historialError) throw new Error(historialError.message || "No se pudo cargar el historial anterior.");
+      ventas.push(...((historial ?? []) as HistorialVentaRow[]).map((venta) => ({
         id: venta.venta_id,
         codigo_venta: venta.numero_factura == null ? venta.codigo_venta : String(venta.numero_factura),
         fecha_venta: venta.fecha_facturacion ?? venta.fecha_venta,
@@ -229,62 +216,50 @@ export async function listarVentasGestion(): Promise<GestionVenta[]> {
         estado: venta.estado,
         cliente_id: venta.cliente_id,
         usuario_id: venta.usuario_id,
-      }));
+      })));
+      if (!historial || historial.length < 500) break;
     }
   }
-  const ids = ventas.map((venta) => venta.id);
   const clienteIds = [...new Set(ventas.flatMap((venta) => venta.cliente_id ? [venta.cliente_id] : []))];
   const usuarioIds = [...new Set(ventas.flatMap((venta) => venta.usuario_id ? [venta.usuario_id] : []))];
-  let facturasPorVenta = new Map<string, FacturaGestionRow>();
-  let clientesPorId = new Map<string, ClienteGestionRow>();
-  let usuariosPorId = new Map<string, UsuarioGestionRow>();
-
-  const [clientesResult, usuariosResult] = await Promise.all([
-    clienteIds.length
-      ? supabase.from("clientes").select("id, nombre_razon_social, numero_documento, correo").in("id", clienteIds)
-      : Promise.resolve({ data: [], error: null }),
-    usuarioIds.length
-      ? supabase.from("usuarios").select("id, nombre, apellidos, correo").in("id", usuarioIds)
-      : Promise.resolve({ data: [], error: null }),
+  const clientesPorId = new Map<string, ClienteGestionRow>();
+  const usuariosPorId = new Map<string, UsuarioGestionRow>();
+  await Promise.all([
+    (async () => {
+      for (let offset = 0; offset < clienteIds.length; offset += 100) {
+        const result = await supabase.from("clientes").select("id, nombre_razon_social, numero_documento, correo").in("id", clienteIds.slice(offset, offset + 100));
+        if (result.error) throw new Error("No se pudieron consultar los clientes de las ventas.");
+        for (const cliente of (result.data ?? []) as ClienteGestionRow[]) clientesPorId.set(cliente.id, cliente);
+      }
+    })(),
+    (async () => {
+      for (let offset = 0; offset < usuarioIds.length; offset += 100) {
+        const result = await supabase.from("usuarios").select("id, nombre, apellidos, correo").in("id", usuarioIds.slice(offset, offset + 100));
+        if (result.error) throw new Error("No se pudieron consultar los usuarios de las ventas.");
+        for (const usuario of (result.data ?? []) as UsuarioGestionRow[]) usuariosPorId.set(usuario.id, usuario);
+      }
+    })(),
   ]);
-
-  if (!clientesResult.error) {
-    clientesPorId = new Map(((clientesResult.data ?? []) as ClienteGestionRow[]).map((cliente) => [cliente.id, cliente]));
-  }
-  if (!usuariosResult.error) {
-    usuariosPorId = new Map(((usuariosResult.data ?? []) as UsuarioGestionRow[]).map((usuario) => [usuario.id, usuario]));
-  }
-
-  if (ids.length) {
-    const { data: facturas, error: facturaError } = await supabase
-      .from("facturas_siat")
-      .select("id, venta_id, numero_factura, fecha_emision, estado_fiscal")
-      .in("venta_id", ids);
-
-    if (!facturaError) {
-      facturasPorVenta = new Map(
-        ((facturas ?? []) as FacturaGestionRow[]).map((factura) => [factura.venta_id, factura])
-      );
-    }
-  }
 
   return ventas.map((venta) => {
     const cliente = venta.cliente_id ? clientesPorId.get(venta.cliente_id) : null;
     const usuario = venta.usuario_id ? usuariosPorId.get(venta.usuario_id) : null;
-    const factura = facturasPorVenta.get(venta.id);
     const nombreUsuario = [usuario?.nombre, usuario?.apellidos].filter(Boolean).join(" ");
 
     return {
-      id: venta.id,
-      facturaId: factura?.id ?? null,
-      numeroFactura: factura?.numero_factura == null ? venta.codigo_venta : String(factura.numero_factura),
-      fechaEmision: factura?.fecha_emision ?? venta.fecha_venta,
-      razonSocial: cliente?.nombre_razon_social || "Consumidor final",
+      id: `venta:${venta.id}`,
+      ventaId: venta.id,
+      origen: "VENTA",
+      estadoComercial: venta.estado,
+      facturaId: null,
+      numeroFactura: venta.codigo_venta,
+      fechaEmision: venta.fecha_venta,
+      razonSocial: cliente?.nombre_razon_social || (venta.cliente_id ? "Cliente no disponible" : "Consumidor final"),
       numeroDocumento: cliente?.numero_documento || "—",
       monto: Number(venta.total ?? 0),
       moneda: "BOB",
       usuario: nombreUsuario || usuario?.correo || "Sistema",
-      estado: estadoGestion(venta.estado, factura?.estado_fiscal),
+      estado: "PENDIENTE",
       correoCliente: cliente?.correo ?? null,
     };
   });

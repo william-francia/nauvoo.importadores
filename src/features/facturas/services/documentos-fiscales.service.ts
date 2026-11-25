@@ -1,5 +1,6 @@
 import { originalSignedXml, snapshotFromSignedXml } from "../../../../supabase/functions/_shared/siat/fiscal-document.ts";
 import { generateFiscalPdf } from "../../../../supabase/functions/_shared/siat/fiscal-pdf.ts";
+import { cancelledWatermark } from "../../../../supabase/functions/_shared/siat/pdf-watermark.ts";
 import { officialQrUrl } from "../../../../supabase/functions/_shared/siat/qr.ts";
 import type { FacturaSiatDetalle } from "../types/siat.types";
 import { obtenerXmlFiscalComprimido } from "./siat.gateway.service";
@@ -11,12 +12,12 @@ export async function prepararDocumentoFiscal(factura: FacturaSiatDetalle, actio
   const gzip = await obtenerXmlFiscalComprimido(factura.id);
   const xml = await originalSignedXml(gzip, factura.xmlHash);
   const snapshot = snapshotFromSignedXml(xml, factura);
-  const qr = officialQrUrl("PRUEBAS", snapshot.nit, snapshot.cuf, snapshot.numeroFactura, action === "PDF_ROLLO" ? 1 : 2);
+  const qr = officialQrUrl(factura.ambiente, snapshot.nit, snapshot.cuf, snapshot.numeroFactura, action === "PDF_ROLLO" ? 1 : 2);
   if (action === "CONSULTA") return { url: qr };
   if (action === "XML") return { bytes: xml, mime: "application/xml", filename: `factura-${snapshot.numeroFactura}.xml` };
   const units = await listarUnidadesFacturaSiat().catch(() => []);
   const labeledSnapshot = { ...snapshot, detalle: snapshot.detalle.map((item) => ({ ...item, unidadDescripcion: units.find((unit) => unit.codigo === item.unidadMedidaSin)?.descripcion })) };
-  const bytes = await generateFiscalPdf(labeledSnapshot, qr, { format: action === "PDF_ROLLO" ? "rollo" : "carta", widthMm });
+  const bytes = await cancelledWatermark(await generateFiscalPdf(labeledSnapshot, qr, { format: action === "PDF_ROLLO" ? "rollo" : "carta", widthMm }), factura.estadoFiscal === "ANULADA");
   return { bytes, mime: "application/pdf", filename: `factura-${snapshot.numeroFactura}${action === "PDF_ROLLO" ? "-rollo" : ""}.pdf` };
 }
 

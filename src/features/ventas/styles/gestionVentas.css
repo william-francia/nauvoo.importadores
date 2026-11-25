@@ -336,7 +336,8 @@
     font-weight: 700;
 }
 
-.gestion-status--validada {
+.gestion-status--validada,
+.gestion-status--revertida {
     background:
         var(--gv-green-bg);
 
@@ -1152,3 +1153,7 @@
 .gestion-notification {
     font-size: 10px;
 }
+
+.gestion-row-context { display: block; margin-top: 4px; color: #64748b; font-size: 11px; font-weight: normal; }
+.gestion-document-note { margin: 10px 16px; font-size: 12px; color: #64748b; }
+.gestion-filter-row select { max-width: 150px; padding: 7px; border: 1px solid #cbd5e1; border-radius: 4px; background: white; }

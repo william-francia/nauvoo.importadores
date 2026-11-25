@@ -10,13 +10,13 @@ export function buildEmailNotice(input: { operation: "ANULACION" | "REVERSION"; 
   return `${emisor} (NIT ${nit}) informa la reversión de la anulación de la factura N.º ${numero}, código de autorización ${cuf}.`;
 }
 
-export async function sendResendEmail(input: { apiKey: string; from: string; to: string; text: string; attempt: string }, transport: typeof fetch = fetch): Promise<string> {
+export async function sendResendEmail(input: { apiKey: string; from: string; to: string; text: string; attempt: string; subject?: string; idempotencyPrefix?: "siat-documento"; attachments?: Array<{ filename: string; content: string }> }, transport: typeof fetch = fetch): Promise<string> {
   if (!input.apiKey.trim() || !input.from.trim()) throw new Error("CORREO_AUTOMATICO_NO_CONFIGURADO");
   let response: Response;
   try {
     response = await transport("https://api.resend.com/emails", { method: "POST", signal: AbortSignal.timeout(15_000),
-      headers: { authorization: `Bearer ${input.apiKey}`, "content-type": "application/json", "idempotency-key": `siat-9a/${input.attempt}` },
-      body: JSON.stringify({ from: input.from, to: [input.to], subject: "Aviso de operación de factura", text: input.text }) });
+      headers: { authorization: `Bearer ${input.apiKey}`, "content-type": "application/json", "idempotency-key": `${input.idempotencyPrefix ?? "siat-9a"}/${input.attempt}` },
+      body: JSON.stringify({ from: input.from, to: [input.to], subject: input.subject ?? "Aviso de operación de factura", text: input.text, ...(input.attachments ? { attachments: input.attachments } : {}) }) });
   } catch { throw new Error("CORREO_RESULTADO_INCIERTO_REQUIERE_REVISION"); }
   if (!response.ok) throw new Error("CORREO_RESULTADO_INCIERTO_REQUIERE_REVISION");
   const data = await response.json().catch(() => null) as { id?: unknown } | null;

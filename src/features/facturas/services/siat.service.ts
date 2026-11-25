@@ -89,9 +89,14 @@ const FACTURA_SELECT = `
 `;
 
 export async function listarFacturasSiat(): Promise<FacturaSiatResumen[]> {
-  const { data, error } = await supabase.from("facturas_siat").select(FACTURA_SELECT).order("fecha_emision", { ascending: false }).limit(500);
-  if (error) throw siatError(error, "No se pudieron cargar las facturas fiscales.");
-  return (data ?? []).map(mapFactura);
+  const result: FacturaSiatResumen[] = [];
+  for (let offset = 0; ; offset += 500) {
+    const { data, error } = await supabase.from("facturas_siat").select(FACTURA_SELECT)
+      .order("fecha_emision", { ascending: false }).order("id").range(offset, offset + 499);
+    if (error) throw siatError(error, "No se pudieron cargar las facturas fiscales.");
+    result.push(...(data ?? []).map(mapFactura));
+    if ((data ?? []).length < 500) return [...new Map(result.map((f) => [f.id, f])).values()];
+  }
 }
 
 export async function obtenerFacturaSiat(id: string): Promise<FacturaSiatDetalle> {

@@ -19,7 +19,7 @@ export async function originalSignedXml(gzip: Uint8Array, expectedHash: string |
 }
 
 export function snapshotFromSignedXml(bytes: Uint8Array, expected: PersistedInvoiceIdentity): InvoiceSnapshot {
-  if (expected.ambiente !== "PRUEBAS" || expected.estadoFiscal !== "VALIDADA" || expected.codigoEstado !== 908
+  if (expected.ambiente !== "PRUEBAS" || !["VALIDADA", "ANULADA", "REVERTIDA"].includes(expected.estadoFiscal) || expected.codigoEstado !== 908
     || expected.transaccion !== true || !expected.codigoRecepcion || !expected.xmlFirmado) {
     throw new Error("La representación requiere una factura piloto validada y firmada.");
   }
