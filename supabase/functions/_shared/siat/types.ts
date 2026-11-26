@@ -133,7 +133,7 @@ export interface SiatAdapter {
   verificarComunicacion(): Promise<SiatResponse>;
   verificarNit(context: SiatContext, nitParaVerificacion: string): Promise<SiatResponse>;
   solicitarCuis(context: SiatContext): Promise<CuisResult>;
-  solicitarCufd(context: SiatContext): Promise<CufdResult>;
+  solicitarCufd(context: SiatContext, options?: { retries: number }): Promise<CufdResult>;
   sincronizarFechaHora(context: SiatContext): Promise<{ fechaHora: string; response: SiatResponse }>;
   sincronizarCatalogo(context: SiatContext, operation: string): Promise<{ items: unknown[]; response: SiatResponse }>;
   recepcionarFactura(input: InvoiceReceptionInput): Promise<SiatResponse>;

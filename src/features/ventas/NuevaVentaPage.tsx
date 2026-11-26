@@ -1,5 +1,6 @@
 import {
   useState,
+  useRef,
 } from "react";
 
 import "./ventas.css";
@@ -14,9 +15,7 @@ import { AlertTriangle, RotateCcw, X } from "lucide-react";
 
 import { useVentaDraft } from "./hooks/useVentaDraft";
 
-import {
-  registrarVenta,
-} from "./services/ventas.api";
+import { confirmarVentaFiscal, canalInicial, mensajeCheckout, type CanalEntrega } from "./services/checkout";
 
 import type {
   ClienteVenta,
@@ -36,6 +35,13 @@ function money(value: number) {
 
 export default function NuevaVentaPage() {
   const venta = useVentaDraft();
+  const lock = useRef(false);
+  const requestId = useRef(sessionStorage.getItem("nuvoo-checkout-pendiente") ?? crypto.randomUUID());
+  const [entregaSeleccion, setEntregaSeleccion] = useState<{ cliente: string; canal: CanalEntrega } | null>(null);
+  const [destinoConfirmado, setDestinoConfirmado] = useState(false);
+  const [resultadoFiscal, setResultadoFiscal] = useState("");
+  const canal = entregaSeleccion?.cliente === venta.cliente?.id ? entregaSeleccion!.canal : canalInicial(venta.cliente);
+  const destinatario = canal === "WHATSAPP" ? venta.cliente?.telefono ?? "" : canal === "CORREO" ? venta.cliente?.correo ?? "" : "";
 
   const [
     modalClienteAbierto,
@@ -109,12 +115,18 @@ export default function NuevaVentaPage() {
       return;
     }
 
+    if (lock.current) return;
+    if (canal !== "NINGUNO" && !destinoConfirmado) {
+      setMensaje({ tipo: "error", texto: "Confirma el destinatario y su consentimiento de entrega." }); return;
+    }
+    lock.current = true;
+    sessionStorage.setItem("nuvoo-checkout-pendiente", requestId.current);
     try {
       setProcesando(true);
       setMensaje(null);
 
       const respuesta =
-        await registrarVenta({
+        await confirmarVentaFiscal({
           cliente_id:
             venta.cliente?.id ?? null,
 
@@ -148,12 +160,10 @@ export default function NuevaVentaPage() {
 
             })
           ),
-        });
-
-      console.log(
-        "Venta registrada:",
-        respuesta
-      );
+        }, { canal, destinatario, consentimiento: destinoConfirmado }, requestId.current);
+      setResultadoFiscal(mensajeCheckout(respuesta));
+      sessionStorage.removeItem("nuvoo-checkout-pendiente");
+      requestId.current = crypto.randomUUID();
 
       setResumenVenta({
         total: money(venta.totales.total),
@@ -173,6 +183,7 @@ export default function NuevaVentaPage() {
       });
     } finally {
       setProcesando(false);
+      lock.current = false;
     }
   }
 
@@ -429,9 +440,7 @@ export default function NuevaVentaPage() {
           <section className="venta-panel">
             <ClienteSelector
               cliente={venta.cliente}
-              onSeleccionar={
-                venta.setCliente
-              }
+              onSeleccionar={(cliente) => { venta.setCliente(cliente); setDestinoConfirmado(false); }}
               onNuevoCliente={() =>
                 setModalClienteAbierto(
                   true
@@ -439,25 +448,7 @@ export default function NuevaVentaPage() {
               }
             />
 
-            <div className="venta-field venta-email-alternativo">
-              <label>
-                Correo electrónico
-                alternativo
-              </label>
-
-              <input
-                placeholder="Correo alternativo"
-              />
-            </div>
-
-            <label className="venta-check">
-              <input type="checkbox" />
-
-              <span>
-                Permitir facturar incluso
-                si el NIT es inválido
-              </span>
-            </label>
+            <p className="venta-none">La identificación fiscal se valida antes de confirmar la venta. No se permiten NIT inválidos.</p>
           </section>
 
           <PagoPanel
@@ -487,6 +478,7 @@ export default function NuevaVentaPage() {
       <ConfirmarVentaModal
         abierto={!confirmarStockCero && (Boolean(pagoPendiente) || ventaRealizada)}
         exitoso={ventaRealizada}
+        resultado={resultadoFiscal}
         total={resumenVenta?.total ?? money(venta.totales.total)}
         cliente={resumenVenta?.cliente ?? venta.cliente?.nombre_razon_social ?? "Cliente general"}
         procesando={procesando}
@@ -501,7 +493,20 @@ export default function NuevaVentaPage() {
         onConfirmar={() => {
           if (pagoPendiente) void registrarPago(pagoPendiente);
         }}
-      />
+      >
+        <div className="venta-confirm-details">
+          <label>Entrega de factura
+            <select value={canal} disabled={procesando} onChange={(event) => { setEntregaSeleccion({ cliente: venta.cliente!.id, canal: event.target.value as CanalEntrega }); setDestinoConfirmado(false); }}>
+              <option value="NINGUNO">Sin envío / descargar PDF</option>
+              {venta.cliente?.telefono && <option value="WHATSAPP">WhatsApp</option>}
+              {venta.cliente?.correo && <option value="CORREO">Correo electrónico</option>}
+            </select>
+          </label>
+          {canal !== "NINGUNO" && <label><input type="checkbox" checked={destinoConfirmado} disabled={procesando} onChange={(e) => setDestinoConfirmado(e.target.checked)} />Confirmo el destino {destinatario} y el consentimiento del cliente para recibir su factura por {canal}.</label>}
+          <small>Sin proveedor configurado, descarga el PDF desde Gestión de ventas y compártelo manualmente. No se declarará enviado.</small>
+          {mensaje?.tipo === "error" && <p role="alert">{mensaje.texto}</p>}
+        </div>
+      </ConfirmarVentaModal>
       {confirmarStockCero && pagoPendiente && (
         <div className="venta-stock-modal-backdrop" role="presentation">
           <section className="venta-stock-modal" role="dialog" aria-modal="true" aria-labelledby="venta-stock-title">

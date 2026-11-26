@@ -1,4 +1,5 @@
 import { AlertTriangle, CheckCircle2, X } from "lucide-react";
+import type { ReactNode } from "react";
 
 interface Props {
   abierto: boolean;
@@ -8,6 +9,8 @@ interface Props {
   procesando?: boolean;
   onCancelar: () => void;
   onConfirmar?: () => void | Promise<void>;
+  resultado?: string;
+  children?: ReactNode;
 }
 
 export default function ConfirmarVentaModal({
@@ -18,6 +21,8 @@ export default function ConfirmarVentaModal({
   procesando = false,
   onCancelar,
   onConfirmar,
+  resultado,
+  children,
 }: Props) {
   if (!abierto) return null;
 
@@ -30,7 +35,7 @@ export default function ConfirmarVentaModal({
           </span>
           <div>
             <h2 id="venta-confirm-title">{exitoso ? "Venta realizada" : "¿Confirmar venta?"}</h2>
-            <p>{exitoso ? "La venta se registró correctamente." : "Revisa los datos antes de realizar el pago."}</p>
+            <p>{exitoso ? resultado ?? "La venta se registró correctamente." : "Revisa los datos antes de realizar el pago."}</p>
           </div>
           <button type="button" onClick={onCancelar} disabled={procesando} aria-label="Cerrar">
             <X size={20} />
@@ -42,6 +47,7 @@ export default function ConfirmarVentaModal({
           <div><span>Total</span><strong>{total} BOB</strong></div>
         </div>
 
+        {!exitoso && children}
         <footer>
           {!exitoso && <button type="button" className="venta-confirm-button venta-confirm-button--ghost" onClick={onCancelar} disabled={procesando}>Cancelar</button>}
           {exitoso ? (

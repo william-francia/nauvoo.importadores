@@ -63,6 +63,10 @@ Deno.serve(async (request) => {
     const db = serviceClient(); const user = await authenticatedUser(request, db);
     if (rateLimit(user.authId)) return json({ error: "Demasiadas solicitudes. Intente nuevamente en un minuto." }, 429, origin);
     const body = record(await request.json()); const action = String(body.action ?? ""); const repository = new SiatRepository(db);
+    if (action === "checkout-sale") {
+      const { checkoutSale } = await import("./sale-checkout.ts");
+      return json(await checkoutSale(body, request, repository, user.authId, dispatchWorker), 200, origin);
+    }
     if (action === "invoice-email-capabilities" || action === "invoice-email-send") {
       if (!isAdmin(String(user.profile.rol))) throw new Error("Documentos fiscales reservados a administración.");
       const apiKey = Deno.env.get("RESEND_API_KEY") ?? "", from = Deno.env.get("SIAT_EMAIL_FROM") ?? "", hmacKey = Deno.env.get("SIAT_NOTIFICACION_HMAC_KEY") ?? "";

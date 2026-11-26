@@ -9,10 +9,10 @@ export function reversalProblemCodes(response: Pick<SiatResponse, "codigoEstado"
 }
 
 // Plazo indicado por el SIN: día nueve del mes siguiente a la emisión, hora de Bolivia.
-export function assertFiscalOperationAllowed(invoice: Record<string, unknown>, payload: Record<string, unknown>, operation: "ANULAR" | "REVERTIR_ANULACION", now = Date.now()): void {
+export function assertFiscalOperationAllowed(invoice: Record<string, unknown>, payload: Record<string, unknown>, operation: "ANULAR" | "REVERTIR_ANULACION", now = Date.now(), checkoutVerified = false): void {
   if (["c2279bbb-e851-468b-afe6-8ebf0b436d28", "08dd889e-f2f7-4acb-be2e-2f911aae9919"].includes(String(invoice.id ?? "").toLowerCase())) throw new Error("FACTURA_PILOTO_ANTERIOR_PROTEGIDA");
   if (invoice.ambiente !== "PRUEBAS") throw new Error("OPERACION_SOLO_PILOTO");
-  if (invoice.origen_fiscal !== "PILOTO") throw new Error("OPERACION_REQUIERE_FACTURA_PILOTO_AISLADA");
+  if (invoice.origen_fiscal !== "PILOTO" && !(invoice.origen_fiscal === "VENTA" && invoice.venta_id && checkoutVerified)) throw new Error("OPERACION_REQUIERE_FACTURA_PILOTO_AISLADA");
   if (payload.operacion !== operation || payload.confirmacionExpresa !== true || typeof payload.actor !== "string" || !payload.actor) throw new Error("OPERACION_REQUIERE_CONFIRMACION_ADMINISTRATIVA");
   if (operation === "ANULAR" && payload.declaracionNoUtilizadaDDJJ !== true) throw new Error("OPERACION_REQUIERE_DECLARACION_DDJJ");
   if (invoice.fecha_reversion) throw new Error("FACTURA_YA_REVERTIDA");

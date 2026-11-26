@@ -339,7 +339,7 @@ export class SiatEngine {
   async cancel(job: Record<string, unknown>) {
     const invoiceId = stringValue(job.factura_id, "Factura"); const invoice = await this.repository.invoice(invoiceId); const payload = objectValue(job.payload); const config = await this.repository.configuration();
     if (invoice.estado_fiscal !== "ANULACION_PENDIENTE") throw new Error("La factura no está pendiente de anulación.");
-    assertFiscalOperationAllowed(invoice, payload, "ANULAR");
+    assertFiscalOperationAllowed(invoice, payload, "ANULAR", Date.now(), invoice.origen_fiscal === "VENTA" && await this.repository.checkoutInvoiceAllowed(invoiceId));
     const context = await this.currentInvoiceContext(config, invoice, payload); const cuf = stringValue(invoice.cuf, "CUF"); const motivo = numberValue(payload.motivo, "Motivo");
     const unknown = async (message: string, response?: SiatResponse) => {
       await this.repository.updateInvoice(invoiceId, { ultimo_error_sanitizado: message, ...(response ? { respuesta_anulacion: response.rawSanitizado, mensajes_siat: response.mensajes } : {}) });
@@ -367,7 +367,7 @@ export class SiatEngine {
   async reverse(job: Record<string, unknown>) {
     const invoiceId = stringValue(job.factura_id, "Factura"); const invoice = await this.repository.invoice(invoiceId); const config = await this.repository.configuration(); const payload = objectValue(job.payload);
     if (invoice.estado_fiscal !== "REVERSION_PENDIENTE") throw new Error("La factura no está pendiente de reversión.");
-    assertFiscalOperationAllowed(invoice, payload, "REVERTIR_ANULACION");
+    assertFiscalOperationAllowed(invoice, payload, "REVERTIR_ANULACION", Date.now(), invoice.origen_fiscal === "VENTA" && await this.repository.checkoutInvoiceAllowed(invoiceId));
     const context = await this.currentInvoiceContext(config, invoice, payload); const cuf = stringValue(invoice.cuf, "CUF");
     const unknown = async (message: string, response?: SiatResponse) => {
       await this.repository.updateInvoice(invoiceId, { ultimo_error_sanitizado: message, ...(response ? { respuesta_reversion: response.rawSanitizado, mensajes_siat: response.mensajes } : {}) });
@@ -632,7 +632,7 @@ export class SiatEngine {
     const existing = await this.repository.activeCufd(config, stringValue(cuis.id, "CUIS"));
     if (existing) { await this.repository.completeJob(String(job.id)); return; }
     const context = this.context(config, { codigoSucursal: numberValue(branch.codigo, "Sucursal"), codigoPuntoVenta: point ? numberValue(point.codigo, "Punto de venta") : null, cuis: stringValue(cuis.codigo, "CUIS") });
-    const result = await this.adapter.solicitarCufd(context);
+    const result = await this.adapter.solicitarCufd(context, objectValue(job.payload).sinReintentoAutomatico === true ? { retries: 0 } : undefined);
     if (!result.transaccion || !result.codigo || !result.codigoControl || !result.fechaVigencia) throw new Error(result.mensajes.map((item) => item.descripcion).join("; ") || "El SIN no entregó CUFD.");
     const fechaPrueba = new Date(Date.now() + Number(config.desfase_hora_sin_ms ?? 0));
     const cufPrueba = generateCuf({ nit: stringValue(config.nit, "NIT"), fechaEmision: fechaPrueba, codigoSucursal: 0, modalidad: 1, tipoEmision: 1, tipoFactura: 1, documentoSector: 1, numeroFactura: 1, codigoPuntoVenta: 0, codigoControl: result.codigoControl });

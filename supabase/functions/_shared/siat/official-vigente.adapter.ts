@@ -88,8 +88,8 @@ export class OfficialVigenteAdapter implements SiatAdapter {
     return { ...normalizeSiatResponse(raw), codigo: text(raw, "codigo"), fechaVigencia: text(raw, "fechaVigencia") };
   }
 
-  async solicitarCufd(context: SiatContext): Promise<CufdResult> {
-    const raw = await this.codes.call("cufd", "Cufd", orderedCufdFields(context), { retries: 1 });
+  async solicitarCufd(context: SiatContext, options?: { retries: number }): Promise<CufdResult> {
+    const raw = await this.codes.call("cufd", "Cufd", orderedCufdFields(context), { retries: options?.retries ?? 1 });
     return { ...normalizeSiatResponse(raw), codigo: text(raw, "codigo"), codigoControl: text(raw, "codigoControl"), direccion: text(raw, "direccion"), fechaVigencia: text(raw, "fechaVigencia") };
   }
 

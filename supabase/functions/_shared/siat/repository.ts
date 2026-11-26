@@ -7,6 +7,12 @@ const fail = (error: { message?: string } | null, fallback: string): never => { 
 export class SiatRepository {
   constructor(readonly db: SupabaseClient) {}
 
+  async checkoutInvoiceAllowed(id: string): Promise<boolean> {
+    const {data,error}=await this.db.rpc("siat_documento_checkout_9a",{p_factura:id});
+    if(error) fail(error,"No se pudo verificar el origen de la factura.");
+    return data===true;
+  }
+
   async configuration() {
     const { data, error } = await this.db.from("siat_configuracion").select("*").eq("id", true).single();
     if (error || !data) fail(error, "Configuración SIAT no disponible.");

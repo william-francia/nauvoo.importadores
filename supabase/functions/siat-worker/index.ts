@@ -59,8 +59,14 @@ Deno.serve(async (request) => {
   const allowCancellation = Deno.env.get("SIAT_ANULACION_PILOTO_HABILITADA") === "true" && (Deno.env.get("SIAT_NOTIFICACION_HMAC_KEY") ?? "").length >= 32;
   for (let index = 0; index < 10; index += 1) {
     const job = contingency ? await repository.claimContingency(workerId, Deno.env.get("SIAT_CONTINGENCIA_AGENTE_CODIGO")!) : await repository.claim(workerId, allowCancellation); if (!job) break;
-    try { await engine.process(job); processed += 1; }
-    catch (error) { const message = errorMessage(error); failures.push(message); await repository.retryJob(String(job.id), Number(job.intentos ?? 1), message, permanentError(message)); }
+    try {
+      await engine.process(job); processed += 1;
+      if (job.factura_id) {
+        try { const { deliverCheckout } = await import("./checkout-delivery.ts"); await deliverCheckout(repository, String(job.factura_id)); }
+        catch { failures.push("ENTREGA_PENDIENTE: la factura conserva su estado fiscal."); }
+      }
+    }
+    catch (error) { const message = errorMessage(error); failures.push(message); const payload = job.payload as Record<string, unknown> | null; await repository.retryJob(String(job.id), Number(job.intentos ?? 1), message, payload?.sinReintentoAutomatico === true || permanentError(message)); }
   }
   return json({ processed, failures });
 });

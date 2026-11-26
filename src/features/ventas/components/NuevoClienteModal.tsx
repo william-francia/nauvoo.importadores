@@ -43,13 +43,6 @@ export default function NuevoClienteModal({
     event.preventDefault();
     setError(null);
 
-    const correoCompleto = form.correo.trim().length > 0;
-    const telefonoCompleto = Boolean(form.telefono?.trim());
-    if (!correoCompleto && !telefonoCompleto) {
-      setError("Debes ingresar un correo electrónico o un teléfono.");
-      return;
-    }
-
     setGuardando(true);
 
     try {
@@ -108,13 +101,13 @@ export default function NuevoClienteModal({
             </label>
 
             <label className="clients-field">
-              <span>Correo Electrónico<strong>*</strong></span>
-              <input required={!form.telefono?.trim()} type="email" placeholder="cliente@correo.com" value={form.correo} onChange={(event) => change("correo", event.target.value)} />
+              <span>Correo Electrónico (opcional)</span>
+              <input type="email" placeholder="cliente@correo.com" value={form.correo} onChange={(event) => change("correo", event.target.value)} />
             </label>
 
             <label className="clients-field">
               <span>Teléfonos</span>
-              <input required={!form.correo.trim()} type="tel" placeholder="Ej. 70000000" value={form.telefono ?? ""} onChange={(event) => change("telefono", event.target.value)} />
+              <input type="tel" placeholder="Ej. 70000000" value={form.telefono ?? ""} onChange={(event) => change("telefono", event.target.value)} />
             </label>
           </div>
 
