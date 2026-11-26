@@ -26,10 +26,10 @@ import { useActualizarProducto, useCrearProducto, useProductos } from "../../fea
 
 const INITIAL_VALUES: ProductoFormValues = {
   actividadEconomicaCodigo:
-    "475200",
+    "4752100",
 
   homologadoCodigo:
-    "62161",
+    "",
 
   nombre: "",
 

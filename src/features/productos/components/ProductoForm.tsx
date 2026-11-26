@@ -14,6 +14,7 @@ import type {
   ProductoFormValues,
   StockPorLocal,
 } from "../types/productos.types";
+import { ACTIVIDADES_ECONOMICAS } from "../constants/productos.constants";
 
 interface Props {
   mode:
@@ -125,6 +126,15 @@ export default function ProductoForm({
     >
       <div className="producto-form-top">
         <div className="producto-form-main">
+          <section className="producto-form-section">
+            <h2>HOMOLOGACIÓN</h2>
+            <label className="producto-field">
+              <span>Actividad Económica</span>
+              <textarea readOnly rows={2} value={form.actividadEconomicaCodigo === "4752100" || mode === "create"
+                ? `P - 4752100 - ${ACTIVIDADES_ECONOMICAS.find(item => item.codigo === "4752100")?.nombre ?? ""}`
+                : form.actividadEconomicaCodigo ? `${form.actividadEconomicaCodigo} - ${ACTIVIDADES_ECONOMICAS.find(item => item.codigo === form.actividadEconomicaCodigo)?.nombre ?? ""}` : "Sin actividad económica registrada"} />
+            </label>
+          </section>
           <section className="producto-form-section">
             <h2>
               INFORMACIÓN DEL PRODUCTO

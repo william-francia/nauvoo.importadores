@@ -18,6 +18,7 @@ interface ProductoRow {
   id: string;
   codigo_interno: string;
   codigo_producto_sin: number | null;
+  actividad_economica: string | null;
   nombre: string;
   descripcion: string | null;
   numero: string | null;
@@ -58,8 +59,8 @@ function mapearProducto(row: ProductoRow): Producto {
   const codigoSin = row.codigo_producto_sin ? String(row.codigo_producto_sin) : "";
   return {
     id: row.id,
-    actividadEconomicaCodigo: "",
-    actividadEconomicaNombre: ACTIVIDADES_ECONOMICAS[0]?.nombre ?? "",
+    actividadEconomicaCodigo: row.actividad_economica ?? "",
+    actividadEconomicaNombre: ACTIVIDADES_ECONOMICAS.find(item => item.codigo === row.actividad_economica)?.nombre ?? "",
     homologadoCodigo: codigoSin,
     homologadoNombre: PRODUCTOS_HOMOLOGADOS.find((item) => item.codigo === codigoSin)?.nombre ?? "",
     nombre: row.nombre,
@@ -99,7 +100,7 @@ function productoPayload(values: ProductoFormValues) {
 export async function listarProductos(): Promise<Producto[]> {
   const { data, error } = await supabase
     .from("productos")
-    .select(`id, codigo_interno, codigo_producto_sin, nombre, descripcion, numero, medida, precio_produccion, precio_12, precio_pieza, activo,
+    .select(`id, codigo_interno, codigo_producto_sin, actividad_economica, nombre, descripcion, numero, medida, precio_produccion, precio_12, precio_pieza, activo,
       stock_por_almacen (cantidad_disponible, almacen:almacenes (id, codigo, nombre, activo))`)
     .order("nombre");
   if (error) throw new Error(error.message || "No se pudieron cargar los productos.");

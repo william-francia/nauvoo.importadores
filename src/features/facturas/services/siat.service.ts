@@ -288,12 +288,12 @@ export async function listarCatalogosHomologacion(): Promise<CatalogosHomologaci
 
 export async function listarHomologacionesProductos(): Promise<ProductoHomologacion[]> {
   const [products, homologations] = await Promise.all([
-    supabase.from("productos").select("id,codigo_interno,nombre").eq("activo", true).order("nombre"),
+    supabase.from("productos").select("id,codigo_interno,nombre,actividad_economica").eq("activo", true).order("nombre"),
     supabase.from("siat_producto_homologaciones").select("*").eq("version_normativa", "SIAT_VIGENTE"),
   ]);
   if (products.error || homologations.error) throw siatError(products.error ?? homologations.error, "No se pudo cargar la homologación de productos.");
   const byProduct = new Map((homologations.data ?? []).map((raw) => { const row = object(raw); return [text(row.producto_id), row] as const; }));
-  return (products.data ?? []).map((raw) => { const product = object(raw); const homologation = object(byProduct.get(text(product.id))); return { productoId: text(product.id), codigoInterno: text(product.codigo_interno), nombre: text(product.nombre), codigoProductoSin: text(homologation.codigo_producto_sin), actividadEconomica: text(homologation.actividad_economica), unidadMedidaSin: text(homologation.unidad_medida_sin), origen: text(homologation.origen, "IMPORTADO") as ProductoHomologacion["origen"], versionCatalogo: text(homologation.version_catalogo), versionNormativa: text(homologation.version_normativa, "SIAT_VIGENTE") as ProductoHomologacion["versionNormativa"], estado: text(homologation.estado, "PENDIENTE") as ProductoHomologacion["estado"] }; });
+  return (products.data ?? []).map((raw) => { const product = object(raw); const homologation = object(byProduct.get(text(product.id))); return { productoId: text(product.id), codigoInterno: text(product.codigo_interno), nombre: text(product.nombre), codigoProductoSin: text(homologation.codigo_producto_sin), actividadEconomica: text(homologation.actividad_economica ?? product.actividad_economica), unidadMedidaSin: text(homologation.unidad_medida_sin), origen: text(homologation.origen, "IMPORTADO") as ProductoHomologacion["origen"], versionCatalogo: text(homologation.version_catalogo), versionNormativa: text(homologation.version_normativa, "SIAT_VIGENTE") as ProductoHomologacion["versionNormativa"], estado: text(homologation.estado, "PENDIENTE") as ProductoHomologacion["estado"] }; });
 }
 
 export async function guardarHomologacionProducto(producto: Pick<ProductoHomologacion, "productoId" | "codigoInterno">, input: HomologacionProductoInput): Promise<void> {

@@ -62,6 +62,10 @@ export const UNIDADES_MEDIDA = [
 
 export const ACTIVIDADES_ECONOMICAS = [
   {
+    codigo: "4752100",
+    nombre: "Venta al por menor de artículos de ferretería, fontanería y calefacción",
+  },
+  {
     codigo: "475200",
     nombre:
       "VENTA AL POR MENOR DE ARTÍCULOS DE FERRETERÍA, PINTURAS Y PRODUCTOS DE VIDRIO",
